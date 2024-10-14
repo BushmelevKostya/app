@@ -100,7 +100,7 @@ h1 {
   background-color: #f1f1f1;
 }
 
-.movie-table button {
+.movie-table button, .movie-actions button, .modal-content button{
   padding: 5px 10px;
   background-color: #007bff;
   color: white;

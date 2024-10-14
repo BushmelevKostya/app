@@ -2,16 +2,16 @@
   <header class="header">
     <button class="menu-btn">Меню</button>
     <h1>Лабораторная работа</h1>
-    <button class="login-btn" (click)="navigateToLogin()">Войти</button>
+    <button class="login-btn" (click)="login()">Войти</button>
   </header>
 
   <div class="search-bar">
     <input type="text" placeholder="Искать по ID..." />
-    <button (click)="toDoMethod()">Поиск</button>
+    <button (click)="changeSearchFlag()">Поиск</button>
   </div>
 
   <div class="movie-actions">
-    <button (click)="toDoMethod()">Создать фильм</button>
+    <button (click)="changeCreateFlag()">Создать фильм</button>
   </div>
 
   <table class="movie-table">
@@ -33,17 +33,17 @@
       <td>{{ movie.totalBoxOffice }}</td>
       <td>{{ movie.mpaaRating }}</td>
       <td>
-        <button (click)="updateMovie(movie.id)">Обновить</button>
-        <button class="delete-btn" (click)="deleteMovie(movie.id)">Удалить</button>
+        <button (click)="changeUpdateFlag()">Обновить</button>
+        <button class="delete-btn" (click)="changeDeleteFlag()">Удалить</button>
       </td>
     </tr>
     </tbody>
   </table>
 
   <!-- Модальное окно для создания фильма -->
-  <div class="modal" *ngIf="toDoMethod">
+  <div class="modal" *ngIf=createFlag>
     <div class="modal-content">
-      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <span class="close-btn" (click)="changeCreateFlag()">&times;</span>
       <h2>Создать фильм</h2>
       <form (ngSubmit)="createMovie()">
         <label for="name">Название</label>
@@ -68,9 +68,9 @@
     </div>
   </div>
 
-  <div class="modal" *ngIf="toDoMethod">
+  <div class="modal" *ngIf="updateFlag">
     <div class="modal-content">
-      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <span class="close-btn" (click)="changeUpdateFlag()">&times;</span>
       <h2>Обновить фильм</h2>
       <form (ngSubmit)="updateMovie(movie.id)">
         <label for="name">Название</label>
@@ -95,9 +95,9 @@
     </div>
   </div>
 
-  <div class="modal" *ngIf="toDoMethod">
+  <div class="modal" *ngIf="deleteFlag">
     <div class="modal-content">
-      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <span class="close-btn" (click)="changeDeleteFlag()">&times;</span>
       <h2>Удалить фильм</h2>
       <p>Вы уверены, что хотите удалить фильм "{{ movie.name }}"?</p>
       <button (click)="deleteMovie(movie.id)">Да</button>
@@ -105,11 +105,11 @@
     </div>
   </div>
 
-  <div class="modal" *ngIf="toDoMethod">
+  <div class="modal" *ngIf="searchFlag">
     <div class="modal-content">
-      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <span class="close-btn" (click)="changeSearchFlag()">&times;</span>
       <h2>Поиск фильма</h2>
-      <form (ngSubmit)="searchMovieById()">
+      <form (ngSubmit)="toDoMethod()">
         <label for="searchId">ID фильма</label>
         <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" required />
 
@@ -117,4 +117,5 @@
       </form>
     </div>
   </div>
+
 </div>
