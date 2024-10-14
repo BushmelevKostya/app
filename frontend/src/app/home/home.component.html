@@ -1,9 +1,17 @@
 <div class="home-container">
   <header class="header">
-    <button class="menu-btn">Меню</button>
+    <button class="menu-btn" (click)="changeMenuOpen()">Меню</button>
     <h1>Лабораторная работа</h1>
-    <button class="login-btn" (click)="login()">Войти</button>
+    <button class="login-btn" (click)="navigateTo('/login')">Войти</button>
   </header>
+
+  <div class="side-menu" [class.open]="menuOpen">
+    <ul>
+      <li><a (click)="navigateTo('/visualize')">Визуализация объектов</a></li>
+      <li><a (click)="navigateTo('/admin-login')">Зайти как администратор</a></li>
+      <li><a (click)="navigateTo('/register')">Зарегистрироваться</a></li>
+    </ul>
+  </div>
 
   <div class="search-bar">
     <input type="text" placeholder="Искать по ID..." />

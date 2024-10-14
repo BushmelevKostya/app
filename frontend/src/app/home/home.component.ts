@@ -19,6 +19,7 @@ export class HomeComponent {
   updateFlag = 0
   deleteFlag = 0
   searchFlag = 0
+  menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
 
@@ -43,14 +44,6 @@ export class HomeComponent {
   movies = [this.movie];
   constructor( private router: Router ) {}
 
-  login() {
-    this.router.navigate(['/login'])
-  }
-
-  home() {
-    this.router.navigate(['/home'])
-  }
-
   createMovie() {
   }
 
@@ -70,6 +63,10 @@ export class HomeComponent {
     this.searchFlag = this.searchFlag ? 0 : 1
   }
 
+  changeMenuOpen() {
+    this.menuOpen = this.menuOpen ? 0 : 1
+  }
+
   searchMovie() {
   }
 
@@ -85,5 +82,9 @@ export class HomeComponent {
 
   sortTable(str: String) {
     //TODO
+  }
+
+  navigateTo(address: String) {
+    this.router.navigate([address])
   }
 }
