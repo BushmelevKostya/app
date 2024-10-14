@@ -19,9 +19,17 @@ export class HomeComponent {
   updateFlag = 0
   deleteFlag = 0
   searchFlag = 0
+  notsFlag = 0
+  isAdmin = 1
   menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
+  request = {
+    id: 1,
+    userEmail: "kosbush@gmail.com"
+  }
+  requests = [this.request]
+
 
   movie = {
     id: 1,
@@ -65,6 +73,10 @@ export class HomeComponent {
 
   changeMenuOpen() {
     this.menuOpen = this.menuOpen ? 0 : 1
+  }
+
+  changeNotsFlag() {
+    this.notsFlag = this.notsFlag ? 0 : 1
   }
 
   searchMovie() {
