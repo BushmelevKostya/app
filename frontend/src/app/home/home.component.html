@@ -1,109 +1,120 @@
 <div class="home-container">
   <header class="header">
     <button class="menu-btn">Меню</button>
+    <h1>Лабораторная работа</h1>
     <button class="login-btn" (click)="navigateToLogin()">Войти</button>
   </header>
 
-  <h1>{{ title }}</h1>
-
   <div class="search-bar">
-    <input type="number" [(ngModel)]="searchId" placeholder="Введите ID фильма" />
-    <button (click)="searchMovieById()">Найти</button>
+    <input type="text" placeholder="Искать по ID..." />
+    <button (click)="toDoMethod()">Поиск</button>
   </div>
 
-  <form (ngSubmit)="createMovie()" class="movie-form">
-    <label for="name">Название фильма:</label>
-    <input id="name" [(ngModel)]="movie.name" name="name" required />
-
-    <!-- Координаты -->
-    <label for="coordinatesX">Координаты X:</label>
-    <input id="coordinatesX" type="number" [(ngModel)]="movie.coordinates.x" name="coordinatesX" required />
-
-    <label for="coordinatesY">Координаты Y:</label>
-    <input id="coordinatesY" type="number" [(ngModel)]="movie.coordinates.y" name="coordinatesY" required />
-
-    <label for="oscarsCount">Количество Оскаров:</label>
-    <input id="oscarsCount" type="number" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required />
-
-    <label for="budget">Бюджет:</label>
-    <input id="budget" type="number" [(ngModel)]="movie.budget" name="budget" required />
-
-    <label for="totalBoxOffice">Общий сбор:</label>
-    <input id="totalBoxOffice" type="number" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required />
-
-    <label for="mpaaRating">Рейтинг MPAA:</label>
-    <select id="mpaaRating" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
-      <option value="G">G</option>
-      <option value="PG">PG</option>
-      <option value="PG_13">PG-13</option>
-      <option value="R">R</option>
-    </select>
-
-    <label for="directorName">Имя режиссера:</label>
-    <input id="directorName" [(ngModel)]="movie.director.name" name="directorName" />
-
-    <label for="directorHeight">Рост режиссера:</label>
-    <input id="directorHeight" type="number" [(ngModel)]="movie.director.height" name="directorHeight" />
-
-    <label for="directorNationality">Национальность режиссера:</label>
-    <select id="directorNationality" [(ngModel)]="movie.director.nationality" name="directorNationality">
-      <option value="SPAIN">Испания</option>
-      <option value="INDIA">Индия</option>
-      <option value="VATICAN">Ватикан</option>
-    </select>
-
-    <label for="tagline">Тэглайн:</label>
-    <input id="tagline" [(ngModel)]="movie.tagline" name="tagline" required />
-
-    <label for="genre">Жанр:</label>
-    <select id="genre" [(ngModel)]="movie.genre" name="genre">
-      <option value="ACTION">Экшн</option>
-      <option value="TRAGEDY">Трагедия</option>
-      <option value="THRILLER">Триллер</option>
-      <option value="FANTASY">Фэнтези</option>
-      <option value="SCIENCE_FICTION">Научная фантастика</option>
-    </select>
-
-    <button type="submit">Создать фильм</button>
-  </form>
+  <div class="movie-actions">
+    <button (click)="toDoMethod()">Создать фильм</button>
+  </div>
 
   <table class="movie-table">
     <thead>
     <tr>
-      <th>ID</th>
-      <th>Название</th>
-      <th>Координаты</th>
-      <th>Оскары</th>
-      <th>Бюджет</th>
-      <th>Режиссер</th>
-      <th>Рейтинг MPAA</th>
-      <th>Тэглайн</th>
-      <th>Жанр</th>
+      <th (click)="sortTable('name')">Название</th>
+      <th (click)="sortTable('oscarsCount')">Оскары</th>
+      <th (click)="sortTable('budget')">Бюджет</th>
+      <th (click)="sortTable('totalBoxOffice')">Сборы</th>
+      <th (click)="sortTable('mpaaRating')">MPAA Рейтинг</th>
       <th>Действия</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let movie of movies">
-      <td>{{ movie.id }}</td>
       <td>{{ movie.name }}</td>
-      <td>{{ movie.coordinates.x }}, {{ movie.coordinates.y }}</td>
       <td>{{ movie.oscarsCount }}</td>
       <td>{{ movie.budget }}</td>
-      <td>{{ movie.director.name }}</td>
+      <td>{{ movie.totalBoxOffice }}</td>
       <td>{{ movie.mpaaRating }}</td>
-      <td>{{ movie.tagline }}</td>
-      <td>{{ movie.genre }}</td>
       <td>
         <button (click)="updateMovie(movie.id)">Обновить</button>
-        <button (click)="deleteMovie(movie.id)">Удалить</button>
+        <button class="delete-btn" (click)="deleteMovie(movie.id)">Удалить</button>
       </td>
     </tr>
     </tbody>
   </table>
 
-  <div class="pagination">
-    <button class="prev-page">Предыдущая</button>
-    <button class="next-page">Следующая</button>
+  <!-- Модальное окно для создания фильма -->
+  <div class="modal" *ngIf="toDoMethod">
+    <div class="modal-content">
+      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <h2>Создать фильм</h2>
+      <form (ngSubmit)="createMovie()">
+        <label for="name">Название</label>
+        <input type="text" id="name1" [(ngModel)]="movie.name" name="name" required />
+
+        <label for="oscarsCount">Количество Оскаров</label>
+        <input type="number" id="oscarsCount1" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required />
+
+        <label for="budget">Бюджет</label>
+        <input type="number" id="budget1" [(ngModel)]="movie.budget" name="budget" required />
+
+        <label for="totalBoxOffice">Сборы</label>
+        <input type="number" id="totalBoxOffice1" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required />
+
+        <label for="mpaaRating">MPAA Рейтинг</label>
+        <select id="mpaaRating1" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
+          <option *ngFor="let rating of movie.mpaaRating" [value]="rating">{{ rating }}</option>
+        </select>
+
+        <button type="submit">Создать</button>
+      </form>
+    </div>
   </div>
 
+  <div class="modal" *ngIf="toDoMethod">
+    <div class="modal-content">
+      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <h2>Обновить фильм</h2>
+      <form (ngSubmit)="updateMovie(movie.id)">
+        <label for="name">Название</label>
+        <input type="text" id="name" [(ngModel)]="movie.name" name="name" required />
+
+        <label for="oscarsCount">Количество Оскаров</label>
+        <input type="number" id="oscarsCount" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required />
+
+        <label for="budget">Бюджет</label>
+        <input type="number" id="budget" [(ngModel)]="movie.budget" name="budget" required />
+
+        <label for="totalBoxOffice">Сборы</label>
+        <input type="number" id="totalBoxOffice" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required />
+
+        <label for="mpaaRating">MPAA Рейтинг</label>
+        <select id="mpaaRating" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
+          <option *ngFor="let rating of movie.mpaaRating" [value]="rating">{{ rating }}</option>
+        </select>
+
+        <button type="submit">Обновить</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="toDoMethod">
+    <div class="modal-content">
+      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <h2>Удалить фильм</h2>
+      <p>Вы уверены, что хотите удалить фильм "{{ movie.name }}"?</p>
+      <button (click)="deleteMovie(movie.id)">Да</button>
+      <button (click)="toDoMethod()">Нет</button>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="toDoMethod">
+    <div class="modal-content">
+      <span class="close-btn" (click)="toDoMethod()">&times;</span>
+      <h2>Поиск фильма</h2>
+      <form (ngSubmit)="searchMovieById()">
+        <label for="searchId">ID фильма</label>
+        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" required />
+
+        <button type="submit">Найти</button>
+      </form>
+    </div>
+  </div>
 </div>

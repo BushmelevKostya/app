@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router'
 import {FormsModule} from '@angular/forms';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     FormsModule,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -54,6 +55,14 @@ export class HomeComponent {
   }
 
   deleteMovie(id: number) {
+    //TODO
+  }
+
+  toDoMethod() {
+    //TODO
+  }
+
+  sortTable(str: String) {
     //TODO
   }
 }

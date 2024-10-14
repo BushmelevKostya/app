@@ -1,18 +1,13 @@
-<div class="login-container">
-  <h2>Авторизация</h2>
-  <form>
+<div class="auth-container">
+  <h2>Вход</h2>
+  <form (ngSubmit)="home()">
     <label for="email">Email</label>
-    <input id="email" type="email" placeholder="Введите email" name="email">
-<!--    <input id="email" type="email" placeholder="Введите email" [(ngModel)]="email" name="email">-->
+    <input type="email" id="email" name="email" required />
 
     <label for="password">Пароль</label>
-    <input id="password" type="password" placeholder="Введите пароль" name="password">
-<!--    <input id="password" type="password" placeholder="Введите пароль" [(ngModel)]="password" name="password">-->
+    <input type="password" id="password" name="password" required />
 
-    <button>Войти</button>
-<!--    <button (click)="login()">Войти</button>-->
+    <button type="submit">Войти</button>
   </form>
-
-  <button>Регистрация</button>
-<!--  <button (click)="redirectToRegistration()">Регистрация</button>-->
+  <p>Нет аккаунта? <a routerLink="/register">Зарегистрироваться</a></p>
 </div>
