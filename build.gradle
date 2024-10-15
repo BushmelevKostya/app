@@ -11,6 +11,11 @@ node {
     download = false
 }
 
+task npmBuild(type: NpmTask) {
+    args = ['run', 'build']
+    workingDir = file('frontend')
+}
+
 processResources.dependsOn npmBuild
 
 group = 'itmo'

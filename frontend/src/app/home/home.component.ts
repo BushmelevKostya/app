@@ -76,6 +76,7 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       })
     });
+    this.ngOnInit();
   }
 
   movieForm: FormGroup
@@ -113,7 +114,8 @@ export class HomeComponent {
     goldenPalmCount: 0,
     usaBoxOffice: null,
     tagline: '',
-    genre: ''
+    genre: '',
+    creationDate: "23"
   };
 
   movies = [this.movie];
@@ -203,5 +205,32 @@ export class HomeComponent {
   }
 
   loadExistingOperator() {
+  }
+
+  ngOnInit() {
+    this.movieForm.valueChanges.subscribe((newValue) => {
+      this.updateMovies(newValue);
+    });
+  }
+
+  updateMovies(data: any) {
+    this.movies = [{
+      name: data.name,
+      creationDate: data.creationDate,
+      oscarsCount: data.oscarsCount,
+      budget: data.budget,
+      totalBoxOffice: data.totalBoxOffice,
+      mpaaRating: data.mpaaRating,
+      length: data.length,
+      goldenPalmCount: data.goldenPalmCount,
+      usaBoxOffice: data.usaBoxOffice,
+      tagline: data.tagline,
+      genre: data.genre,
+      coordinates: data.coordinates,
+      director: data.director,
+      screenwriter: data.screenwriter,
+      operator: data.operator,
+      id: 0
+    }];
   }
 }

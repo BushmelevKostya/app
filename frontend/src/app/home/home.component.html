@@ -29,31 +29,64 @@
     <button (click)="changeCreateFlag()">Создать фильм</button>
   </div>
 
-  <table class="movie-table">
-    <thead>
-    <tr>
-      <th (click)="sortTable('name')">Название</th>
-      <th (click)="sortTable('oscarsCount')">Оскары</th>
-      <th (click)="sortTable('budget')">Бюджет</th>
-      <th (click)="sortTable('totalBoxOffice')">Сборы</th>
-      <th (click)="sortTable('mpaaRating')">MPAA Рейтинг</th>
-      <th>Действия</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let movie of movies">
-      <td>{{ movie.name }}</td>
-      <td>{{ movie.oscarsCount }}</td>
-      <td>{{ movie.budget }}</td>
-      <td>{{ movie.totalBoxOffice }}</td>
-      <td>{{ movie.mpaaRating }}</td>
-      <td>
-        <button (click)="changeUpdateFlag()">Обновить</button>
-        <button class="delete-btn" (click)="changeDeleteFlag()">Удалить</button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+      <tr>
+        <th>Name</th>
+        <th>Creation Date</th>
+        <th>Oscars Count</th>
+        <th>Budget</th>
+        <th>Total Box Office</th>
+        <th>MPAA Rating</th>
+        <th>Length</th>
+        <th>Golden Palm Count</th>
+        <th>USA Box Office</th>
+        <th>Tagline</th>
+        <th>Genre</th>
+        <th>Coordinates (X, Y)</th>
+        <th>Director (Name, Eye Color, Hair Color, Location)</th>
+        <th>Screenwriter (Name, Eye Color, Hair Color, Location)</th>
+        <th>Operator (Name, Eye Color, Hair Color, Location)</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let movie of movies">
+        <td>{{ movie.name }}</td>
+        <td>{{ movie.creationDate }}</td>
+        <td>{{ movie.oscarsCount }}</td>
+        <td>{{ movie.budget }}</td>
+        <td>{{ movie.totalBoxOffice }}</td>
+        <td>{{ movie.mpaaRating }}</td>
+        <td>{{ movie.length }}</td>
+        <td>{{ movie.goldenPalmCount }}</td>
+        <td>{{ movie.usaBoxOffice }}</td>
+        <td>{{ movie.tagline }}</td>
+        <td>{{ movie.genre }}</td>
+        <td>{{ movie.coordinates.x }}, {{ movie.coordinates.y }}</td>
+        <td>
+          {{ movie.director.name }},
+          {{ movie.director.eyeColor }},
+          {{ movie.director.hairColor }},
+          ({{ movie.director.location.x }}, {{ movie.director.location.y }}, {{ movie.director.location.z }} - {{ movie.director.location.name }})
+        </td>
+        <td>
+          {{ movie.screenwriter.name }},
+          {{ movie.screenwriter.eyeColor }},
+          {{ movie.screenwriter.hairColor }},
+          ({{ movie.screenwriter.location.x }}, {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }} - {{ movie.screenwriter.location.name }})
+        </td>
+        <td>
+          {{ movie.operator.name }},
+          {{ movie.operator.eyeColor }},
+          {{ movie.operator.hairColor }},
+          ({{ movie.operator.location.x }}, {{ movie.operator.location.y }}, {{ movie.operator.location.z }} - {{ movie.operator.location.name }})
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
 
   <!-- Модальное окно для создания фильма -->
   <div class="modal" *ngIf="createFlag">
