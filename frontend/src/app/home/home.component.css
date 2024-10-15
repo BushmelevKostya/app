@@ -379,12 +379,11 @@ h1 {
 }
 
 .table {
-  width: 100%;
   table-layout: fixed; /* Фиксированная ширина ячеек для адаптации */
 }
 
 thead th {
-  position: sticky;
+  /*position: sticky;*/
   top: 0;
   background-color: #343a40;
   color: white;
@@ -393,4 +392,69 @@ thead th {
 
 tbody td {
   white-space: nowrap;
+}
+
+.table-wrapper {
+  overflow: auto;
+  max-height: 500px;
+  max-width: 100%;
+}
+
+.movie-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.movie-table th, .movie-table td {
+  border: 1px solid #888;
+  padding: 8px;
+}
+
+.object-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.object-attributes {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px; /* Ограничение высоты для вертикальной прокрутки */
+}
+
+.movie-table {
+  width: 100%;
+  /*border-collapse: collapse;*/
+}
+
+.movie-table th,
+.movie-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.movie-table th {
+  background-color: #333;
+  /*position: sticky;*/
+  top: 0; /* Зафиксировать заголовок при прокрутке */
+}
+
+.object-header {
+  font-weight: bold;
+  border-bottom: 1px solid #444;
+  margin-bottom: 4px;
+}
+
+.object-attributes {
+  padding-left: 10px; /* Отступ для значений атрибутов */
+}
+
+.attribute-label {
+  font-weight: bold;
 }

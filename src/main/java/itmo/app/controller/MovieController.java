@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:4200")
 public class MovieController {
 	private MovieCollection movieCollection = MovieCollection.getInstance();
-	@PostMapping("/create")
+	@PostMapping("/action")
 	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
 		movieCollection.add(movie);
 		movieCollection.printCollection();

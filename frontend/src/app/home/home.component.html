@@ -21,7 +21,7 @@
   </div>
 
   <div class="search-bar">
-    <input type="text" placeholder="Искать по ID..." />
+    <input type="text" placeholder="Искать по ID..."/>
     <button (click)="changeSearchFlag()">Поиск</button>
   </div>
 
@@ -29,10 +29,11 @@
     <button (click)="changeCreateFlag()">Создать фильм</button>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-      <thead class="thead-dark">
+  <div class="table-wrapper">
+    <table class="movie-table">
+      <thead>
       <tr>
+        <th>ID</th>
         <th>Name</th>
         <th>Creation Date</th>
         <th>Oscars Count</th>
@@ -44,14 +45,16 @@
         <th>USA Box Office</th>
         <th>Tagline</th>
         <th>Genre</th>
-        <th>Coordinates (X, Y)</th>
-        <th>Director (Name, Eye Color, Hair Color, Location)</th>
-        <th>Screenwriter (Name, Eye Color, Hair Color, Location)</th>
-        <th>Operator (Name, Eye Color, Hair Color, Location)</th>
+        <th>Coordinates</th>
+        <th>Director</th>
+        <th>Screenwriter</th>
+        <th>Operator</th>
+        <th>Actions</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let movie of movies">
+        <td>{{ movie.id }}</td>
         <td>{{ movie.name }}</td>
         <td>{{ movie.creationDate }}</td>
         <td>{{ movie.oscarsCount }}</td>
@@ -63,24 +66,57 @@
         <td>{{ movie.usaBoxOffice }}</td>
         <td>{{ movie.tagline }}</td>
         <td>{{ movie.genre }}</td>
-        <td>{{ movie.coordinates.x }}, {{ movie.coordinates.y }}</td>
+
+        <!-- Coordinates -->
         <td>
-          {{ movie.director.name }},
-          {{ movie.director.eyeColor }},
-          {{ movie.director.hairColor }},
-          ({{ movie.director.location.x }}, {{ movie.director.location.y }}, {{ movie.director.location.z }} - {{ movie.director.location.name }})
+          <div class="attribute-label">X:</div>
+          <div>{{ movie.coordinates.x }}</div>
+          <div class="attribute-label">Y:</div>
+          <div>{{ movie.coordinates.y }}</div>
         </td>
+
+        <!-- Director -->
         <td>
-          {{ movie.screenwriter.name }},
-          {{ movie.screenwriter.eyeColor }},
-          {{ movie.screenwriter.hairColor }},
-          ({{ movie.screenwriter.location.x }}, {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }} - {{ movie.screenwriter.location.name }})
+          <div class="object-header">Director's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ movie.director.name }}</div>
+            <div>Eye Color: {{ movie.director.eyeColor }}</div>
+            <div>Hair Color: {{ movie.director.hairColor }}</div>
+            <div>Location: {{ movie.director.location.name }} ({{ movie.director.location.x }}, {{ movie.director.location.y }}, {{ movie.director.location.z }})</div>
+            <div>Height: {{ movie.director.height }}</div>
+            <div>Nationality: {{ movie.director.nationality }}</div>
+          </div>
         </td>
+
+        <!-- Screenwriter -->
         <td>
-          {{ movie.operator.name }},
-          {{ movie.operator.eyeColor }},
-          {{ movie.operator.hairColor }},
-          ({{ movie.operator.location.x }}, {{ movie.operator.location.y }}, {{ movie.operator.location.z }} - {{ movie.operator.location.name }})
+          <div class="object-header">Screenwriter's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ movie.screenwriter.name }}</div>
+            <div>Eye Color: {{ movie.screenwriter.eyeColor }}</div>
+            <div>Hair Color: {{ movie.screenwriter.hairColor }}</div>
+            <div>Location: {{ movie.screenwriter.location.name }} ({{ movie.screenwriter.location.x }}, {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }})</div>
+            <div>Height: {{ movie.screenwriter.height }}</div>
+            <div>Nationality: {{ movie.screenwriter.nationality }}</div>
+          </div>
+        </td>
+
+        <!-- Operator -->
+        <td>
+          <div class="object-header">Operator's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ movie.operator.name }}</div>
+            <div>Eye Color: {{ movie.operator.eyeColor }}</div>
+            <div>Hair Color: {{ movie.operator.hairColor }}</div>
+            <div>Location: {{ movie.operator.location.name }} ({{ movie.operator.location.x }}, {{ movie.operator.location.y }}, {{ movie.operator.location.z }})</div>
+            <div>Height: {{ movie.operator.height }}</div>
+            <div>Nationality: {{ movie.operator.nationality }}</div>
+          </div>
+        </td>
+
+        <td>
+          <button (click)="updateMovie(movie)">Обновить</button>
+          <button (click)="deleteMovie(movie.id)">Удалить</button>
         </td>
       </tr>
       </tbody>
@@ -95,19 +131,19 @@
       <h2>Создать фильм</h2>
       <form [formGroup]="movieForm" (ngSubmit)="createMovie()">
         <label for="name1">Name:</label>
-        <input id="name1" formControlName="name" />
+        <input id="name1" formControlName="name"/>
 
         <label for="creationDate1">Creation Date: </label>
-        <input id="creationDate1" formControlName="creationDate" />
+        <input id="creationDate1" formControlName="creationDate"/>
 
         <label for="oscarsCount1">Oscars Count:</label>
-        <input id="oscarsCount1" type="number" formControlName="oscarsCount" />
+        <input id="oscarsCount1" type="number" formControlName="oscarsCount"/>
 
         <label for="budget1">Budget:</label>
-        <input id="budget1" type="number" formControlName="budget" />
+        <input id="budget1" type="number" formControlName="budget"/>
 
         <label for="totalBoxOffice1">Total Box Office:</label>
-        <input id="totalBoxOffice1" type="number" formControlName="totalBoxOffice" />
+        <input id="totalBoxOffice1" type="number" formControlName="totalBoxOffice"/>
 
         <label for="mpaaRating1">MPAA Rating:</label>
         <select id="mpaaRating1" formControlName="mpaaRating">
@@ -118,16 +154,16 @@
         </select>
 
         <label for="length1">Length:</label>
-        <input id="length1" type="number" formControlName="length" />
+        <input id="length1" type="number" formControlName="length"/>
 
         <label for="goldenPalmCount1">Golden Palm Count:</label>
-        <input id="goldenPalmCount1" type="number" formControlName="goldenPalmCount" />
+        <input id="goldenPalmCount1" type="number" formControlName="goldenPalmCount"/>
 
         <label for="usaBoxOffice1">Usa Box Office:</label>
-        <input id="usaBoxOffice1" type="number" formControlName="usaBoxOffice" />
+        <input id="usaBoxOffice1" type="number" formControlName="usaBoxOffice"/>
 
         <label for="tagline1">Tagline:</label>
-        <input id="tagline1" formControlName="tagline" />
+        <input id="tagline1" formControlName="tagline"/>
 
         <label for="genre1">Genre:</label>
         <select id="genre1" formControlName="genre">
@@ -143,10 +179,10 @@
         <div *ngIf="coordinatesVisible" formGroupName="coordinates">
           <h3>Coordinates</h3>
           <label for="x">X:</label>
-          <input id="x" type="number" formControlName="x" />
+          <input id="x" type="number" formControlName="x"/>
 
           <label for="y">Y:</label>
-          <input id="y" type="number" formControlName="y" />
+          <input id="y" type="number" formControlName="y"/>
 
           <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
         </div>
@@ -156,7 +192,7 @@
         <div *ngIf="directorVisible" formGroupName="director">
           <h3>Director</h3>
           <label for="directorName">director Name:</label>
-          <input id="directorName" formControlName="name" />
+          <input id="directorName" formControlName="name"/>
 
           <label for="directorEyeColor">Eye Color:</label>
           <select id="directorEyeColor" formControlName="eyeColor">
@@ -176,20 +212,20 @@
           <h4>Location</h4>
           <div formGroupName="location">
             <label for="directorLocationX">Location X:</label>
-            <input id="directorLocationX" type="number" formControlName="x" />
+            <input id="directorLocationX" type="number" formControlName="x"/>
 
             <label for="directorLocationY">Location Y:</label>
-            <input id="directorLocationY" type="number" formControlName="y" />
+            <input id="directorLocationY" type="number" formControlName="y"/>
 
             <label for="directorLocationZ">Location Z:</label>
-            <input id="directorLocationZ" type="number" formControlName="z" />
+            <input id="directorLocationZ" type="number" formControlName="z"/>
 
             <label for="directorLocationName">Location Name:</label>
-            <input id="directorLocationName" formControlName="name" />
+            <input id="directorLocationName" formControlName="name"/>
           </div>
 
           <label for="directorHeight">Height:</label>
-          <input id="directorHeight" type="number" formControlName="height" />
+          <input id="directorHeight" type="number" formControlName="height"/>
 
           <label for="directorNationality">Nationality:</label>
           <select id="directorNationality" formControlName="nationality">
@@ -205,7 +241,7 @@
         <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
           <h3>Screenwriter</h3>
           <label for="screenwriterPersonName">Name:</label>
-          <input id="screenwriterPersonName" formControlName="name" />
+          <input id="screenwriterPersonName" formControlName="name"/>
 
           <label for="screenwriterEyeColor">Eye Color:</label>
           <select id="screenwriterEyeColor" formControlName="eyeColor">
@@ -225,20 +261,20 @@
           <h4>Location</h4>
           <div formGroupName="location">
             <label for="screenwriterLocationX">Location X:</label>
-            <input id="screenwriterLocationX" type="number" formControlName="x" />
+            <input id="screenwriterLocationX" type="number" formControlName="x"/>
 
             <label for="screenwriterLocationY">Location Y:</label>
-            <input id="screenwriterLocationY" type="number" formControlName="y" />
+            <input id="screenwriterLocationY" type="number" formControlName="y"/>
 
             <label for="screenwriterLocationZ">Location Z:</label>
-            <input id="screenwriterLocationZ" type="number" formControlName="z" />
+            <input id="screenwriterLocationZ" type="number" formControlName="z"/>
 
             <label for="screenwriterLocationName">Location Name:</label>
-            <input id="screenwriterLocationName" formControlName="name" />
+            <input id="screenwriterLocationName" formControlName="name"/>
           </div>
 
           <label for="screenwriterHeight">Height:</label>
-          <input id="screenwriterHeight" type="number" formControlName="height" />
+          <input id="screenwriterHeight" type="number" formControlName="height"/>
 
           <label for="screenwriterNationality">Nationality:</label>
           <select id="screenwriterNationality" formControlName="nationality">
@@ -254,7 +290,7 @@
         <div *ngIf="operatorVisible" formGroupName="operator">
           <h3>Person</h3>
           <label for="operatorName">Name:</label>
-          <input id="operatorName" formControlName="name" />
+          <input id="operatorName" formControlName="name"/>
 
           <label for="operatorEyeColor">Eye Color:</label>
           <select id="operatorEyeColor" formControlName="eyeColor">
@@ -274,20 +310,20 @@
           <h4>Location</h4>
           <div formGroupName="location">
             <label for="operatorLocationX">Location X:</label>
-            <input id="operatorLocationX" type="number" formControlName="x" />
+            <input id="operatorLocationX" type="number" formControlName="x"/>
 
             <label for="operatorLocationY">Location Y:</label>
-            <input id="operatorLocationY" type="number" formControlName="y" />
+            <input id="operatorLocationY" type="number" formControlName="y"/>
 
             <label for="operatorLocationZ">Location Z:</label>
-            <input id="operatorLocationZ" type="number" formControlName="z" />
+            <input id="operatorLocationZ" type="number" formControlName="z"/>
 
             <label for="operatorLocationName">Location Name:</label>
-            <input id="operatorLocationName" formControlName="name" />
+            <input id="operatorLocationName" formControlName="name"/>
           </div>
 
           <label for="operatorHeight">Height:</label>
-          <input id="operatorHeight" type="number" formControlName="height" />
+          <input id="operatorHeight" type="number" formControlName="height"/>
 
           <label for="operatorNationality">Nationality:</label>
           <select id="operatorNationality" formControlName="nationality">
@@ -308,18 +344,18 @@
     <div class="modal-content">
       <span class="close-btn" (click)="changeUpdateFlag()">&times;</span>
       <h2>Обновить фильм</h2>
-      <form (ngSubmit)="updateMovie(movie.id)">
+      <form (ngSubmit)="updateMovie(movie)">
         <label for="name">Название</label>
-        <input type="text" id="name" [(ngModel)]="movie.name" name="name" required />
+        <input type="text" id="name" [(ngModel)]="movie.name" name="name" required/>
 
         <label for="oscarsCount">Количество Оскаров</label>
-        <input type="number" id="oscarsCount" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required />
+        <input type="number" id="oscarsCount" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required/>
 
         <label for="budget">Бюджет</label>
-        <input type="number" id="budget" [(ngModel)]="movie.budget" name="budget" required />
+        <input type="number" id="budget" [(ngModel)]="movie.budget" name="budget" required/>
 
         <label for="totalBoxOffice">Сборы</label>
-        <input type="number" id="totalBoxOffice" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required />
+        <input type="number" id="totalBoxOffice" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required/>
 
         <label for="mpaaRating">MPAA Рейтинг</label>
         <select id="mpaaRating" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
@@ -347,7 +383,7 @@
       <h2>Поиск фильма</h2>
       <form (ngSubmit)="toDoMethod()">
         <label for="searchId">ID фильма</label>
-        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" required />
+        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" required/>
 
         <button type="submit">Найти</button>
       </form>
@@ -359,7 +395,8 @@
       <h2>Заявки на администрирование</h2>
       <ul>
         <li *ngFor="let request of requests">
-          {{ request.userEmail }} <button (click)="toDoMethod()">Одобрить</button>
+          {{ request.userEmail }}
+          <button (click)="toDoMethod()">Одобрить</button>
         </li>
       </ul>
       <button (click)="changeNotsFlag()">Закрыть</button>

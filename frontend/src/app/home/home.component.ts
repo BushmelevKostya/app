@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -79,6 +80,7 @@ export class HomeComponent {
     this.ngOnInit();
   }
 
+  apiUrl = "http://localhost:8080/api/action"
   movieForm: FormGroup
   createFlag = 0
   updateFlag = 0
@@ -107,22 +109,22 @@ export class HomeComponent {
     budget: 1000000000,
     totalBoxOffice: 100000000000000,
     mpaaRating: 'Самый крутой',
-    director: { name: '', eyeColor: '', hairColor: '', location: { x: 0, y: 0, z: 0, name: '' }, height: 0, nationality: '' },
-    screenwriter: { name: '', eyeColor: '', hairColor: '', location: { x: 0, y: 0, z: 0, name: '' }, height: 0, nationality: '' },
-    operator: { name: '', eyeColor: '', hairColor: '', location: { x: 0, y: 0, z: 0, name: '' }, height: 0, nationality: '' },
+    director: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    screenwriter: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    operator: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
     length: 0,
     goldenPalmCount: 0,
     usaBoxOffice: null,
-    tagline: '',
-    genre: '',
+    tagline: '1',
+    genre: '1',
     creationDate: "23"
   };
 
-  movies = [this.movie];
+  movies: any[] = [this.movie, this.movie]
 
   createMovie() {
     if (this.movieForm.valid) {
-      this.http.post('http://localhost:8080/api/create', this.movieForm.value).subscribe(
+      this.http.post('http://localhost:8080/api/action', this.movieForm.value).subscribe(
         response => {
           console.log('Movie created successfully', response)
         },
@@ -161,10 +163,13 @@ export class HomeComponent {
   searchMovie() {
   }
 
-  updateMovie(id: number) {
+
+  updateMovie(movie: any) {
+    return this.http.put(`${this.apiUrl}/${movie.id}`, movie);
   }
 
   deleteMovie(id: number) {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   toDoMethod() {
@@ -208,29 +213,16 @@ export class HomeComponent {
   }
 
   ngOnInit() {
-    this.movieForm.valueChanges.subscribe((newValue) => {
-      this.updateMovies(newValue);
+    this.loadMovies();
+  }
+
+  loadMovies() {
+    this.getMovies().subscribe((data: any[]) => {
+      this.movies = data;
     });
   }
 
-  updateMovies(data: any) {
-    this.movies = [{
-      name: data.name,
-      creationDate: data.creationDate,
-      oscarsCount: data.oscarsCount,
-      budget: data.budget,
-      totalBoxOffice: data.totalBoxOffice,
-      mpaaRating: data.mpaaRating,
-      length: data.length,
-      goldenPalmCount: data.goldenPalmCount,
-      usaBoxOffice: data.usaBoxOffice,
-      tagline: data.tagline,
-      genre: data.genre,
-      coordinates: data.coordinates,
-      director: data.director,
-      screenwriter: data.screenwriter,
-      operator: data.operator,
-      id: 0
-    }];
+  getMovies(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
   }
 }
