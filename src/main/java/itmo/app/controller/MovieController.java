@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class MovieController {
 	@PostMapping("/create")
 	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
-		System.out.println("Received movie: " + movie);
+		System.out.println("Received movie: " + movie.getDirector().getLocation().getName());
 		return new ResponseEntity<>(movie, HttpStatus.CREATED);
 	}
 }

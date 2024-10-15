@@ -1,9 +1,7 @@
 package itmo.app.model;
 
 public enum Country {
-	FRANCE,
-	CHINA,
+	SPAIN,
 	INDIA,
-	NORTH_KOREA,
-	JAPAN;
+	VATICAN
 }

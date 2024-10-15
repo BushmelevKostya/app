@@ -2,6 +2,7 @@ package itmo.app.model;
 
 public enum MpaaRating {
 	G,
-	R,
-	NC_17;
+	PG,
+	PG_13,
+	R
 }

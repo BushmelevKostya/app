@@ -56,13 +56,16 @@
   </table>
 
   <!-- Модальное окно для создания фильма -->
-  <div class="modal" *ngIf=createFlag>
+  <div class="modal" *ngIf="createFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeCreateFlag()">&times;</span>
       <h2>Создать фильм</h2>
       <form [formGroup]="movieForm" (ngSubmit)="createMovie()">
         <label for="name1">Name:</label>
         <input id="name1" formControlName="name" />
+
+        <label for="creationDate1">Creation Date: </label>
+        <input id="creationDate1" formControlName="creationDate" />
 
         <label for="oscarsCount1">Oscars Count:</label>
         <input id="oscarsCount1" type="number" formControlName="oscarsCount" />
@@ -81,8 +84,187 @@
           <option value="R">R</option>
         </select>
 
+        <label for="length1">Length:</label>
+        <input id="length1" type="number" formControlName="length" />
+
+        <label for="goldenPalmCount1">Golden Palm Count:</label>
+        <input id="goldenPalmCount1" type="number" formControlName="goldenPalmCount" />
+
+        <label for="usaBoxOffice1">Usa Box Office:</label>
+        <input id="usaBoxOffice1" type="number" formControlName="usaBoxOffice" />
+
         <label for="tagline1">Tagline:</label>
         <input id="tagline1" formControlName="tagline" />
+
+        <label for="genre1">Genre:</label>
+        <select id="genre1" formControlName="genre">
+          <option value="ACTION">ACTION</option>
+          <option value="TRAGEDY">TRAGEDY</option>
+          <option value="THRILLER">THRILLER</option>
+          <option value="FANTASY">FANTASY</option>
+          <option value="SCIENCE_FICTION">SCIENCE_FICTION</option>
+        </select>
+
+        <!-- Блок для Coordinates -->
+        <button type="button" (click)="toggleCoordinates()">Create Coordinates</button>
+        <div *ngIf="coordinatesVisible" formGroupName="coordinates">
+          <h3>Coordinates</h3>
+          <label for="x">X:</label>
+          <input id="x" type="number" formControlName="x" />
+
+          <label for="y">Y:</label>
+          <input id="y" type="number" formControlName="y" />
+
+          <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+        </div>
+
+        <!-- Блок для Person -->
+        <button type="button" (click)="toggleDirector()">Create Director</button>
+        <div *ngIf="directorVisible" formGroupName="director">
+          <h3>Director</h3>
+          <label for="directorName">director Name:</label>
+          <input id="directorName" formControlName="name" />
+
+          <label for="directorEyeColor">Eye Color:</label>
+          <select id="directorEyeColor" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="directorHairColor">Hair Color:</label>
+          <select id="directorHairColor" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="directorLocationX">Location X:</label>
+            <input id="directorLocationX" type="number" formControlName="x" />
+
+            <label for="directorLocationY">Location Y:</label>
+            <input id="directorLocationY" type="number" formControlName="y" />
+
+            <label for="directorLocationZ">Location Z:</label>
+            <input id="directorLocationZ" type="number" formControlName="z" />
+
+            <label for="directorLocationName">Location Name:</label>
+            <input id="directorLocationName" formControlName="name" />
+          </div>
+
+          <label for="directorHeight">Height:</label>
+          <input id="directorHeight" type="number" formControlName="height" />
+
+          <label for="directorNationality">Nationality:</label>
+          <select id="directorNationality" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingDirector()">Load Existing Director</button>
+        </div>
+
+        <button type="button" (click)="toggleScreenwriter()">Create Screenwriter</button>
+        <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
+          <h3>Screenwriter</h3>
+          <label for="screenwriterPersonName">Name:</label>
+          <input id="screenwriterPersonName" formControlName="name" />
+
+          <label for="screenwriterEyeColor">Eye Color:</label>
+          <select id="screenwriterEyeColor" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="screenwriterHairColor">Hair Color:</label>
+          <select id="screenwriterHairColor" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="screenwriterLocationX">Location X:</label>
+            <input id="screenwriterLocationX" type="number" formControlName="x" />
+
+            <label for="screenwriterLocationY">Location Y:</label>
+            <input id="screenwriterLocationY" type="number" formControlName="y" />
+
+            <label for="screenwriterLocationZ">Location Z:</label>
+            <input id="screenwriterLocationZ" type="number" formControlName="z" />
+
+            <label for="screenwriterLocationName">Location Name:</label>
+            <input id="screenwriterLocationName" formControlName="name" />
+          </div>
+
+          <label for="screenwriterHeight">Height:</label>
+          <input id="screenwriterHeight" type="number" formControlName="height" />
+
+          <label for="screenwriterNationality">Nationality:</label>
+          <select id="screenwriterNationality" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingScreenwriter()">Load Existing Screenwriter</button>
+        </div>
+
+        <button type="button" (click)="toggleOperator()">Create Operator</button>
+        <div *ngIf="operatorVisible" formGroupName="operator">
+          <h3>Person</h3>
+          <label for="operatorName">Name:</label>
+          <input id="operatorName" formControlName="name" />
+
+          <label for="operatorEyeColor">Eye Color:</label>
+          <select id="operatorEyeColor" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="operatorHairColor">Hair Color:</label>
+          <select id="operatorHairColor" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="operatorLocationX">Location X:</label>
+            <input id="operatorLocationX" type="number" formControlName="x" />
+
+            <label for="operatorLocationY">Location Y:</label>
+            <input id="operatorLocationY" type="number" formControlName="y" />
+
+            <label for="operatorLocationZ">Location Z:</label>
+            <input id="operatorLocationZ" type="number" formControlName="z" />
+
+            <label for="operatorLocationName">Location Name:</label>
+            <input id="operatorLocationName" formControlName="name" />
+          </div>
+
+          <label for="operatorHeight">Height:</label>
+          <input id="operatorHeight" type="number" formControlName="height" />
+
+          <label for="operatorNationality">Nationality:</label>
+          <select id="operatorNationality" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingOperator()">Load Existing Operator</button>
+        </div>
 
         <button type="submit">Create Movie</button>
       </form>

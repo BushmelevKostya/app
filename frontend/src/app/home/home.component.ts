@@ -19,14 +19,62 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 })
 
 export class HomeComponent {
-  constructor( private router: Router, private fb: FormBuilder, private http: HttpClient ) {
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient) {
     this.movieForm = this.fb.group({
-      name: ['', Validators.required],
-      oscarsCount: [0, [Validators.required, Validators.min(1)]],
-      budget: [0, [Validators.required, Validators.min(1)]],
-      totalBoxOffice: [0, [Validators.required, Validators.min(1)]],
-      mpaaRating: ['', Validators.required],
-      tagline: ['', Validators.required]
+      name: ['defaultName', Validators.required],
+      creationDate: ["2024-10-15 14:30:55", Validators.required],
+      oscarsCount: [1, [Validators.required, Validators.min(1)]],
+      budget: [1, [Validators.required, Validators.min(1)]],
+      totalBoxOffice: [1, [Validators.required, Validators.min(1)]],
+      mpaaRating: ['G', Validators.required],
+      length: [1, Validators.required],
+      goldenPalmCount: [1, Validators.required],
+      usaBoxOffice: [1, Validators.required],
+      tagline: ['defaultTagline', Validators.required],
+      genre: ['ACTION', Validators.required],
+      coordinates: this.fb.group({
+        x: [0, Validators.required],
+        y: [0, Validators.required]
+      }),
+      director: this.fb.group({
+        name: ['defaultName', Validators.required],
+        eyeColor: ['BLACK', Validators.required],
+        hairColor: ['BLACK', Validators.required],
+        location: this.fb.group({
+          x: [0, Validators.required],
+          y: [0, Validators.required],
+          z: [0, Validators.required],
+          name: ['defaultLocationName', Validators.required]
+        }),
+        height: [0, Validators.required],
+        nationality: ['SPAIN', Validators.required]
+      }),
+      screenwriter: this.fb.group({
+        name: ['defaultName', Validators.required],
+        eyeColor: ['BLACK', Validators.required],
+        hairColor: ['BLACK', Validators.required],
+        location: this.fb.group({
+          x: [0, Validators.required],
+          y: [0, Validators.required],
+          z: [0, Validators.required],
+          name: ['defaultLocationName', Validators.required]
+        }),
+        height: [0, Validators.required],
+        nationality: ['SPAIN', Validators.required]
+      }),
+      operator: this.fb.group({
+        name: ['defaultName', Validators.required],
+        eyeColor: ['BLACK', Validators.required],
+        hairColor: ['BLACK', Validators.required],
+        location: this.fb.group({
+          x: [0, Validators.required],
+          y: [0, Validators.required],
+          z: [0, Validators.required],
+          name: ['defaultLocationName', Validators.required]
+        }),
+        height: [0, Validators.required],
+        nationality: ['SPAIN', Validators.required]
+      })
     });
   }
 
@@ -36,6 +84,10 @@ export class HomeComponent {
   deleteFlag = 0
   searchFlag = 0
   notsFlag = 0
+  coordinatesVisible = false
+  directorVisible = false
+  screenwriterVisible = false
+  operatorVisible = false
   isAdmin = 1
   menuOpen = 0
   title = 'Лабораторная работа'
@@ -68,7 +120,7 @@ export class HomeComponent {
 
   createMovie() {
     if (this.movieForm.valid) {
-      this.http.post('/api/create', this.movieForm.value).subscribe(
+      this.http.post('http://localhost:8080/api/create', this.movieForm.value).subscribe(
         response => {
           console.log('Movie created successfully', response)
         },
@@ -123,5 +175,33 @@ export class HomeComponent {
 
   navigateTo(address: String) {
     this.router.navigate([address])
+  }
+
+  toggleCoordinates() {
+    this.coordinatesVisible = !this.coordinatesVisible;
+  }
+
+  toggleDirector() {
+    this.directorVisible = !this.directorVisible;
+  }
+
+  loadExistingDirector() {
+  }
+
+  loadExistingCoordinates() {
+  }
+
+  toggleScreenwriter() {
+    this.screenwriterVisible = !this.screenwriterVisible;
+  }
+
+  loadExistingScreenwriter() {
+  }
+
+  toggleOperator() {
+    this.operatorVisible = !this.operatorVisible;
+  }
+
+  loadExistingOperator() {
   }
 }
