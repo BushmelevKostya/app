@@ -60,25 +60,31 @@
     <div class="modal-content">
       <span class="close-btn" (click)="changeCreateFlag()">&times;</span>
       <h2>Создать фильм</h2>
-      <form (ngSubmit)="createMovie()">
-        <label for="name">Название</label>
-        <input type="text" id="name1" [(ngModel)]="movie.name" name="name" required />
+      <form [formGroup]="movieForm" (ngSubmit)="createMovie()">
+        <label for="name1">Name:</label>
+        <input id="name1" formControlName="name" />
 
-        <label for="oscarsCount">Количество Оскаров</label>
-        <input type="number" id="oscarsCount1" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required />
+        <label for="oscarsCount1">Oscars Count:</label>
+        <input id="oscarsCount1" type="number" formControlName="oscarsCount" />
 
-        <label for="budget">Бюджет</label>
-        <input type="number" id="budget1" [(ngModel)]="movie.budget" name="budget" required />
+        <label for="budget1">Budget:</label>
+        <input id="budget1" type="number" formControlName="budget" />
 
-        <label for="totalBoxOffice">Сборы</label>
-        <input type="number" id="totalBoxOffice1" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required />
+        <label for="totalBoxOffice1">Total Box Office:</label>
+        <input id="totalBoxOffice1" type="number" formControlName="totalBoxOffice" />
 
-        <label for="mpaaRating">MPAA Рейтинг</label>
-        <select id="mpaaRating1" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
-          <option *ngFor="let rating of movie.mpaaRating" [value]="rating">{{ rating }}</option>
+        <label for="mpaaRating1">MPAA Rating:</label>
+        <select id="mpaaRating1" formControlName="mpaaRating">
+          <option value="G">G</option>
+          <option value="PG">PG</option>
+          <option value="PG_13">PG-13</option>
+          <option value="R">R</option>
         </select>
 
-        <button type="submit">Создать</button>
+        <label for="tagline1">Tagline:</label>
+        <input id="tagline1" formControlName="tagline" />
+
+        <button type="submit">Create Movie</button>
       </form>
     </div>
   </div>

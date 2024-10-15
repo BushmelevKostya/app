@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router'
-import {FormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -9,12 +10,27 @@ import {NgForOf, NgIf} from '@angular/common';
   imports: [
     FormsModule,
     NgForOf,
-    NgIf
+    NgIf,
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
+
 export class HomeComponent {
+  constructor( private router: Router, private fb: FormBuilder, private http: HttpClient ) {
+    this.movieForm = this.fb.group({
+      name: ['', Validators.required],
+      oscarsCount: [0, [Validators.required, Validators.min(1)]],
+      budget: [0, [Validators.required, Validators.min(1)]],
+      totalBoxOffice: [0, [Validators.required, Validators.min(1)]],
+      mpaaRating: ['', Validators.required],
+      tagline: ['', Validators.required]
+    });
+  }
+
+  movieForm: FormGroup
   createFlag = 0
   updateFlag = 0
   deleteFlag = 0
@@ -29,7 +45,6 @@ export class HomeComponent {
     userEmail: "kosbush@gmail.com"
   }
   requests = [this.request]
-
 
   movie = {
     id: 1,
@@ -50,9 +65,19 @@ export class HomeComponent {
   };
 
   movies = [this.movie];
-  constructor( private router: Router ) {}
 
   createMovie() {
+    if (this.movieForm.valid) {
+      this.http.post('/api/create', this.movieForm.value).subscribe(
+        response => {
+          console.log('Movie created successfully', response)
+        },
+        error => {
+          console.error('Error creating movie', error)
+        });
+    } else {
+      console.error("Form is invalid")
+    }
   }
 
   changeCreateFlag() {
