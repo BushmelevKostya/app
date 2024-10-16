@@ -29,6 +29,7 @@ public class MovieController {
 	
 	@DeleteMapping("/action/{id}")
 	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long id) {
+		System.out.println(id);
 		movieRepository.deleteById(id);
 		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
 	}

@@ -21,6 +21,57 @@ import {Observable} from 'rxjs';
 
 export class HomeComponent {
   constructor(private router: Router, private fb: FormBuilder, private http: HttpClient) {
+    this.movieForm = this.fb.group({})
+    this.initMovieForm()
+    this.getMovies();
+  }
+
+  apiUrl = "http://localhost:8080/api/action"
+  movieForm: FormGroup
+  createFlag = 0
+  updateFlag = 0
+  deleteFlag = 0
+  searchFlag = 0
+  notsFlag = 0
+  coordinatesVisible = false
+  directorVisible = false
+  screenwriterVisible = false
+  operatorVisible = false
+  isAdmin = 1
+  menuOpen = 0
+  title = 'Лабораторная работа'
+  searchId: number | null = null;
+  request = {
+    id: 1,
+    userEmail: "kosbush@gmail.com"
+  }
+  requests = [this.request]
+
+  movie = {
+    id: 0,
+    name: 'Чип и Дейл',
+    coordinates: { x: 0, y: 0 },
+    oscarsCount: 3,
+    budget: 1000000000,
+    totalBoxOffice: 100000000000000,
+    mpaaRating: 'Самый крутой',
+    director: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    screenwriter: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    operator: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    length: 0,
+    goldenPalmCount: 0,
+    usaBoxOffice: null,
+    tagline: '1',
+    genre: '1',
+    creationDate: "23"
+  };
+
+  movies: any[] = [this.movie, this.movie]
+
+  //TODO сделать потокобезопасной
+  selectedMovieId: number | null = null;
+
+  initMovieForm() {
     this.movieForm = this.fb.group({
       name: ['defaultName', Validators.required],
       creationDate: ["2024-10-15 14:30:55", Validators.required],
@@ -77,53 +128,7 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       })
     });
-    this.getMovies();
   }
-
-  apiUrl = "http://localhost:8080/api/action"
-  movieForm: FormGroup
-  createFlag = 0
-  updateFlag = 0
-  deleteFlag = 0
-  searchFlag = 0
-  notsFlag = 0
-  coordinatesVisible = false
-  directorVisible = false
-  screenwriterVisible = false
-  operatorVisible = false
-  isAdmin = 1
-  menuOpen = 0
-  title = 'Лабораторная работа'
-  searchId: number | null = null;
-  request = {
-    id: 1,
-    userEmail: "kosbush@gmail.com"
-  }
-  requests = [this.request]
-
-  movie = {
-    id: 0,
-    name: 'Чип и Дейл',
-    coordinates: { x: 0, y: 0 },
-    oscarsCount: 3,
-    budget: 1000000000,
-    totalBoxOffice: 100000000000000,
-    mpaaRating: 'Самый крутой',
-    director: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
-    screenwriter: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
-    operator: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
-    length: 0,
-    goldenPalmCount: 0,
-    usaBoxOffice: null,
-    tagline: '1',
-    genre: '1',
-    creationDate: "23"
-  };
-
-  movies: any[] = [this.movie, this.movie]
-
-  //TODO сделать потокобезопасной
-  selectedMovieId: number | null = null;
 
   changeCreateFlag() {
     this.createFlag = this.createFlag ? 0 : 1
@@ -140,7 +145,6 @@ export class HomeComponent {
 
   changeDeleteFlag() {
     this.deleteFlag = this.deleteFlag ? 0 : 1
-    this.selectedMovieId = null
   }
 
   changeSearchFlag() {
@@ -225,6 +229,7 @@ export class HomeComponent {
   }
 
   deleteMovie() {
+    console.log(this.selectedMovieId)
     return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}`).subscribe((data: any[]) => {
       this.movies = data
       this.changeDeleteFlag()

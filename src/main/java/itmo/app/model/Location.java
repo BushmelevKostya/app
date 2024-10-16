@@ -20,10 +20,6 @@ public class Location {
 	@Column(name = "LocationName", nullable = false) // Поле не может быть null
 	private String name; // Поле не может быть null
 	
-	@ManyToOne
-	@JoinColumn(name = "person_id")
-	private Person person;
-	
 	public long getId() {
 		return id;
 	}

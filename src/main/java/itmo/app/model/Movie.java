@@ -37,7 +37,7 @@ public class Movie {
 	private MpaaRating mpaaRating; //Поле не может быть null
 	
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "director_id")
+	@JoinColumn(name = "person_id")
 	private Person director; //Поле может быть null
 	
 	@ManyToOne(cascade = CascadeType.ALL)

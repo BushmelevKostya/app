@@ -20,8 +20,9 @@ public class Person {
 	@Column(name = "PersonHairColor", nullable = false) // Поле не может быть null
 	private Color hairColor;
 	
-	@OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-	private List<Location> locations;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "location_id")
+	private Location location;
 	
 	@Column
 	private float height; // Значение поля должно быть больше 0
@@ -62,12 +63,12 @@ public class Person {
 		this.hairColor = hairColor;
 	}
 	
-	public List<Location> getLocations() {
-		return locations;
+	public Location getLocation() {
+		return location;
 	}
 	
-	public void setLocations(List<Location> locations) {
-		this.locations = locations;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 	
 	public float getHeight() {
