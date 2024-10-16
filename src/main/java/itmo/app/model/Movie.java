@@ -1,26 +1,65 @@
 package itmo.app.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "movies")
 public class Movie {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+	
+	@Column(nullable = false)
 	private String name; //Поле не может быть null, Строка не может быть пустой
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "coordinates_id")
 	private Coordinates coordinates; //Поле не может быть null
+	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	@Column(nullable = false, updatable = false)
 	private java.time.LocalDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+	
+	@Column
 	private int oscarsCount; //Значение поля должно быть больше 0
+	
+	@Column(nullable = false)
 	private Float budget; //Значение поля должно быть больше 0, Поле не может быть null
+	
+	@Column
 	private int totalBoxOffice; //Значение поля должно быть больше 0
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private MpaaRating mpaaRating; //Поле не может быть null
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "director_id")
 	private Person director; //Поле может быть null
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "screenwriter_id")
 	private Person screenwriter;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "operator_id")
 	private Person operator; //Поле может быть null
+	
+	@Column
 	private int length; //Значение поля должно быть больше 0
+	
 	private long goldenPalmCount; //Значение поля должно быть больше 0
+	@Column
 	private Double usaBoxOffice; //Поле может быть null, Значение поля должно быть больше 0
+	
+	@Column(nullable = false)
 	private String tagline; //Поле не может быть null
+	
+	@Enumerated(EnumType.STRING)
+	@Column
 	private MovieGenre genre; //Поле может быть null
 	
 	public long getId() {

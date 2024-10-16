@@ -1,12 +1,42 @@
 package itmo.app.model;
 
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "persons")
 public class Person {
-	private String name; //Поле не может быть null, Строка не может быть пустой
-	private Color eyeColor; //Поле не может быть null
-	private Color hairColor; //Поле не может быть null
-	private Location location; //Поле может быть null
-	private float height; //Значение поля должно быть больше 0
-	private Country nationality; //Поле не может быть null
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+	
+	@Column(name = "PersonName", nullable = false) // Поле не может быть null, Строка не может быть пустой
+	private String name;
+	
+	@Column(name = "PersonEyeColor", nullable = false) // Поле не может быть null
+	private Color eyeColor;
+	
+	@Column(name = "PersonHairColor", nullable = false) // Поле не может быть null
+	private Color hairColor;
+	
+	@OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+	private List<Location> locations;
+	
+	@Column
+	private float height; // Значение поля должно быть больше 0
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false) // Поле не может быть null
+	private Country nationality; // Поле не может быть null
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
 	
 	public String getName() {
 		return name;
@@ -32,12 +62,12 @@ public class Person {
 		this.hairColor = hairColor;
 	}
 	
-	public Location getLocation() {
-		return location;
+	public List<Location> getLocations() {
+		return locations;
 	}
 	
-	public void setLocation(Location location) {
-		this.location = location;
+	public void setLocations(List<Location> locations) {
+		this.locations = locations;
 	}
 	
 	public float getHeight() {

@@ -1,10 +1,36 @@
 package itmo.app.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "locations")
 public class Location {
-	private Double x; //Поле не может быть null
-	private Double y; //Поле не может быть null
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+	
+	@Column(name = "LocationX", nullable = false) // Поле не может быть null
+	private Double x;
+	
+	@Column(name = "LocationY", nullable = false) // Поле не может быть null
+	private Double y;
+	
 	private float z;
-	private String name; //Поле не может быть null
+	
+	@Column(name = "LocationName", nullable = false) // Поле не может быть null
+	private String name; // Поле не может быть null
+	
+	@ManyToOne
+	@JoinColumn(name = "person_id")
+	private Person person;
+	
+	public long getId() {
+		return id;
+	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
 	
 	public Double getX() {
 		return x;

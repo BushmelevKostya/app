@@ -81,12 +81,6 @@ public class MovieCollection {
 		System.out.println("Name: " + person.getName());
 		System.out.println("Eye Color: " + person.getEyeColor());
 		System.out.println("Hair Color: " + person.getHairColor());
-		if (person.getLocation() != null) {
-			System.out.println("Location: X = " + person.getLocation().getX() + ", Y = " + person.getLocation().getY() + ", Z = " + person.getLocation().getZ());
-			System.out.println("Location Name: " + person.getLocation().getName());
-		} else {
-			System.out.println("Location: Not specified");
-		}
 		System.out.println("Height: " + person.getHeight());
 		System.out.println("Nationality: " + person.getNationality());
 	}

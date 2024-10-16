@@ -77,7 +77,7 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       })
     });
-    this.ngOnInit();
+    this.getMovies();
   }
 
   apiUrl = "http://localhost:8080/api/action"
@@ -102,7 +102,7 @@ export class HomeComponent {
   requests = [this.request]
 
   movie = {
-    id: 1,
+    id: 0,
     name: 'Чип и Дейл',
     coordinates: { x: 0, y: 0 },
     oscarsCount: 3,
@@ -122,19 +122,8 @@ export class HomeComponent {
 
   movies: any[] = [this.movie, this.movie]
 
-  createMovie() {
-    if (this.movieForm.valid) {
-      this.http.post('http://localhost:8080/api/action', this.movieForm.value).subscribe(
-        response => {
-          console.log('Movie created successfully', response)
-        },
-        error => {
-          console.error('Error creating movie', error)
-        });
-    } else {
-      console.error("Form is invalid")
-    }
-  }
+  //TODO сделать потокобезопасной
+  selectedMovieId: number | null = null;
 
   changeCreateFlag() {
     this.createFlag = this.createFlag ? 0 : 1
@@ -144,8 +133,14 @@ export class HomeComponent {
     this.updateFlag = this.updateFlag ? 0 : 1
   }
 
+  openDeleteModal(id: number) {
+    this.selectedMovieId = id;
+    this.changeDeleteFlag();
+  }
+
   changeDeleteFlag() {
     this.deleteFlag = this.deleteFlag ? 0 : 1
+    this.selectedMovieId = null
   }
 
   changeSearchFlag() {
@@ -166,10 +161,6 @@ export class HomeComponent {
 
   updateMovie(movie: any) {
     return this.http.put(`${this.apiUrl}/${movie.id}`, movie);
-  }
-
-  deleteMovie(id: number) {
-    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
   toDoMethod() {
@@ -212,18 +203,31 @@ export class HomeComponent {
   loadExistingOperator() {
   }
 
-  ngOnInit() {
-    this.loadMovies();
-  }
-
-  loadMovies() {
-    this.getMovies().subscribe((data: any[]) => {
+  getMovies() {
+    this.http.get<any[]>(this.apiUrl).subscribe((data: any[]) => {
       this.movies = data
-      console.log(this.movies[0].name)
     });
   }
 
-  getMovies(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  createMovie() {
+    if (this.movieForm.valid) {
+      this.http.post('http://localhost:8080/api/action', this.movieForm.value).subscribe(
+        response => {
+          this.getMovies()
+          this.changeCreateFlag()
+        },
+        error => {
+          console.error('Error creating movie', error)
+        });
+    } else {
+      console.error("Form is invalid")
+    }
+  }
+
+  deleteMovie() {
+    return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}`).subscribe((data: any[]) => {
+      this.movies = data
+      this.changeDeleteFlag()
+    });
   }
 }
