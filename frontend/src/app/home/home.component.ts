@@ -218,7 +218,8 @@ export class HomeComponent {
 
   loadMovies() {
     this.getMovies().subscribe((data: any[]) => {
-      this.movies = data;
+      this.movies = data
+      console.log(this.movies[0].name)
     });
   }
 
