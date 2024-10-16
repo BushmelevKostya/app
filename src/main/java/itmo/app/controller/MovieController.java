@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -37,5 +38,11 @@ public class MovieController {
 	public ResponseEntity<List<Movie>> updateMovie(@RequestBody Movie movie) {
 		movieRepository.save(movie);
 		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/action/{id}")
+	public ResponseEntity<Movie> getMovieById(@PathVariable long id) {
+		Optional<Movie> movie = movieRepository.findById(id);
+		return movie.map(value -> new ResponseEntity<>(value, HttpStatus.FOUND)).orElse(null);
 	}
 }

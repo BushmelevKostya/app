@@ -42,6 +42,7 @@ export class HomeComponent {
   menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
+  foundMovie: any = null;
   request = {
     id: 1,
     userEmail: "kosbush@gmail.com"
@@ -288,5 +289,20 @@ export class HomeComponent {
       this.movies = data
       this.changeUpdateFlag()
     })
+  }
+
+  searchMovie() {
+    this.http.get<any>(`${this.apiUrl}/${this.searchId}`).subscribe( (data: any) => {
+        if (data !== null) {
+          this.foundMovie = data;
+          console.log(11)
+        } else {
+          this.foundMovie = null
+        }
+      },
+      (error) => {
+        this.foundMovie = null;
+      }
+    )
   }
 }

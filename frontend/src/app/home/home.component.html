@@ -20,13 +20,9 @@
     </ul>
   </div>
 
-  <div class="search-bar">
-    <input type="text" placeholder="Искать по ID..."/>
-    <button (click)="changeSearchFlag()">Поиск</button>
-  </div>
-
   <div class="movie-actions">
     <button (click)="changeCreateFlag()">Создать фильм</button>
+    <button (click)="changeSearchFlag()">Поиск</button>
   </div>
 
   <!-- Табличка -->
@@ -572,12 +568,53 @@
     <div class="modal-content">
       <span class="close-btn" (click)="changeSearchFlag()">&times;</span>
       <h2>Поиск фильма</h2>
-      <form (ngSubmit)="toDoMethod()">
+      <form (ngSubmit)="searchMovie()">
         <label for="searchId">ID фильма</label>
-        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" required/>
-
+        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" placeholder="Искать по ID..." required/>
         <button type="submit">Найти</button>
       </form>
+      <div *ngIf="foundMovie; else notFound">
+        <h3>Найденный фильм:</h3>
+        <table>
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Дата создания</th>
+            <th>Количество Оскаров</th>
+            <th>Бюджет</th>
+            <th>Общие кассовые сборы</th>
+            <th>Рейтинг MPAA</th>
+            <th>Длительность</th>
+            <th>Золотая пальмовая ветвь</th>
+            <th>Кассовые сборы в США</th>
+            <th>Слоган</th>
+            <th>Жанр</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>{{ foundMovie.id }}</td>
+            <td>{{ foundMovie.name }}</td>
+            <td>{{ foundMovie.creationDate }}</td>
+            <td>{{ foundMovie.oscarsCount }}</td>
+            <td>{{ foundMovie.budget }}</td>
+            <td>{{ foundMovie.totalBoxOffice }}</td>
+            <td>{{ foundMovie.mpaaRating }}</td>
+            <td>{{ foundMovie.length }}</td>
+            <td>{{ foundMovie.goldenPalmCount }}</td>
+            <td>{{ foundMovie.usaBoxOffice }}</td>
+            <td>{{ foundMovie.tagline }}</td>
+            <td>{{ foundMovie.genre }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #notFound>
+        <p>Объект не найден</p>
+      </ng-template>
+
     </div>
   </div>
 
