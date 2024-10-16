@@ -29,6 +29,7 @@
     <button (click)="changeCreateFlag()">Создать фильм</button>
   </div>
 
+  <!-- Табличка -->
   <div class="table-wrapper">
     <table class="movie-table">
       <thead>
@@ -115,7 +116,7 @@
         </td>
 
         <td>
-          <button (click)="changeUpdateFlag()">Обновить</button>
+          <button (click)="openUpdateModal(movie)">Обновить</button>
           <button (click)="openDeleteModal(movie.id)">Удалить</button>
         </td>
       </tr>
@@ -123,50 +124,49 @@
     </table>
   </div>
 
-
   <!-- Модальное окно для создания фильма -->
   <div class="modal" *ngIf="createFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeCreateFlag()">&times;</span>
       <h2>Создать фильм</h2>
-      <form [formGroup]="movieForm" (ngSubmit)="createMovie()">
-        <label for="name1">Name:</label>
-        <input id="name1" formControlName="name"/>
+      <form [formGroup]="movieCreateForm" (ngSubmit)="createMovie()">
+        <label for="nameCreate">Name:</label>
+        <input id="nameCreate" formControlName="name"/>
 
-        <label for="creationDate1">Creation Date: </label>
-        <input id="creationDate1" formControlName="creationDate"/>
+        <label for="creationDateCreate">Creation Date: </label>
+        <input id="creationDateCreate" formControlName="creationDate"/>
 
-        <label for="oscarsCount1">Oscars Count:</label>
-        <input id="oscarsCount1" type="number" formControlName="oscarsCount"/>
+        <label for="oscarsCountCreate">Oscars Count:</label>
+        <input id="oscarsCountCreate" type="number" formControlName="oscarsCount"/>
 
-        <label for="budget1">Budget:</label>
-        <input id="budget1" type="number" formControlName="budget"/>
+        <label for="budgetCreate">Budget:</label>
+        <input id="budgetCreate" type="number" formControlName="budget"/>
 
-        <label for="totalBoxOffice1">Total Box Office:</label>
-        <input id="totalBoxOffice1" type="number" formControlName="totalBoxOffice"/>
+        <label for="totalBoxOfficeCreate">Total Box Office:</label>
+        <input id="totalBoxOfficeCreate" type="number" formControlName="totalBoxOffice"/>
 
-        <label for="mpaaRating1">MPAA Rating:</label>
-        <select id="mpaaRating1" formControlName="mpaaRating">
+        <label for="mpaaRatingCreate">MPAA Rating:</label>
+        <select id="mpaaRatingCreate" formControlName="mpaaRating">
           <option value="G">G</option>
           <option value="PG">PG</option>
           <option value="PG_13">PG-13</option>
           <option value="R">R</option>
         </select>
 
-        <label for="length1">Length:</label>
-        <input id="length1" type="number" formControlName="length"/>
+        <label for="lengthCreate">Length:</label>
+        <input id="lengthCreate" type="number" formControlName="length"/>
 
-        <label for="goldenPalmCount1">Golden Palm Count:</label>
-        <input id="goldenPalmCount1" type="number" formControlName="goldenPalmCount"/>
+        <label for="goldenPalmCountCreate">Golden Palm Count:</label>
+        <input id="goldenPalmCountCreate" type="number" formControlName="goldenPalmCount"/>
 
-        <label for="usaBoxOffice1">Usa Box Office:</label>
-        <input id="usaBoxOffice1" type="number" formControlName="usaBoxOffice"/>
+        <label for="usaBoxOfficeCreate">Usa Box Office:</label>
+        <input id="usaBoxOfficeCreate" type="number" formControlName="usaBoxOffice"/>
 
-        <label for="tagline1">Tagline:</label>
-        <input id="tagline1" formControlName="tagline"/>
+        <label for="taglineCreate">Tagline:</label>
+        <input id="taglineCreate" formControlName="tagline"/>
 
-        <label for="genre1">Genre:</label>
-        <select id="genre1" formControlName="genre">
+        <label for="genreCreate">Genre:</label>
+        <select id="genreCreate" formControlName="genre">
           <option value="ACTION">ACTION</option>
           <option value="TRAGEDY">TRAGEDY</option>
           <option value="THRILLER">THRILLER</option>
@@ -178,11 +178,11 @@
         <button type="button" (click)="toggleCoordinates()">Create Coordinates</button>
         <div *ngIf="coordinatesVisible" formGroupName="coordinates">
           <h3>Coordinates</h3>
-          <label for="x">X:</label>
-          <input id="x" type="number" formControlName="x"/>
+          <label for="xCreate">X:</label>
+          <input id="xCreate" type="number" formControlName="x"/>
 
-          <label for="y">Y:</label>
-          <input id="y" type="number" formControlName="y"/>
+          <label for="yCreate">Y:</label>
+          <input id="yCreate" type="number" formControlName="y"/>
 
           <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
         </div>
@@ -191,18 +191,18 @@
         <button type="button" (click)="toggleDirector()">Create Director</button>
         <div *ngIf="directorVisible" formGroupName="director">
           <h3>Director</h3>
-          <label for="directorName">director Name:</label>
-          <input id="directorName" formControlName="name"/>
+          <label for="directorNameCreate">director Name:</label>
+          <input id="directorNameCreate" formControlName="name"/>
 
-          <label for="directorEyeColor">Eye Color:</label>
-          <select id="directorEyeColor" formControlName="eyeColor">
+          <label for="directorEyeColorCreate">Eye Color:</label>
+          <select id="directorEyeColorCreate" formControlName="eyeColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
           </select>
 
-          <label for="directorHairColor">Hair Color:</label>
-          <select id="directorHairColor" formControlName="hairColor">
+          <label for="directorHairColorCreate">Hair Color:</label>
+          <select id="directorHairColorCreate" formControlName="hairColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
@@ -211,24 +211,24 @@
           <!-- Вложенный блок для Location -->
           <h4>Location</h4>
           <div formGroupName="location">
-            <label for="directorLocationX">Location X:</label>
-            <input id="directorLocationX" type="number" formControlName="x"/>
+            <label for="directorLocationXCreate">Location X:</label>
+            <input id="directorLocationXCreate" type="number" formControlName="x"/>
 
-            <label for="directorLocationY">Location Y:</label>
-            <input id="directorLocationY" type="number" formControlName="y"/>
+            <label for="directorLocationYCreate">Location Y:</label>
+            <input id="directorLocationYCreate" type="number" formControlName="y"/>
 
-            <label for="directorLocationZ">Location Z:</label>
-            <input id="directorLocationZ" type="number" formControlName="z"/>
+            <label for="directorLocationZCreate">Location Z:</label>
+            <input id="directorLocationZCreate" type="number" formControlName="z"/>
 
-            <label for="directorLocationName">Location Name:</label>
-            <input id="directorLocationName" formControlName="name"/>
+            <label for="directorLocationNameCreate">Location Name:</label>
+            <input id="directorLocationNameCreate" formControlName="name"/>
           </div>
 
-          <label for="directorHeight">Height:</label>
-          <input id="directorHeight" type="number" formControlName="height"/>
+          <label for="directorHeightCreate">Height:</label>
+          <input id="directorHeightCreate" type="number" formControlName="height"/>
 
-          <label for="directorNationality">Nationality:</label>
-          <select id="directorNationality" formControlName="nationality">
+          <label for="directorNationalityCreate">Nationality:</label>
+          <select id="directorNationalityCreate" formControlName="nationality">
             <option value="SPAIN">SPAIN</option>
             <option value="INDIA">INDIA</option>
             <option value="VATICAN">VATICAN</option>
@@ -240,18 +240,18 @@
         <button type="button" (click)="toggleScreenwriter()">Create Screenwriter</button>
         <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
           <h3>Screenwriter</h3>
-          <label for="screenwriterPersonName">Name:</label>
-          <input id="screenwriterPersonName" formControlName="name"/>
+          <label for="screenwriterPersonNameCreate">Name:</label>
+          <input id="screenwriterPersonNameCreate" formControlName="name"/>
 
-          <label for="screenwriterEyeColor">Eye Color:</label>
-          <select id="screenwriterEyeColor" formControlName="eyeColor">
+          <label for="screenwriterEyeColorCreate">Eye Color:</label>
+          <select id="screenwriterEyeColorCreate" formControlName="eyeColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
           </select>
 
-          <label for="screenwriterHairColor">Hair Color:</label>
-          <select id="screenwriterHairColor" formControlName="hairColor">
+          <label for="screenwriterHairColorCreate">Hair Color:</label>
+          <select id="screenwriterHairColorCreate" formControlName="hairColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
@@ -260,24 +260,24 @@
           <!-- Вложенный блок для Location -->
           <h4>Location</h4>
           <div formGroupName="location">
-            <label for="screenwriterLocationX">Location X:</label>
-            <input id="screenwriterLocationX" type="number" formControlName="x"/>
+            <label for="screenwriterLocationXCreate">Location X:</label>
+            <input id="screenwriterLocationXCreate" type="number" formControlName="x"/>
 
-            <label for="screenwriterLocationY">Location Y:</label>
-            <input id="screenwriterLocationY" type="number" formControlName="y"/>
+            <label for="screenwriterLocationYCreate">Location Y:</label>
+            <input id="screenwriterLocationYCreate" type="number" formControlName="y"/>
 
-            <label for="screenwriterLocationZ">Location Z:</label>
-            <input id="screenwriterLocationZ" type="number" formControlName="z"/>
+            <label for="screenwriterLocationZCreate">Location Z:</label>
+            <input id="screenwriterLocationZCreate" type="number" formControlName="z"/>
 
-            <label for="screenwriterLocationName">Location Name:</label>
-            <input id="screenwriterLocationName" formControlName="name"/>
+            <label for="screenwriterLocationNameCreate">Location Name:</label>
+            <input id="screenwriterLocationNameCreate" formControlName="name"/>
           </div>
 
-          <label for="screenwriterHeight">Height:</label>
-          <input id="screenwriterHeight" type="number" formControlName="height"/>
+          <label for="screenwriterHeightCreate">Height:</label>
+          <input id="screenwriterHeightCreate" type="number" formControlName="height"/>
 
-          <label for="screenwriterNationality">Nationality:</label>
-          <select id="screenwriterNationality" formControlName="nationality">
+          <label for="screenwriterNationalityCreate">Nationality:</label>
+          <select id="screenwriterNationalityCreate" formControlName="nationality">
             <option value="SPAIN">SPAIN</option>
             <option value="INDIA">INDIA</option>
             <option value="VATICAN">VATICAN</option>
@@ -289,18 +289,18 @@
         <button type="button" (click)="toggleOperator()">Create Operator</button>
         <div *ngIf="operatorVisible" formGroupName="operator">
           <h3>Person</h3>
-          <label for="operatorName">Name:</label>
-          <input id="operatorName" formControlName="name"/>
+          <label for="operatorNameCreate">Name:</label>
+          <input id="operatorNameCreate" formControlName="name"/>
 
-          <label for="operatorEyeColor">Eye Color:</label>
-          <select id="operatorEyeColor" formControlName="eyeColor">
+          <label for="operatorEyeColorCreate">Eye Color:</label>
+          <select id="operatorEyeColorCreate" formControlName="eyeColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
           </select>
 
-          <label for="operatorHairColor">Hair Color:</label>
-          <select id="operatorHairColor" formControlName="hairColor">
+          <label for="operatorHairColorCreate">Hair Color:</label>
+          <select id="operatorHairColorCreate" formControlName="hairColor">
             <option value="BLACK">BLACK</option>
             <option value="ORANGE">ORANGE</option>
             <option value="BROWN">BROWN</option>
@@ -309,24 +309,24 @@
           <!-- Вложенный блок для Location -->
           <h4>Location</h4>
           <div formGroupName="location">
-            <label for="operatorLocationX">Location X:</label>
-            <input id="operatorLocationX" type="number" formControlName="x"/>
+            <label for="operatorLocationXCreate">Location X:</label>
+            <input id="operatorLocationXCreate" type="number" formControlName="x"/>
 
-            <label for="operatorLocationY">Location Y:</label>
-            <input id="operatorLocationY" type="number" formControlName="y"/>
+            <label for="operatorLocationYCreate">Location Y:</label>
+            <input id="operatorLocationYCreate" type="number" formControlName="y"/>
 
-            <label for="operatorLocationZ">Location Z:</label>
-            <input id="operatorLocationZ" type="number" formControlName="z"/>
+            <label for="operatorLocationZCreate">Location Z:</label>
+            <input id="operatorLocationZCreate" type="number" formControlName="z"/>
 
-            <label for="operatorLocationName">Location Name:</label>
-            <input id="operatorLocationName" formControlName="name"/>
+            <label for="operatorLocationNameCreate">Location Name:</label>
+            <input id="operatorLocationNameCreate" formControlName="name"/>
           </div>
 
-          <label for="operatorHeight">Height:</label>
-          <input id="operatorHeight" type="number" formControlName="height"/>
+          <label for="operatorHeightCreate">Height:</label>
+          <input id="operatorHeightCreate" type="number" formControlName="height"/>
 
-          <label for="operatorNationality">Nationality:</label>
-          <select id="operatorNationality" formControlName="nationality">
+          <label for="operatorNationalityCreate">Nationality:</label>
+          <select id="operatorNationalityCreate" formControlName="nationality">
             <option value="SPAIN">SPAIN</option>
             <option value="INDIA">INDIA</option>
             <option value="VATICAN">VATICAN</option>
@@ -340,33 +340,223 @@
     </div>
   </div>
 
+  <!-- Модальное окно для обновления фильма -->
   <div class="modal" *ngIf="updateFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeUpdateFlag()">&times;</span>
-      <h2>Обновить фильм</h2>
-      <form (ngSubmit)="updateMovie(movie)">
-        <label for="name">Название</label>
-        <input type="text" id="name" [(ngModel)]="movie.name" name="name" required/>
+      <h2>Создать фильм</h2>
+      <form [formGroup]="movieUpdateForm" (ngSubmit)="updateMovie()">
+        <label for="nameUpdate">Name:</label>
+        <input id="nameUpdate" formControlName="name"/>
 
-        <label for="oscarsCount">Количество Оскаров</label>
-        <input type="number" id="oscarsCount" [(ngModel)]="movie.oscarsCount" name="oscarsCount" required/>
+        <label for="creationDateUpdate">Creation Date: </label>
+        <input id="creationDateUpdate" formControlName="creationDate"/>
 
-        <label for="budget">Бюджет</label>
-        <input type="number" id="budget" [(ngModel)]="movie.budget" name="budget" required/>
+        <label for="oscarsCountUpdate">Oscars Count:</label>
+        <input id="oscarsCountUpdate" type="number" formControlName="oscarsCount"/>
 
-        <label for="totalBoxOffice">Сборы</label>
-        <input type="number" id="totalBoxOffice" [(ngModel)]="movie.totalBoxOffice" name="totalBoxOffice" required/>
+        <label for="budgetUpdate">Budget:</label>
+        <input id="budgetUpdate" type="number" formControlName="budget"/>
 
-        <label for="mpaaRating">MPAA Рейтинг</label>
-        <select id="mpaaRating" [(ngModel)]="movie.mpaaRating" name="mpaaRating" required>
-          <option *ngFor="let rating of movie.mpaaRating" [value]="rating">{{ rating }}</option>
+        <label for="totalBoxOfficeUpdate">Total Box Office:</label>
+        <input id="totalBoxOfficeUpdate" type="number" formControlName="totalBoxOffice"/>
+
+        <label for="mpaaRatingUpdate">MPAA Rating:</label>
+        <select id="mpaaRatingUpdate" formControlName="mpaaRating">
+          <option value="G">G</option>
+          <option value="PG">PG</option>
+          <option value="PG_13">PG-13</option>
+          <option value="R">R</option>
         </select>
 
-        <button type="submit">Обновить</button>
+        <label for="lengthUpdate">Length:</label>
+        <input id="lengthUpdate" type="number" formControlName="length"/>
+
+        <label for="goldenPalmCountUpdate">Golden Palm Count:</label>
+        <input id="goldenPalmCountUpdate" type="number" formControlName="goldenPalmCount"/>
+
+        <label for="usaBoxOfficeUpdate">Usa Box Office:</label>
+        <input id="usaBoxOfficeUpdate" type="number" formControlName="usaBoxOffice"/>
+
+        <label for="taglineUpdate">Tagline:</label>
+        <input id="taglineUpdate" formControlName="tagline"/>
+
+        <label for="genreUpdate">Genre:</label>
+        <select id="genreUpdate" formControlName="genre">
+          <option value="ACTION">ACTION</option>
+          <option value="TRAGEDY">TRAGEDY</option>
+          <option value="THRILLER">THRILLER</option>
+          <option value="FANTASY">FANTASY</option>
+          <option value="SCIENCE_FICTION">SCIENCE_FICTION</option>
+        </select>
+
+        <!-- Блок для Coordinates -->
+        <button type="button" (click)="toggleCoordinates()">Update Coordinates</button>
+        <div *ngIf="coordinatesVisible" formGroupName="coordinates">
+          <h3>Coordinates</h3>
+          <label for="xUpdate">X:</label>
+          <input id="xUpdate" type="number" formControlName="x"/>
+
+          <label for="yUpdate">Y:</label>
+          <input id="yUpdate" type="number" formControlName="y"/>
+
+          <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+        </div>
+
+        <!-- Блок для Person -->
+        <button type="button" (click)="toggleDirector()">Update Director</button>
+        <div *ngIf="directorVisible" formGroupName="director">
+          <h3>Director</h3>
+          <label for="directorNameUpdate">director Name:</label>
+          <input id="directorNameUpdate" formControlName="name"/>
+
+          <label for="directorEyeColorUpdate">Eye Color:</label>
+          <select id="directorEyeColorUpdate" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="directorHairColorUpdate">Hair Color:</label>
+          <select id="directorHairColorUpdate" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="directorLocationXUpdate">Location X:</label>
+            <input id="directorLocationXUpdate" type="number" formControlName="x"/>
+
+            <label for="directorLocationYUpdate">Location Y:</label>
+            <input id="directorLocationYUpdate" type="number" formControlName="y"/>
+
+            <label for="directorLocationZUpdate">Location Z:</label>
+            <input id="directorLocationZUpdate" type="number" formControlName="z"/>
+
+            <label for="directorLocationNameUpdate">Location Name:</label>
+            <input id="directorLocationNameUpdate" formControlName="name"/>
+          </div>
+
+          <label for="directorHeightUpdate">Height:</label>
+          <input id="directorHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="directorNationalityUpdate">Nationality:</label>
+          <select id="directorNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingDirector()">Load Existing Director</button>
+        </div>
+
+        <button type="button" (click)="toggleScreenwriter()">Update Screenwriter</button>
+        <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
+          <h3>Screenwriter</h3>
+          <label for="screenwriterPersonNameUpdate">Name:</label>
+          <input id="screenwriterPersonNameUpdate" formControlName="name"/>
+
+          <label for="screenwriterEyeColorUpdate">Eye Color:</label>
+          <select id="screenwriterEyeColorUpdate" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="screenwriterHairColorUpdate">Hair Color:</label>
+          <select id="screenwriterHairColorUpdate" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="screenwriterLocationXUpdate">Location X:</label>
+            <input id="screenwriterLocationXUpdate" type="number" formControlName="x"/>
+
+            <label for="screenwriterLocationYUpdate">Location Y:</label>
+            <input id="screenwriterLocationYUpdate" type="number" formControlName="y"/>
+
+            <label for="screenwriterLocationZUpdate">Location Z:</label>
+            <input id="screenwriterLocationZUpdate" type="number" formControlName="z"/>
+
+            <label for="screenwriterLocationNameUpdate">Location Name:</label>
+            <input id="screenwriterLocationNameUpdate" formControlName="name"/>
+          </div>
+
+          <label for="screenwriterHeightUpdate">Height:</label>
+          <input id="screenwriterHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="screenwriterNationalityUpdate">Nationality:</label>
+          <select id="screenwriterNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingScreenwriter()">Load Existing Screenwriter</button>
+        </div>
+
+        <button type="button" (click)="toggleOperator()">Update Operator</button>
+        <div *ngIf="operatorVisible" formGroupName="operator">
+          <h3>Person</h3>
+          <label for="operatorNameUpdate">Name:</label>
+          <input id="operatorNameUpdate" formControlName="name"/>
+
+          <label for="operatorEyeColorUpdate">Eye Color:</label>
+          <select id="operatorEyeColorUpdate" formControlName="eyeColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <label for="operatorHairColorUpdate">Hair Color:</label>
+          <select id="operatorHairColorUpdate" formControlName="hairColor">
+            <option value="BLACK">BLACK</option>
+            <option value="ORANGE">ORANGE</option>
+            <option value="BROWN">BROWN</option>
+          </select>
+
+          <!-- Вложенный блок для Location -->
+          <h4>Location</h4>
+          <div formGroupName="location">
+            <label for="operatorLocationXUpdate">Location X:</label>
+            <input id="operatorLocationXUpdate" type="number" formControlName="x"/>
+
+            <label for="operatorLocationYUpdate">Location Y:</label>
+            <input id="operatorLocationYUpdate" type="number" formControlName="y"/>
+
+            <label for="operatorLocationZUpdate">Location Z:</label>
+            <input id="operatorLocationZUpdate" type="number" formControlName="z"/>
+
+            <label for="operatorLocationNameUpdate">Location Name:</label>
+            <input id="operatorLocationNameUpdate" formControlName="name"/>
+          </div>
+
+          <label for="operatorHeightUpdate">Height:</label>
+          <input id="operatorHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="operatorNationalityUpdate">Nationality:</label>
+          <select id="operatorNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
+          <button type="button" (click)="loadExistingOperator()">Load Existing Operator</button>
+        </div>
+
+        <button type="submit">Update Movie</button>
       </form>
     </div>
   </div>
 
+  <!-- Модальное окно для удаления фильма -->
   <div class="modal" *ngIf="deleteFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeDeleteFlag()">&times;</span>
@@ -377,6 +567,7 @@
     </div>
   </div>
 
+  <!-- Модальное окно для поиска фильма -->
   <div class="modal" *ngIf="searchFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeSearchFlag()">&times;</span>
@@ -390,6 +581,7 @@
     </div>
   </div>
 
+  <!-- Модальное окно для уведомлений -->
   <div class="modal" *ngIf="notsFlag">
     <div class="modal-content">
       <h2>Заявки на администрирование</h2>
