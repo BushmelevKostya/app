@@ -1,7 +1,7 @@
 package itmo.app.model.collections;
 
-import itmo.app.model.Movie;
-import itmo.app.model.Person;
+import itmo.app.model.entity.Movie;
+import itmo.app.model.entity.Person;
 
 import java.util.ArrayList;
 

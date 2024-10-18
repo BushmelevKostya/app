@@ -1,4 +1,4 @@
-package itmo.app.model;
+package itmo.app.model.entity;
 
 import jakarta.persistence.*;
 

@@ -3,7 +3,6 @@ import { Router } from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -21,6 +20,11 @@ import {Observable} from 'rxjs';
 
 export class HomeComponent {
   constructor(private router: Router, private fb: FormBuilder, private http: HttpClient) {
+    this.isAdmin = sessionStorage.getItem('isAdmin') === 'true'
+    if (this.isAdmin) {
+      this.loadRequests()
+    }
+
     this.movieCreateForm = this.initMovieForm()
     this.getMovies();
     this.movieUpdateForm = this.initMovieForm()
@@ -38,16 +42,16 @@ export class HomeComponent {
   directorVisible = false
   screenwriterVisible = false
   operatorVisible = false
-  isAdmin = 1
+  isAdmin = false
   menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
   foundMovie: any = null;
-  request = {
-    id: 1,
-    userEmail: "kosbush@gmail.com"
-  }
-  requests = [this.request]
+  // request = {
+  //   id: 1,
+  //   userEmail: "kosbush@gmail.com"
+  // }
+  requests: any[] = []
 
   movie = {
     id: 0,
@@ -130,6 +134,18 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       })
     });
+  }
+
+  loadRequests() {
+    this.http.get<any[]>('/api/notifications/pending')
+      .subscribe(
+        (data) => {
+          this.requests = data;
+        },
+        (error) => {
+          console.error("Ошибка при загрузке уведомлений:", error);
+        }
+      );
   }
 
   changeCreateFlag() {
@@ -307,5 +323,18 @@ export class HomeComponent {
         console.log(error)
       }
     )
+  }
+
+  approveRequest(id: number) {
+    this.http.post(`/api/notifications/approve/${id}`, {})
+      .subscribe(
+        () => {
+          alert("Заявка одобрена.");
+          this.loadRequests();
+        },
+        (error) => {
+          console.error("Ошибка при одобрении заявки:", error);
+        }
+      );
   }
 }

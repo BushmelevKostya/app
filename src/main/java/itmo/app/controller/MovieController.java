@@ -1,6 +1,6 @@
 package itmo.app.controller;
 
-import itmo.app.model.Movie;
+import itmo.app.model.entity.Movie;
 import itmo.app.model.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
