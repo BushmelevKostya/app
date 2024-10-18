@@ -579,17 +579,21 @@
           <thead>
           <tr>
             <th>ID</th>
-            <th>Название</th>
-            <th>Дата создания</th>
-            <th>Количество Оскаров</th>
-            <th>Бюджет</th>
-            <th>Общие кассовые сборы</th>
-            <th>Рейтинг MPAA</th>
-            <th>Длительность</th>
-            <th>Золотая пальмовая ветвь</th>
-            <th>Кассовые сборы в США</th>
-            <th>Слоган</th>
-            <th>Жанр</th>
+            <th>Name</th>
+            <th>Creation Date</th>
+            <th>Oscars Count</th>
+            <th>Budget</th>
+            <th>Total Box Office</th>
+            <th>MPAA Rating</th>
+            <th>Length</th>
+            <th>Golden Palm Count</th>
+            <th>USA Box Office</th>
+            <th>Tagline</th>
+            <th>Genre</th>
+            <th>Coordinates</th>
+            <th>Director</th>
+            <th>Screenwriter</th>
+            <th>Operator</th>
           </tr>
           </thead>
           <tbody>
@@ -606,6 +610,53 @@
             <td>{{ foundMovie.usaBoxOffice }}</td>
             <td>{{ foundMovie.tagline }}</td>
             <td>{{ foundMovie.genre }}</td>
+
+            <!-- Coordinates -->
+            <td>
+              <div class="attribute-label">X:</div>
+              <div>{{ foundMovie.coordinates.x }}</div>
+              <div class="attribute-label">Y:</div>
+              <div>{{ foundMovie.coordinates.y }}</div>
+            </td>
+
+            <!-- Director -->
+            <td>
+              <div class="object-header">Director's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ foundMovie.director.name }}</div>
+                <div>Eye Color: {{ foundMovie.director.eyeColor }}</div>
+                <div>Hair Color: {{ foundMovie.director.hairColor }}</div>
+                <div>Location: {{ foundMovie.director.location.name }} ({{ foundMovie.director.location.x }}, {{ foundMovie.director.location.y }}, {{ foundMovie.director.location.z }})</div>
+                <div>Height: {{ foundMovie.director.height }}</div>
+                <div>Nationality: {{ foundMovie.director.nationality }}</div>
+              </div>
+            </td>
+
+            <!-- Screenwriter -->
+            <td>
+              <div class="object-header">Screenwriter's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ foundMovie.screenwriter.name }}</div>
+                <div>Eye Color: {{ foundMovie.screenwriter.eyeColor }}</div>
+                <div>Hair Color: {{ foundMovie.screenwriter.hairColor }}</div>
+                <div>Location: {{ foundMovie.screenwriter.location.name }} ({{ foundMovie.screenwriter.location.x }}, {{ foundMovie.screenwriter.location.y }}, {{ foundMovie.screenwriter.location.z }})</div>
+                <div>Height: {{ foundMovie.screenwriter.height }}</div>
+                <div>Nationality: {{ foundMovie.screenwriter.nationality }}</div>
+              </div>
+            </td>
+
+            <!-- Operator -->
+            <td>
+              <div class="object-header">Operator's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ foundMovie.operator.name }}</div>
+                <div>Eye Color: {{ foundMovie.operator.eyeColor }}</div>
+                <div>Hair Color: {{ foundMovie.operator.hairColor }}</div>
+                <div>Location: {{ foundMovie.operator.location.name }} ({{ foundMovie.operator.location.x }}, {{ foundMovie.operator.location.y }}, {{ foundMovie.operator.location.z }})</div>
+                <div>Height: {{ foundMovie.operator.height }}</div>
+                <div>Nationality: {{ foundMovie.operator.nationality }}</div>
+              </div>
+            </td>
           </tr>
           </tbody>
         </table>

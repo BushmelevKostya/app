@@ -43,6 +43,6 @@ public class MovieController {
 	@GetMapping("/action/{id}")
 	public ResponseEntity<Movie> getMovieById(@PathVariable long id) {
 		Optional<Movie> movie = movieRepository.findById(id);
-		return movie.map(value -> new ResponseEntity<>(value, HttpStatus.FOUND)).orElse(null);
+		return movie.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElse(null);
 	}
 }
