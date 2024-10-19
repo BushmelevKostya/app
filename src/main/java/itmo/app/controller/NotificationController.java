@@ -1,7 +1,9 @@
 package itmo.app.controller;
 
 import itmo.app.model.entity.Notification;
+import itmo.app.model.entity.User;
 import itmo.app.model.repository.NotificationRepository;
+import itmo.app.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ import java.util.Optional;
 public class NotificationController {
 	@Autowired
 	private NotificationRepository notificationRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@PostMapping("/request")
 	public ResponseEntity<Notification> createRequest(@RequestBody Notification notification) {
@@ -36,6 +41,16 @@ public class NotificationController {
 			Notification notification = request.get();
 			notification.setApproved(true);
 			notificationRepository.save(notification);
+			System.out.println(notification.getUserEmail());
+			Optional<User> isUser = userRepository.findByEmail(notification.getUserEmail());
+			User user;
+			if (isUser.isPresent()) {
+				System.out.println(123);
+				user = isUser.get();
+				user.setApprovedAdmin(true);
+				userRepository.save(user);
+			}
+			
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);

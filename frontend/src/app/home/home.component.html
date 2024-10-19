@@ -15,7 +15,6 @@
   <div class="side-menu" [class.open]="menuOpen">
     <ul>
       <li><a (click)="navigateTo('/visualize')">Визуализация объектов</a></li>
-      <li><a (click)="navigateTo('/admin-login')">Зайти как администратор</a></li>
       <li><a (click)="navigateTo('/register')">Зарегистрироваться</a></li>
     </ul>
   </div>
@@ -676,7 +675,7 @@
       <ul>
         <li *ngFor="let request of requests">
           {{ request.userEmail }}
-          <button (click)="toDoMethod()">Одобрить</button>
+          <button (click)="approveRequest(request.id)">Одобрить</button>
         </li>
       </ul>
       <button (click)="changeNotsFlag()">Закрыть</button>

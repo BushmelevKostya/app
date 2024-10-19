@@ -24,7 +24,7 @@ export class RegistrationComponent {
 
   register() {
     if (this.password !== this.confirmPassword) {
-      alert("Пароли не совпадают!");
+      alert("Passwords are different!");
       return;
     }
 
@@ -36,14 +36,14 @@ export class RegistrationComponent {
     this.http.post(`/api/users/register?isAdminRequest=${this.isAdminRequest}`, userData)
       .subscribe(
         (response) => {
-          console.log("Регистрация успешна!", response);
+          alert("Registration sucessful!");
           this.router.navigate(['/login']);
         },
         (error) => {
           if (error.status === 202) {
-            alert("Запрос на регистрацию как администратор создан, дождитесь одобрения.");
+            alert("A request to register as an administrator has been created, please wait for approval.");
           } else {
-            console.error("Ошибка регистрации:", error.message);
+            alert("Registration error:" + error.message);
           }
         }
       );

@@ -329,11 +329,11 @@ export class HomeComponent {
     this.http.post(`/api/notifications/approve/${id}`, {})
       .subscribe(
         () => {
-          alert("Заявка одобрена.");
+          alert("Application approved");
           this.loadRequests();
         },
         (error) => {
-          console.error("Ошибка при одобрении заявки:", error);
+          alert("Error approving application:" + error.message);
         }
       );
   }

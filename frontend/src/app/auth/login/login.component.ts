@@ -24,17 +24,21 @@ export class LoginComponent {
       isAdmin: this.isAdminLogin
     };
 
-    this.http.post(`/api/users/login`, loginData)
+    this.http.post<any>(`/api/users/login`, loginData, {observe: 'response'})
       .subscribe(
         (response: any) => {
-          alert(response.message)
-          if (this.isAdminLogin && response === "Администратор успешно вошел") {
-            sessionStorage.setItem('isAdmin', 'true');
+          if (response.status === 200) {
+            if (this.isAdminLogin && response.body?.message === "The administrator has successfully logged in") {
+              sessionStorage.setItem('isAdmin', 'true');
+            }
+            alert(response.body?.message || "Login successful");
+            this.router.navigate(['/home']);
+          } else if (response.status === 202) {
+            alert(response.body?.message);
           }
-          this.router.navigate(['/home']);
         },
         (error) => {
-          alert("Ошибка входа: " + error.message)
+          alert("Error: " + error.message);
         }
       );
   }
