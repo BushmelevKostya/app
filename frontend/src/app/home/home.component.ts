@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router'
+import {Component} from '@angular/core';
+import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
@@ -56,14 +56,35 @@ export class HomeComponent {
   movie = {
     id: 0,
     name: 'Чип и Дейл',
-    coordinates: { x: 0, y: 0 },
+    coordinates: {x: 0, y: 0},
     oscarsCount: 3,
     budget: 1000000000,
     totalBoxOffice: 100000000000000,
     mpaaRating: 'Самый крутой',
-    director: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
-    screenwriter: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
-    operator: { name: '1', eyeColor: '1', hairColor: '1', location: { x: 0, y: 0, z: 0, name: '1' }, height: 0, nationality: '1' },
+    director: {
+      name: '1',
+      eyeColor: '1',
+      hairColor: '1',
+      location: {x: 0, y: 0, z: 0, name: '1'},
+      height: 0,
+      nationality: '1'
+    },
+    screenwriter: {
+      name: '1',
+      eyeColor: '1',
+      hairColor: '1',
+      location: {x: 0, y: 0, z: 0, name: '1'},
+      height: 0,
+      nationality: '1'
+    },
+    operator: {
+      name: '1',
+      eyeColor: '1',
+      hairColor: '1',
+      location: {x: 0, y: 0, z: 0, name: '1'},
+      height: 0,
+      nationality: '1'
+    },
     length: 0,
     goldenPalmCount: 0,
     usaBoxOffice: null,
@@ -73,6 +94,10 @@ export class HomeComponent {
   };
 
   movies: any[] = [this.movie, this.movie]
+  existingCoordinates: any[] = [];
+  existingDirectors: any[] = [];
+  existingScreenwriters: any[] = [];
+  existingOperators: any[] = [];
 
   //TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
@@ -91,6 +116,7 @@ export class HomeComponent {
       tagline: ['defaultTagline', Validators.required],
       genre: ['ACTION', Validators.required],
       coordinates: this.fb.group({
+        id: ['', Validators.required],
         x: [0, Validators.required],
         y: [0, Validators.required]
       }),
@@ -167,6 +193,7 @@ export class HomeComponent {
   toDoMethod() {
     //TODO
   }
+
   navigateTo(address: String) {
     this.router.navigate([address])
   }
@@ -179,24 +206,78 @@ export class HomeComponent {
     this.directorVisible = !this.directorVisible;
   }
 
-  loadExistingDirector() {
+  loadExistingPersons() {
+    this.http.get('/api/persons').subscribe(
+      (response: any) => {
+        this.existingDirectors = response;
+        this.existingScreenwriters = response;
+        this.existingOperators = response;
+      },
+      (error) => {
+        console.error("Error loading persons:", error);
+      }
+    );
   }
 
   loadExistingCoordinates() {
+    this.http.get('/api/coordinates').subscribe(
+      (response: any) => {
+        this.existingCoordinates = response;
+      },
+      (error) => {
+        console.error("Error loading coordinates:", error);
+      }
+    );
+  }
+
+  selectCoordinate(coordinate: any) {
+    this.movieCreateForm.get('coordinates.id')?.setValue(coordinate.id);
+    this.movieCreateForm.get('coordinates.x')?.setValue(coordinate.x);
+    this.movieCreateForm.get('coordinates.y')?.setValue(coordinate.y);
+  }
+
+  selectDirector(director: any) {
+    this.movieCreateForm.get('director.name')?.setValue(director.name);
+    this.movieCreateForm.get('director.eyeColor')?.setValue(director.eyeColor);
+    this.movieCreateForm.get('director.hairColor')?.setValue(director.hairColor);
+    this.movieCreateForm.get('director.location.x')?.setValue(director.location.x);
+    this.movieCreateForm.get('director.location.y')?.setValue(director.location.y);
+    this.movieCreateForm.get('director.location.z')?.setValue(director.location.z);
+    this.movieCreateForm.get('director.location.name')?.setValue(director.location.name);
+    this.movieCreateForm.get('director.height')?.setValue(director.height);
+    this.movieCreateForm.get('director.nationality')?.setValue(director.nationality);
+  }
+
+  selectScreenwriter(screenwriter: any) {
+    this.movieCreateForm.get('screenwriter.name')?.setValue(screenwriter.name);
+    this.movieCreateForm.get('screenwriter.eyeColor')?.setValue(screenwriter.eyeColor);
+    this.movieCreateForm.get('screenwriter.hairColor')?.setValue(screenwriter.hairColor);
+    this.movieCreateForm.get('screenwriter.location.x')?.setValue(screenwriter.location.x);
+    this.movieCreateForm.get('screenwriter.location.y')?.setValue(screenwriter.location.y);
+    this.movieCreateForm.get('screenwriter.location.z')?.setValue(screenwriter.location.z);
+    this.movieCreateForm.get('screenwriter.location.name')?.setValue(screenwriter.location.name);
+    this.movieCreateForm.get('screenwriter.height')?.setValue(screenwriter.height);
+    this.movieCreateForm.get('screenwriter.nationality')?.setValue(screenwriter.nationality);
+  }
+
+  selectOperator(operator: any) {
+    this.movieCreateForm.get('operator.name')?.setValue(operator.name);
+    this.movieCreateForm.get('operator.eyeColor')?.setValue(operator.eyeColor);
+    this.movieCreateForm.get('operator.hairColor')?.setValue(operator.hairColor);
+    this.movieCreateForm.get('operator.location.x')?.setValue(operator.location.x);
+    this.movieCreateForm.get('operator.location.y')?.setValue(operator.location.y);
+    this.movieCreateForm.get('operator.location.z')?.setValue(operator.location.z);
+    this.movieCreateForm.get('operator.location.name')?.setValue(operator.location.name);
+    this.movieCreateForm.get('operator.height')?.setValue(operator.height);
+    this.movieCreateForm.get('operator.nationality')?.setValue(operator.nationality);
   }
 
   toggleScreenwriter() {
     this.screenwriterVisible = !this.screenwriterVisible;
   }
 
-  loadExistingScreenwriter() {
-  }
-
   toggleOperator() {
     this.operatorVisible = !this.operatorVisible;
-  }
-
-  loadExistingOperator() {
   }
 
   getMovies() {
@@ -206,18 +287,16 @@ export class HomeComponent {
   }
 
   createMovie() {
-    if (this.movieCreateForm.valid) {
-      this.http.post('http://localhost:8080/api/action', this.movieCreateForm.value).subscribe(
-        response => {
-          this.getMovies()
-          this.changeCreateFlag()
-        },
-        error => {
-          console.error('Error creating movie', error)
-        });
-    } else {
-      console.error("Form is invalid")
-    }
+    // this.movieCreateForm.value.coordinates.id = -1
+    this.http.post('http://localhost:8080/api/action', this.movieCreateForm.value).subscribe(
+      response => {
+        this.getMovies()
+        this.changeCreateFlag()
+      },
+      error => {
+        console.error('Error creating movie', error)
+      });
+    // }
   }
 
   openDeleteModal(id: number) {
@@ -308,7 +387,7 @@ export class HomeComponent {
   }
 
   searchMovie() {
-    this.http.get<any>(`${this.apiUrl}/${this.searchId}`).subscribe( (data: any) => {
+    this.http.get<any>(`${this.apiUrl}/${this.searchId}`).subscribe((data: any) => {
         console.log("start")
         if (data !== null) {
           this.foundMovie = data;

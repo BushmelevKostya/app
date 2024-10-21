@@ -15,7 +15,7 @@ public class Movie {
 	@Column(nullable = false)
 	private String name; //Поле не может быть null, Строка не может быть пустой
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "coordinates_id")
 	private Coordinates coordinates; //Поле не может быть null
 	

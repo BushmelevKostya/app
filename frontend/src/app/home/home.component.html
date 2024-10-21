@@ -173,13 +173,23 @@
         <button type="button" (click)="toggleCoordinates()">Create Coordinates</button>
         <div *ngIf="coordinatesVisible" formGroupName="coordinates">
           <h3>Coordinates</h3>
+          <label for="idCoordinatesCreate">ID:</label>
+          <input id="idCoordinatesCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="xCreate">X:</label>
           <input id="xCreate" type="number" formControlName="x"/>
 
           <label for="yCreate">Y:</label>
           <input id="yCreate" type="number" formControlName="y"/>
 
-          <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+          <div>
+            <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+            <ul *ngIf="existingCoordinates.length > 0">
+              <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
+                {{coordinate.id}}, {{ coordinate.x }}, {{ coordinate.y }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Блок для Person -->
@@ -229,7 +239,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingDirector()">Load Existing Director</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
+            <ul *ngIf="existingDirectors.length > 0">
+              <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
+                {{ director.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="button" (click)="toggleScreenwriter()">Create Screenwriter</button>
@@ -278,7 +295,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingScreenwriter()">Load Existing Screenwriter</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
+            <ul *ngIf="existingScreenwriters.length > 0">
+              <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
+                {{ screenwriter.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="button" (click)="toggleOperator()">Create Operator</button>
@@ -327,7 +351,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingOperator()">Load Existing Operator</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>
+            <ul *ngIf="existingOperators.length > 0">
+              <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
+                {{ operator.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="submit">Create Movie</button>
@@ -445,7 +476,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingDirector()">Load Existing Director</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
+            <ul *ngIf="existingDirectors.length > 0">
+              <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
+                {{ director.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="button" (click)="toggleScreenwriter()">Update Screenwriter</button>
@@ -494,7 +532,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingScreenwriter()">Load Existing Screenwriter</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
+            <ul *ngIf="existingScreenwriters.length > 0">
+              <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
+                {{ screenwriter.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="button" (click)="toggleOperator()">Update Operator</button>
@@ -543,7 +588,14 @@
             <option value="VATICAN">VATICAN</option>
           </select>
 
-          <button type="button" (click)="loadExistingOperator()">Load Existing Operator</button>
+          <div>
+            <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>
+            <ul *ngIf="existingOperators.length > 0">
+              <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
+                {{ operator.name }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <button type="submit">Update Movie</button>

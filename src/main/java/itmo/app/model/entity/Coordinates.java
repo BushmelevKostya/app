@@ -15,9 +15,6 @@ public class Coordinates {
 	@Column(nullable = false) // Поле не может быть null
 	private int y;
 	
-	@OneToOne(mappedBy = "coordinates")
-	private Movie movie;
-	
 	public long getId() {
 		return id;
 	}
