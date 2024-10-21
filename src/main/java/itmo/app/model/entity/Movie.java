@@ -15,7 +15,7 @@ public class Movie {
 	@Column(nullable = false)
 	private String name; //Поле не может быть null, Строка не может быть пустой
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "coordinates_id")
 	private Coordinates coordinates; //Поле не может быть null
 	
@@ -36,15 +36,15 @@ public class Movie {
 	@Column(nullable = false)
 	private MpaaRating mpaaRating; //Поле не может быть null
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "person_id")
 	private Person director; //Поле может быть null
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "screenwriter_id")
 	private Person screenwriter;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "operator_id")
 	private Person operator; //Поле может быть null
 	
