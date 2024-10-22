@@ -117,7 +117,7 @@
         </td>
 
         <td>
-          <button (click)="openUpdateModal(movie)">Обновить</button>
+          <button (click)="openUpdateModal(movie.id)">Обновить</button>
           <button (click)="openDeleteModal(movie.id)">Удалить</button>
         </td>
       </tr>
@@ -427,7 +427,7 @@
   <div class="modal" *ngIf="updateFlag">
     <div class="modal-content">
       <span class="close-btn" (click)="changeUpdateFlag()">&times;</span>
-      <h2>Создать фильм</h2>
+      <h2>Обновить фильм</h2>
       <form [formGroup]="movieUpdateForm" (ngSubmit)="updateMovie()">
         <label for="nameUpdate">Name:</label>
         <input id="nameUpdate" formControlName="name"/>
@@ -520,9 +520,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="directorHeightUpdate">Height:</label>
+          <input id="directorHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="directorNationalityUpdate">Nationality:</label>
+          <select id="directorNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleDirectorLocation()">Update Location</button>
+          <div *ngIf="directorLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idDirectorLocationUpdate">ID:</label>
+            <input id="idDirectorLocationUpdate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="directorLocationXUpdate">Location X:</label>
             <input id="directorLocationXUpdate" type="number" formControlName="x"/>
 
@@ -534,17 +549,16 @@
 
             <label for="directorLocationNameUpdate">Location Name:</label>
             <input id="directorLocationNameUpdate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectDirectorLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="directorHeightUpdate">Height:</label>
-          <input id="directorHeightUpdate" type="number" formControlName="height"/>
-
-          <label for="directorNationalityUpdate">Nationality:</label>
-          <select id="directorNationalityUpdate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
@@ -579,9 +593,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="screenwriterHeightUpdate">Height:</label>
+          <input id="screenwriterHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="screenwriterNationalityUpdate">Nationality:</label>
+          <select id="screenwriterNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleScreenwriterLocation()">Update Location</button>
+          <div *ngIf="screenwriterLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idScreenwriterLocationUpdate">ID:</label>
+            <input id="idScreenwriterLocationUpdate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="screenwriterLocationXUpdate">Location X:</label>
             <input id="screenwriterLocationXUpdate" type="number" formControlName="x"/>
 
@@ -593,17 +622,16 @@
 
             <label for="screenwriterLocationNameUpdate">Location Name:</label>
             <input id="screenwriterLocationNameUpdate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectScreenwriterLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="screenwriterHeightUpdate">Height:</label>
-          <input id="screenwriterHeightUpdate" type="number" formControlName="height"/>
-
-          <label for="screenwriterNationalityUpdate">Nationality:</label>
-          <select id="screenwriterNationalityUpdate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
@@ -638,9 +666,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="operatorHeightUpdate">Height:</label>
+          <input id="operatorHeightUpdate" type="number" formControlName="height"/>
+
+          <label for="operatorNationalityUpdate">Nationality:</label>
+          <select id="operatorNationalityUpdate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleOperatorLocation()">Update Location</button>
+          <div *ngIf="operatorLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idOperatorLocationUpdate">ID:</label>
+            <input id="idOperatorLocationUpdate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="operatorLocationXUpdate">Location X:</label>
             <input id="operatorLocationXUpdate" type="number" formControlName="x"/>
 
@@ -652,17 +695,16 @@
 
             <label for="operatorLocationNameUpdate">Location Name:</label>
             <input id="operatorLocationNameUpdate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectOperatorLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="operatorHeightUpdate">Height:</label>
-          <input id="operatorHeightUpdate" type="number" formControlName="height"/>
-
-          <label for="operatorNationalityUpdate">Nationality:</label>
-          <select id="operatorNationalityUpdate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>

@@ -26,8 +26,8 @@ export class HomeComponent {
     }
 
     this.movieCreateForm = this.initMovieForm()
-    this.getMovies();
     this.movieUpdateForm = this.initMovieForm()
+    this.getMovies();
   }
 
   apiUrl = "http://localhost:8080/api/action"
@@ -392,63 +392,9 @@ export class HomeComponent {
     });
   }
 
-  openUpdateModal(movie: any) {
-    this.movieUpdateForm = this.fb.group({
-      name: [movie.name, Validators.required],
-      creationDate: [movie.creationDate, Validators.required],
-      oscarsCount: [movie.oscarsCount, [Validators.required, Validators.min(1)]],
-      budget: [movie.budget, [Validators.required, Validators.min(1)]],
-      totalBoxOffice: [movie.totalBoxOffice, [Validators.required, Validators.min(1)]],
-      mpaaRating: [movie.mpaaRating, Validators.required],
-      length: [movie.length, Validators.required],
-      goldenPalmCount: [movie.goldenPalmCount, Validators.required],
-      usaBoxOffice: [movie.usaBoxOffice, Validators.required],
-      tagline: [movie.tagline, Validators.required],
-      genre: [movie.genre, Validators.required],
-      coordinates: this.fb.group({
-        x: [movie.coordinates.x, Validators.required],
-        y: [movie.coordinates.y, Validators.required]
-      }),
-      director: this.fb.group({
-        name: [movie.director.name, Validators.required],
-        eyeColor: [movie.director.eyeColor, Validators.required],
-        hairColor: [movie.director.hairColor, Validators.required],
-        location: this.fb.group({
-          x: [movie.director.location.x, Validators.required],
-          y: [movie.director.location.y, Validators.required],
-          z: [movie.director.location.z, Validators.required],
-          name: [movie.director.location.name, Validators.required]
-        }),
-        height: [movie.director.height, Validators.required],
-        nationality: [movie.director.nationality, Validators.required]
-      }),
-      screenwriter: this.fb.group({
-        name: [movie.screenwriter.name, Validators.required],
-        eyeColor: [movie.screenwriter.eyeColor, Validators.required],
-        hairColor: [movie.screenwriter.hairColor, Validators.required],
-        location: this.fb.group({
-          x: [movie.screenwriter.location.x, Validators.required],
-          y: [movie.screenwriter.location.y, Validators.required],
-          z: [movie.screenwriter.location.z, Validators.required],
-          name: [movie.screenwriter.location.name, Validators.required]
-        }),
-        height: [movie.screenwriter.height, Validators.required],
-        nationality: [movie.screenwriter.nationality, Validators.required]
-      }),
-      operator: this.fb.group({
-        name: [movie.operator.name, Validators.required],
-        eyeColor: [movie.operator.eyeColor, Validators.required],
-        hairColor: [movie.operator.hairColor, Validators.required],
-        location: this.fb.group({
-          x: [movie.operator.location.x, Validators.required],
-          y: [movie.operator.location.y, Validators.required],
-          z: [movie.operator.location.z, Validators.required],
-          name: [movie.operator.location.name, Validators.required]
-        }),
-        height: [movie.operator.height, Validators.required],
-        nationality: [movie.operator.nationality, Validators.required]
-      })
-    });
+  openUpdateModal(id: any) {
+    this.movieUpdateForm = this.initMovieForm()
+    this.selectedMovieId = id
     this.changeUpdateFlag()
   }
 
@@ -457,11 +403,12 @@ export class HomeComponent {
   }
 
   updateMovie() {
-    return this.http.put<any[]>(`${this.apiUrl}`, this.movieUpdateForm.value).subscribe((data: any[]) => {
-      this.movies = data
-      this.changeUpdateFlag()
-      this.initVars()
-    })
+    return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}`, this.movieUpdateForm.value)
+      .subscribe((data: any[]) => {
+        this.movies = data;
+        this.changeUpdateFlag();
+        this.initVars();
+      });
   }
 
   searchMovie() {

@@ -1,5 +1,6 @@
 package itmo.app.controller;
 
+import itmo.app.controller.enums.Command;
 import itmo.app.model.entity.Coordinates;
 import itmo.app.model.entity.Location;
 import itmo.app.model.entity.Movie;
@@ -81,12 +82,62 @@ public class MovieController {
 	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long id) {
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
 		
-		if (movieToDelete.isPresent()) {
-			Coordinates coordinates = movieToDelete.get().getCoordinates();
-			Person director = movieToDelete.get().getDirector();
-			Person screenwriter = movieToDelete.get().getScreenwriter();
-			Person operator = movieToDelete.get().getOperator();
-			movieRepository.deleteById(id);
+		deleteSingletoneEntities(movieToDelete, new Movie(), id, Command.DELETE);
+		
+		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+	}
+	
+	
+	@PutMapping("/action/{id}")
+	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @RequestBody Movie movie) {
+		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
+		
+		if (existingMovieOpt.isPresent()) {
+			deleteSingletoneEntities(existingMovieOpt, movie, id, Command.UPDATE);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/action/{id}")
+	public ResponseEntity<Movie> getMovieById(@PathVariable long id) {
+		Optional<Movie> movie = movieRepository.findById(id);
+		return movie.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElse(null);
+	}
+	
+	@GetMapping("/coordinates")
+	public ResponseEntity<List<Coordinates>> getAllCoordinates() {
+		List<Coordinates> coordinates = coordinatesRepository.findAll();
+		return new ResponseEntity<>(coordinates, HttpStatus.OK);
+	}
+	
+	@GetMapping("/persons")
+	public ResponseEntity<List<Person>> getAllPersons() {
+		List<Person> persons = personRepository.findAll();
+		return new ResponseEntity<>(persons, HttpStatus.OK);
+	}
+	
+	@GetMapping("/locations")
+	public ResponseEntity<List<Location>> getAllLocations() {
+		List<Location> locations = locationRepository.findAll();
+		return new ResponseEntity<>(locations, HttpStatus.OK);
+	}
+	
+	public void deleteSingletoneEntities(Optional<Movie> optionalMovie, Movie movie, long id, Command command) {
+		if (optionalMovie.isPresent()) {
+			Coordinates coordinates = optionalMovie.get().getCoordinates();
+			Person director = optionalMovie.get().getDirector();
+			Person screenwriter = optionalMovie.get().getScreenwriter();
+			Person operator = optionalMovie.get().getOperator();
+			
+			if (command.equals(Command.UPDATE)){
+				setFields(optionalMovie, movie);
+			} else if (command.equals(Command.DELETE)){
+				movieRepository.deleteById(id);
+			}
 			
 			List<Movie> moviesWithSameCoordinates = movieRepository.findByCoordinates(coordinates);
 			List<Movie> moviesWithSameDirector = movieRepository.findByDirector(director);
@@ -127,38 +178,26 @@ public class MovieController {
 				}
 			}
 		}
+	}
+	
+	public void setFields(Optional<Movie> optionalMovie, Movie movie) {
+		Movie existingMovie = optionalMovie.get();
 		
-		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
-	}
-
-	
-	@PutMapping("/action")
-	public ResponseEntity<List<Movie>> updateMovie(@RequestBody Movie movie) {
-		movieRepository.save(movie);
-		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
-	}
-	
-	@GetMapping("/action/{id}")
-	public ResponseEntity<Movie> getMovieById(@PathVariable long id) {
-		Optional<Movie> movie = movieRepository.findById(id);
-		return movie.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElse(null);
-	}
-	
-	@GetMapping("/coordinates")
-	public ResponseEntity<List<Coordinates>> getAllCoordinates() {
-		List<Coordinates> coordinates = coordinatesRepository.findAll();
-		return new ResponseEntity<>(coordinates, HttpStatus.OK);
-	}
-	
-	@GetMapping("/persons")
-	public ResponseEntity<List<Person>> getAllPersons() {
-		List<Person> persons = personRepository.findAll();
-		return new ResponseEntity<>(persons, HttpStatus.OK);
-	}
-	
-	@GetMapping("/locations")
-	public ResponseEntity<List<Location>> getAllLocations() {
-		List<Location> locations = locationRepository.findAll();
-		return new ResponseEntity<>(locations, HttpStatus.OK);
+		existingMovie.setName(movie.getName());
+		existingMovie.setCoordinates(movie.getCoordinates());
+		existingMovie.setOscarsCount(movie.getOscarsCount());
+		existingMovie.setBudget(movie.getBudget());
+		existingMovie.setTotalBoxOffice(movie.getTotalBoxOffice());
+		existingMovie.setMpaaRating(movie.getMpaaRating());
+		existingMovie.setLength(movie.getLength());
+		existingMovie.setGoldenPalmCount(movie.getGoldenPalmCount());
+		existingMovie.setUsaBoxOffice(movie.getUsaBoxOffice());
+		existingMovie.setTagline(movie.getTagline());
+		existingMovie.setGenre(movie.getGenre());
+		existingMovie.setDirector(movie.getDirector());
+		existingMovie.setScreenwriter(movie.getScreenwriter());
+		existingMovie.setOperator(movie.getOperator());
+		
+		movieRepository.save(existingMovie);
 	}
 }
