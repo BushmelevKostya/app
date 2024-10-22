@@ -42,65 +42,56 @@ export class HomeComponent {
   directorVisible = false
   screenwriterVisible = false
   operatorVisible = false
+  directorLocationVisible = false
+  screenwriterLocationVisible = false
+  operatorLocationVisible = false
   isAdmin = false
   menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
   foundMovie: any = null;
-  // request = {
-  //   id: 1,
-  //   userEmail: "kosbush@gmail.com"
-  // }
   requests: any[] = []
-
-  movie = {
-    id: 0,
-    name: 'Чип и Дейл',
-    coordinates: {x: 0, y: 0},
-    oscarsCount: 3,
-    budget: 1000000000,
-    totalBoxOffice: 100000000000000,
-    mpaaRating: 'Самый крутой',
-    director: {
-      name: '1',
-      eyeColor: '1',
-      hairColor: '1',
-      location: {x: 0, y: 0, z: 0, name: '1'},
-      height: 0,
-      nationality: '1'
-    },
-    screenwriter: {
-      name: '1',
-      eyeColor: '1',
-      hairColor: '1',
-      location: {x: 0, y: 0, z: 0, name: '1'},
-      height: 0,
-      nationality: '1'
-    },
-    operator: {
-      name: '1',
-      eyeColor: '1',
-      hairColor: '1',
-      location: {x: 0, y: 0, z: 0, name: '1'},
-      height: 0,
-      nationality: '1'
-    },
-    length: 0,
-    goldenPalmCount: 0,
-    usaBoxOffice: null,
-    tagline: '1',
-    genre: '1',
-    creationDate: "23"
-  };
-
-  movies: any[] = [this.movie, this.movie]
+  movies: any[] = []
   existingCoordinates: any[] = [];
   existingDirectors: any[] = [];
   existingScreenwriters: any[] = [];
   existingOperators: any[] = [];
+  existingLocations: any[] = [];
 
   //TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
+
+  initVars() {
+    this.coordinatesVisible = false
+    this.directorVisible = false
+    this.screenwriterVisible = false
+    this.operatorVisible = false
+    this.directorLocationVisible = false
+    this.screenwriterLocationVisible = false
+    this.operatorLocationVisible = false
+
+    this.existingCoordinates = [];
+    this.existingDirectors = [];
+    this.existingScreenwriters = [];
+    this.existingOperators = [];
+    this.existingLocations = [];
+
+    this.movieCreateForm.get('coordinates.id')?.setValue('');
+    this.movieCreateForm.get('director.id')?.setValue('');
+    this.movieCreateForm.get('director.location.id')?.setValue('');
+    this.movieCreateForm.get('screenwriter.id')?.setValue('');
+    this.movieCreateForm.get('screenwriter.location.id')?.setValue('');
+    this.movieCreateForm.get('operator.id')?.setValue('');
+    this.movieCreateForm.get('operator.location.id')?.setValue('');
+
+    this.movieUpdateForm.get('coordinates.id')?.setValue('');
+    this.movieUpdateForm.get('director.id')?.setValue('');
+    this.movieUpdateForm.get('director.location.id')?.setValue('');
+    this.movieUpdateForm.get('screenwriter.id')?.setValue('');
+    this.movieUpdateForm.get('screenwriter.location.id')?.setValue('');
+    this.movieUpdateForm.get('operator.id')?.setValue('');
+    this.movieUpdateForm.get('operator.location.id')?.setValue('');
+  }
 
   initMovieForm() {
     return this.fb.group({
@@ -121,10 +112,12 @@ export class HomeComponent {
         y: [0, Validators.required]
       }),
       director: this.fb.group({
+        id: ['', Validators.required],
         name: ['defaultName', Validators.required],
         eyeColor: ['BLACK', Validators.required],
         hairColor: ['BLACK', Validators.required],
         location: this.fb.group({
+          id: ['', Validators.required],
           x: [0, Validators.required],
           y: [0, Validators.required],
           z: [0, Validators.required],
@@ -134,10 +127,12 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       }),
       screenwriter: this.fb.group({
+        id: ['', Validators.required],
         name: ['defaultName', Validators.required],
         eyeColor: ['BLACK', Validators.required],
         hairColor: ['BLACK', Validators.required],
         location: this.fb.group({
+          id: ['', Validators.required],
           x: [0, Validators.required],
           y: [0, Validators.required],
           z: [0, Validators.required],
@@ -147,10 +142,12 @@ export class HomeComponent {
         nationality: ['SPAIN', Validators.required]
       }),
       operator: this.fb.group({
+        id: ['', Validators.required],
         name: ['defaultName', Validators.required],
         eyeColor: ['BLACK', Validators.required],
         hairColor: ['BLACK', Validators.required],
         location: this.fb.group({
+          id: ['', Validators.required],
           x: [0, Validators.required],
           y: [0, Validators.required],
           z: [0, Validators.required],
@@ -202,8 +199,15 @@ export class HomeComponent {
     this.coordinatesVisible = !this.coordinatesVisible;
   }
 
-  toggleDirector() {
-    this.directorVisible = !this.directorVisible;
+  loadExistingCoordinates() {
+    this.http.get('/api/coordinates').subscribe(
+      (response: any) => {
+        this.existingCoordinates = response;
+      },
+      (error) => {
+        console.error("Error loading coordinates:", error);
+      }
+    );
   }
 
   loadExistingPersons() {
@@ -219,13 +223,13 @@ export class HomeComponent {
     );
   }
 
-  loadExistingCoordinates() {
-    this.http.get('/api/coordinates').subscribe(
+  loadExistingLocations() {
+    this.http.get('/api/locations').subscribe(
       (response: any) => {
-        this.existingCoordinates = response;
+        this.existingLocations = response;
       },
       (error) => {
-        console.error("Error loading coordinates:", error);
+        console.error("Error loading locations:", error);
       }
     );
   }
@@ -234,50 +238,124 @@ export class HomeComponent {
     this.movieCreateForm.get('coordinates.id')?.setValue(coordinate.id);
     this.movieCreateForm.get('coordinates.x')?.setValue(coordinate.x);
     this.movieCreateForm.get('coordinates.y')?.setValue(coordinate.y);
+
+    this.movieUpdateForm .get('coordinates.id')?.setValue(coordinate.id);
+    this.movieUpdateForm .get('coordinates.x')?.setValue(coordinate.x);
+    this.movieUpdateForm .get('coordinates.y')?.setValue(coordinate.y);
   }
 
   selectDirector(director: any) {
+    this.movieCreateForm.get('director.id')?.setValue(director.id);
     this.movieCreateForm.get('director.name')?.setValue(director.name);
     this.movieCreateForm.get('director.eyeColor')?.setValue(director.eyeColor);
     this.movieCreateForm.get('director.hairColor')?.setValue(director.hairColor);
-    this.movieCreateForm.get('director.location.x')?.setValue(director.location.x);
-    this.movieCreateForm.get('director.location.y')?.setValue(director.location.y);
-    this.movieCreateForm.get('director.location.z')?.setValue(director.location.z);
-    this.movieCreateForm.get('director.location.name')?.setValue(director.location.name);
     this.movieCreateForm.get('director.height')?.setValue(director.height);
     this.movieCreateForm.get('director.nationality')?.setValue(director.nationality);
+
+    this.movieUpdateForm.get('director.id')?.setValue(director.id);
+    this.movieUpdateForm.get('director.name')?.setValue(director.name);
+    this.movieUpdateForm.get('director.eyeColor')?.setValue(director.eyeColor);
+    this.movieUpdateForm.get('director.hairColor')?.setValue(director.hairColor);
+    this.movieUpdateForm.get('director.height')?.setValue(director.height);
+    this.movieUpdateForm.get('director.nationality')?.setValue(director.nationality);
+  }
+
+  selectDirectorLocation(location: any) {
+    this.movieCreateForm.get('director.location.id')?.setValue(location.id);
+    this.movieCreateForm.get('director.location.x')?.setValue(location.x);
+    this.movieCreateForm.get('director.location.y')?.setValue(location.y);
+    this.movieCreateForm.get('director.location.z')?.setValue(location.z);
+    this.movieCreateForm.get('director.location.name')?.setValue(location.name);
+
+    this.movieUpdateForm.get('director.location.id')?.setValue(location.id);
+    this.movieUpdateForm.get('director.location.x')?.setValue(location.x);
+    this.movieUpdateForm.get('director.location.y')?.setValue(location.y);
+    this.movieUpdateForm.get('director.location.z')?.setValue(location.z);
+    this.movieUpdateForm.get('director.location.name')?.setValue(location.name);
   }
 
   selectScreenwriter(screenwriter: any) {
+    this.movieCreateForm.get('screenwriter.id')?.setValue(screenwriter.id);
     this.movieCreateForm.get('screenwriter.name')?.setValue(screenwriter.name);
     this.movieCreateForm.get('screenwriter.eyeColor')?.setValue(screenwriter.eyeColor);
     this.movieCreateForm.get('screenwriter.hairColor')?.setValue(screenwriter.hairColor);
-    this.movieCreateForm.get('screenwriter.location.x')?.setValue(screenwriter.location.x);
-    this.movieCreateForm.get('screenwriter.location.y')?.setValue(screenwriter.location.y);
-    this.movieCreateForm.get('screenwriter.location.z')?.setValue(screenwriter.location.z);
-    this.movieCreateForm.get('screenwriter.location.name')?.setValue(screenwriter.location.name);
     this.movieCreateForm.get('screenwriter.height')?.setValue(screenwriter.height);
     this.movieCreateForm.get('screenwriter.nationality')?.setValue(screenwriter.nationality);
+
+    this.movieUpdateForm.get('screenwriter.id')?.setValue(screenwriter.id);
+    this.movieUpdateForm.get('screenwriter.name')?.setValue(screenwriter.name);
+    this.movieUpdateForm.get('screenwriter.eyeColor')?.setValue(screenwriter.eyeColor);
+    this.movieUpdateForm.get('screenwriter.hairColor')?.setValue(screenwriter.hairColor);
+    this.movieUpdateForm.get('screenwriter.height')?.setValue(screenwriter.height);
+    this.movieUpdateForm.get('screenwriter.nationality')?.setValue(screenwriter.nationality);
+  }
+
+  selectScreenwriterLocation(location: any) {
+    this.movieCreateForm.get('screenwriter.location.id')?.setValue(location.id);
+    this.movieCreateForm.get('screenwriter.location.x')?.setValue(location.x);
+    this.movieCreateForm.get('screenwriter.location.y')?.setValue(location.y);
+    this.movieCreateForm.get('screenwriter.location.z')?.setValue(location.z);
+    this.movieCreateForm.get('screenwriter.location.name')?.setValue(location.name);
+
+    this.movieUpdateForm.get('screenwriter.location.id')?.setValue(location.id);
+    this.movieUpdateForm.get('screenwriter.location.x')?.setValue(location.x);
+    this.movieUpdateForm.get('screenwriter.location.y')?.setValue(location.y);
+    this.movieUpdateForm.get('screenwriter.location.z')?.setValue(location.z);
+    this.movieUpdateForm.get('screenwriter.location.name')?.setValue(location.name);
   }
 
   selectOperator(operator: any) {
+    this.movieCreateForm.get('operator.id')?.setValue(operator.id);
     this.movieCreateForm.get('operator.name')?.setValue(operator.name);
     this.movieCreateForm.get('operator.eyeColor')?.setValue(operator.eyeColor);
     this.movieCreateForm.get('operator.hairColor')?.setValue(operator.hairColor);
-    this.movieCreateForm.get('operator.location.x')?.setValue(operator.location.x);
-    this.movieCreateForm.get('operator.location.y')?.setValue(operator.location.y);
-    this.movieCreateForm.get('operator.location.z')?.setValue(operator.location.z);
-    this.movieCreateForm.get('operator.location.name')?.setValue(operator.location.name);
     this.movieCreateForm.get('operator.height')?.setValue(operator.height);
     this.movieCreateForm.get('operator.nationality')?.setValue(operator.nationality);
+
+    this.movieUpdateForm.get('operator.id')?.setValue(operator.id);
+    this.movieUpdateForm.get('operator.name')?.setValue(operator.name);
+    this.movieUpdateForm.get('operator.eyeColor')?.setValue(operator.eyeColor);
+    this.movieUpdateForm.get('operator.hairColor')?.setValue(operator.hairColor);
+    this.movieUpdateForm.get('operator.height')?.setValue(operator.height);
+    this.movieUpdateForm.get('operator.nationality')?.setValue(operator.nationality);
+  }
+
+  selectOperatorLocation(location: any) {
+    this.movieCreateForm.get('operator.location.id')?.setValue(location.id);
+    this.movieCreateForm.get('operator.location.x')?.setValue(location.x);
+    this.movieCreateForm.get('operator.location.y')?.setValue(location.y);
+    this.movieCreateForm.get('operator.location.z')?.setValue(location.z);
+    this.movieCreateForm.get('operator.location.name')?.setValue(location.name);
+
+    this.movieUpdateForm.get('operator.location.id')?.setValue(location.id);
+    this.movieUpdateForm.get('operator.location.x')?.setValue(location.x);
+    this.movieUpdateForm.get('operator.location.y')?.setValue(location.y);
+    this.movieUpdateForm.get('operator.location.z')?.setValue(location.z);
+    this.movieUpdateForm.get('operator.location.name')?.setValue(location.name);
+  }
+
+  toggleDirector() {
+    this.directorVisible = !this.directorVisible;
+  }
+
+  toggleDirectorLocation() {
+    this.directorLocationVisible = !this.directorLocationVisible;
   }
 
   toggleScreenwriter() {
     this.screenwriterVisible = !this.screenwriterVisible;
   }
 
+  toggleScreenwriterLocation() {
+    this.screenwriterLocationVisible = !this.screenwriterLocationVisible;
+  }
+
   toggleOperator() {
     this.operatorVisible = !this.operatorVisible;
+  }
+
+  toggleOperatorLocation() {
+    this.operatorLocationVisible = !this.operatorLocationVisible;
   }
 
   getMovies() {
@@ -287,16 +365,15 @@ export class HomeComponent {
   }
 
   createMovie() {
-    // this.movieCreateForm.value.coordinates.id = -1
     this.http.post('http://localhost:8080/api/action', this.movieCreateForm.value).subscribe(
       response => {
         this.getMovies()
         this.changeCreateFlag()
+        this.initVars()
       },
       error => {
         console.error('Error creating movie', error)
       });
-    // }
   }
 
   openDeleteModal(id: number) {
@@ -383,6 +460,7 @@ export class HomeComponent {
     return this.http.put<any[]>(`${this.apiUrl}`, this.movieUpdateForm.value).subscribe((data: any[]) => {
       this.movies = data
       this.changeUpdateFlag()
+      this.initVars()
     })
   }
 
@@ -416,4 +494,6 @@ export class HomeComponent {
         }
       );
   }
+
+  protected readonly screen = screen;
 }

@@ -78,7 +78,9 @@
             <div>Name: {{ movie.director.name }}</div>
             <div>Eye Color: {{ movie.director.eyeColor }}</div>
             <div>Hair Color: {{ movie.director.hairColor }}</div>
-            <div>Location: {{ movie.director.location.name }} ({{ movie.director.location.x }}, {{ movie.director.location.y }}, {{ movie.director.location.z }})</div>
+            <div>Location: {{ movie.director.location.name }} ({{ movie.director.location.x }}
+              , {{ movie.director.location.y }}, {{ movie.director.location.z }})
+            </div>
             <div>Height: {{ movie.director.height }}</div>
             <div>Nationality: {{ movie.director.nationality }}</div>
           </div>
@@ -91,7 +93,9 @@
             <div>Name: {{ movie.screenwriter.name }}</div>
             <div>Eye Color: {{ movie.screenwriter.eyeColor }}</div>
             <div>Hair Color: {{ movie.screenwriter.hairColor }}</div>
-            <div>Location: {{ movie.screenwriter.location.name }} ({{ movie.screenwriter.location.x }}, {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }})</div>
+            <div>Location: {{ movie.screenwriter.location.name }} ({{ movie.screenwriter.location.x }}
+              , {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }})
+            </div>
             <div>Height: {{ movie.screenwriter.height }}</div>
             <div>Nationality: {{ movie.screenwriter.nationality }}</div>
           </div>
@@ -104,7 +108,9 @@
             <div>Name: {{ movie.operator.name }}</div>
             <div>Eye Color: {{ movie.operator.eyeColor }}</div>
             <div>Hair Color: {{ movie.operator.hairColor }}</div>
-            <div>Location: {{ movie.operator.location.name }} ({{ movie.operator.location.x }}, {{ movie.operator.location.y }}, {{ movie.operator.location.z }})</div>
+            <div>Location: {{ movie.operator.location.name }} ({{ movie.operator.location.x }}
+              , {{ movie.operator.location.y }}, {{ movie.operator.location.z }})
+            </div>
             <div>Height: {{ movie.operator.height }}</div>
             <div>Nationality: {{ movie.operator.nationality }}</div>
           </div>
@@ -186,7 +192,7 @@
             <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
             <ul *ngIf="existingCoordinates.length > 0">
               <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
-                {{coordinate.id}}, {{ coordinate.x }}, {{ coordinate.y }}
+                {{ coordinate.id }}, {{ coordinate.x }}, {{ coordinate.y }}
               </li>
             </ul>
           </div>
@@ -196,6 +202,9 @@
         <button type="button" (click)="toggleDirector()">Create Director</button>
         <div *ngIf="directorVisible" formGroupName="director">
           <h3>Director</h3>
+          <label for="idDirectorCreate">ID:</label>
+          <input id="idDirectorCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="directorNameCreate">director Name:</label>
           <input id="directorNameCreate" formControlName="name"/>
 
@@ -213,9 +222,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="directorHeightCreate">Height:</label>
+          <input id="directorHeightCreate" type="number" formControlName="height"/>
+
+          <label for="directorNationalityCreate">Nationality:</label>
+          <select id="directorNationalityCreate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleDirectorLocation()">Create Location</button>
+          <div *ngIf="directorLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idDirectorLocationCreate">ID:</label>
+            <input id="idDirectorLocationCreate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="directorLocationXCreate">Location X:</label>
             <input id="directorLocationXCreate" type="number" formControlName="x"/>
 
@@ -227,23 +251,22 @@
 
             <label for="directorLocationNameCreate">Location Name:</label>
             <input id="directorLocationNameCreate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectDirectorLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="directorHeightCreate">Height:</label>
-          <input id="directorHeightCreate" type="number" formControlName="height"/>
-
-          <label for="directorNationalityCreate">Nationality:</label>
-          <select id="directorNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
             <ul *ngIf="existingDirectors.length > 0">
               <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
-                {{ director.name }}
+                {{ director.id }}, {{ director.name }}
               </li>
             </ul>
           </div>
@@ -252,6 +275,9 @@
         <button type="button" (click)="toggleScreenwriter()">Create Screenwriter</button>
         <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
           <h3>Screenwriter</h3>
+          <label for="idScreenwriterCreate">ID:</label>
+          <input id="idScreenwriterCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="screenwriterPersonNameCreate">Name:</label>
           <input id="screenwriterPersonNameCreate" formControlName="name"/>
 
@@ -269,9 +295,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="screenwriterHeightCreate">Height:</label>
+          <input id="screenwriterHeightCreate" type="number" formControlName="height"/>
+
+          <label for="screenwriterNationalityCreate">Nationality:</label>
+          <select id="screenwriterNationalityCreate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleScreenwriterLocation()">Create Location</button>
+          <div *ngIf="screenwriterLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idScreenwriterLocationCreate">ID:</label>
+            <input id="idScreenwriterLocationCreate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="screenwriterLocationXCreate">Location X:</label>
             <input id="screenwriterLocationXCreate" type="number" formControlName="x"/>
 
@@ -283,23 +324,22 @@
 
             <label for="screenwriterLocationNameCreate">Location Name:</label>
             <input id="screenwriterLocationNameCreate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectScreenwriterLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="screenwriterHeightCreate">Height:</label>
-          <input id="screenwriterHeightCreate" type="number" formControlName="height"/>
-
-          <label for="screenwriterNationalityCreate">Nationality:</label>
-          <select id="screenwriterNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
             <ul *ngIf="existingScreenwriters.length > 0">
               <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
-                {{ screenwriter.name }}
+                {{ screenwriter.id }}, {{ screenwriter.name }}
               </li>
             </ul>
           </div>
@@ -308,6 +348,9 @@
         <button type="button" (click)="toggleOperator()">Create Operator</button>
         <div *ngIf="operatorVisible" formGroupName="operator">
           <h3>Person</h3>
+          <label for="idOperatorCreate">ID:</label>
+          <input id="idOperatorCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="operatorNameCreate">Name:</label>
           <input id="operatorNameCreate" formControlName="name"/>
 
@@ -325,9 +368,24 @@
             <option value="BROWN">BROWN</option>
           </select>
 
+          <label for="operatorHeightCreate">Height:</label>
+          <input id="operatorHeightCreate" type="number" formControlName="height"/>
+
+          <label for="operatorNationalityCreate">Nationality:</label>
+          <select id="operatorNationalityCreate" formControlName="nationality">
+            <option value="SPAIN">SPAIN</option>
+            <option value="INDIA">INDIA</option>
+            <option value="VATICAN">VATICAN</option>
+          </select>
+
           <!-- Вложенный блок для Location -->
-          <h4>Location</h4>
-          <div formGroupName="location">
+          <button type="button" (click)="toggleOperatorLocation()">Create Location</button>
+          <div *ngIf="operatorLocationVisible" formGroupName="location">
+            <h4>Location</h4>
+            <label for="idOperatorLocationCreate">ID:</label>
+            <input id="idOperatorLocationCreate" formControlName="id" placeholder="Will be generate automatically"
+                   readonly/>
+
             <label for="operatorLocationXCreate">Location X:</label>
             <input id="operatorLocationXCreate" type="number" formControlName="x"/>
 
@@ -339,23 +397,22 @@
 
             <label for="operatorLocationNameCreate">Location Name:</label>
             <input id="operatorLocationNameCreate" formControlName="name"/>
+
+            <div>
+              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
+              <ul *ngIf="existingLocations.length > 0">
+                <li *ngFor="let location of existingLocations" (click)="selectOperatorLocation(location)">
+                  {{ location.id }}, {{ location.name }}
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <label for="operatorHeightCreate">Height:</label>
-          <input id="operatorHeightCreate" type="number" formControlName="height"/>
-
-          <label for="operatorNationalityCreate">Nationality:</label>
-          <select id="operatorNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
 
           <div>
             <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>
             <ul *ngIf="existingOperators.length > 0">
               <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
-                {{ operator.name }}
+                {{ operator.id }}, {{ operator.name }}
               </li>
             </ul>
           </div>
@@ -420,19 +477,32 @@
         <button type="button" (click)="toggleCoordinates()">Update Coordinates</button>
         <div *ngIf="coordinatesVisible" formGroupName="coordinates">
           <h3>Coordinates</h3>
+          <label for="idCoordinatesUpdate">ID:</label>
+          <input id="idCoordinatesUpdate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="xUpdate">X:</label>
           <input id="xUpdate" type="number" formControlName="x"/>
 
           <label for="yUpdate">Y:</label>
           <input id="yUpdate" type="number" formControlName="y"/>
 
-          <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+          <div>
+            <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
+            <ul *ngIf="existingCoordinates.length > 0">
+              <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
+                {{ coordinate.id }}, {{ coordinate.x }}, {{ coordinate.y }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Блок для Person -->
         <button type="button" (click)="toggleDirector()">Update Director</button>
         <div *ngIf="directorVisible" formGroupName="director">
           <h3>Director</h3>
+          <label for="idDirectorUpdate">ID:</label>
+          <input id="idDirectorUpdate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="directorNameUpdate">director Name:</label>
           <input id="directorNameUpdate" formControlName="name"/>
 
@@ -480,7 +550,7 @@
             <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
             <ul *ngIf="existingDirectors.length > 0">
               <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
-                {{ director.name }}
+                {{ director.id }}, {{ director.name }}
               </li>
             </ul>
           </div>
@@ -489,6 +559,9 @@
         <button type="button" (click)="toggleScreenwriter()">Update Screenwriter</button>
         <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
           <h3>Screenwriter</h3>
+          <label for="idScreenwriterUpdate">ID:</label>
+          <input id="idScreenwriterUpdate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="screenwriterPersonNameUpdate">Name:</label>
           <input id="screenwriterPersonNameUpdate" formControlName="name"/>
 
@@ -536,7 +609,7 @@
             <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
             <ul *ngIf="existingScreenwriters.length > 0">
               <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
-                {{ screenwriter.name }}
+                {{ screenwriter.id }}, {{ screenwriter.name }}
               </li>
             </ul>
           </div>
@@ -545,6 +618,9 @@
         <button type="button" (click)="toggleOperator()">Update Operator</button>
         <div *ngIf="operatorVisible" formGroupName="operator">
           <h3>Person</h3>
+          <label for="idOperatorUpdate">ID:</label>
+          <input id="idOperatorUpdate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+
           <label for="operatorNameUpdate">Name:</label>
           <input id="operatorNameUpdate" formControlName="name"/>
 
@@ -592,7 +668,7 @@
             <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>
             <ul *ngIf="existingOperators.length > 0">
               <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
-                {{ operator.name }}
+                {{ operator.id }}, {{ operator.name }}
               </li>
             </ul>
           </div>
@@ -621,7 +697,8 @@
       <h2>Поиск фильма</h2>
       <form (ngSubmit)="searchMovie()">
         <label for="searchId">ID фильма</label>
-        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" placeholder="Искать по ID..." required/>
+        <input type="number" id="searchId" [(ngModel)]="searchId" name="searchId" placeholder="Искать по ID..."
+               required/>
         <button type="submit">Найти</button>
       </form>
       <div *ngIf="foundMovie; else notFound">
@@ -677,7 +754,9 @@
                 <div>Name: {{ foundMovie.director.name }}</div>
                 <div>Eye Color: {{ foundMovie.director.eyeColor }}</div>
                 <div>Hair Color: {{ foundMovie.director.hairColor }}</div>
-                <div>Location: {{ foundMovie.director.location.name }} ({{ foundMovie.director.location.x }}, {{ foundMovie.director.location.y }}, {{ foundMovie.director.location.z }})</div>
+                <div>Location: {{ foundMovie.director.location.name }} ({{ foundMovie.director.location.x }}
+                  , {{ foundMovie.director.location.y }}, {{ foundMovie.director.location.z }})
+                </div>
                 <div>Height: {{ foundMovie.director.height }}</div>
                 <div>Nationality: {{ foundMovie.director.nationality }}</div>
               </div>
@@ -690,7 +769,9 @@
                 <div>Name: {{ foundMovie.screenwriter.name }}</div>
                 <div>Eye Color: {{ foundMovie.screenwriter.eyeColor }}</div>
                 <div>Hair Color: {{ foundMovie.screenwriter.hairColor }}</div>
-                <div>Location: {{ foundMovie.screenwriter.location.name }} ({{ foundMovie.screenwriter.location.x }}, {{ foundMovie.screenwriter.location.y }}, {{ foundMovie.screenwriter.location.z }})</div>
+                <div>Location: {{ foundMovie.screenwriter.location.name }} ({{ foundMovie.screenwriter.location.x }}
+                  , {{ foundMovie.screenwriter.location.y }}, {{ foundMovie.screenwriter.location.z }})
+                </div>
                 <div>Height: {{ foundMovie.screenwriter.height }}</div>
                 <div>Nationality: {{ foundMovie.screenwriter.nationality }}</div>
               </div>
@@ -703,7 +784,9 @@
                 <div>Name: {{ foundMovie.operator.name }}</div>
                 <div>Eye Color: {{ foundMovie.operator.eyeColor }}</div>
                 <div>Hair Color: {{ foundMovie.operator.hairColor }}</div>
-                <div>Location: {{ foundMovie.operator.location.name }} ({{ foundMovie.operator.location.x }}, {{ foundMovie.operator.location.y }}, {{ foundMovie.operator.location.z }})</div>
+                <div>Location: {{ foundMovie.operator.location.name }} ({{ foundMovie.operator.location.x }}
+                  , {{ foundMovie.operator.location.y }}, {{ foundMovie.operator.location.z }})
+                </div>
                 <div>Height: {{ foundMovie.operator.height }}</div>
                 <div>Nationality: {{ foundMovie.operator.nationality }}</div>
               </div>

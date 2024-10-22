@@ -18,7 +18,7 @@ public class Person {
 	@Column(name = "PersonHairColor", nullable = false) // Поле не может быть null
 	private Color hairColor;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "location_id")
 	private Location location;
 	
