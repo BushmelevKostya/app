@@ -1,11 +1,11 @@
 package itmo.app.controller;
 
+import itmo.app.controller.services.PasswordUtil;
+import itmo.app.controller.services.UserContext;
 import itmo.app.model.entity.Notification;
 import itmo.app.model.entity.User;
 import itmo.app.model.repository.NotificationRepository;
 import itmo.app.model.repository.UserRepository;
-import org.hibernate.type.descriptor.sql.internal.NamedNativeOrdinalEnumDdlTypeImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,8 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
+	@Autowired
+	private UserContext userContext;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -30,6 +32,9 @@ public class UserController {
 		if (isAdminRequest && adminCount > 0) {
 			user.setAdmin(true);
 			user.setApprovedAdmin(false);
+			
+			String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+			user.setPassword(hashedPassword);
 			userRepository.save(user);
 			
 			Notification notification = new Notification();
@@ -41,12 +46,16 @@ public class UserController {
 		} else if (isAdminRequest && adminCount == 0) {
 			user.setAdmin(true);
 			user.setApprovedAdmin(true);
+			String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+			user.setPassword(hashedPassword);
 			userRepository.save(user);
 			return ResponseEntity.ok("{\"message\":\"\n" +
 					"The first administrator has been successfully registered\"}");
 		} else {
 			user.setAdmin(false);
 			user.setApprovedAdmin(false);
+			String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+			user.setPassword(hashedPassword);
 			userRepository.save(user);
 			return ResponseEntity.ok("{\"message\":\"User successfully registered\"}");
 		}

@@ -20,7 +20,9 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 export class HomeComponent {
   constructor(private router: Router, private fb: FormBuilder, private http: HttpClient) {
-    this.isAdmin = sessionStorage.getItem('isAdmin') === 'true'
+    this.isUserLoggedIn = sessionStorage.getItem('loggedInUser') !== null;
+    this.loggedInUserEmail = sessionStorage.getItem('loggedInUserEmail');
+    this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
     if (this.isAdmin) {
       this.loadRequests()
     }
@@ -46,6 +48,8 @@ export class HomeComponent {
   screenwriterLocationVisible = false
   operatorLocationVisible = false
   isAdmin = false
+  isUserLoggedIn: boolean = false
+  loggedInUserEmail: string | null = ''
   menuOpen = 0
   title = 'Лабораторная работа'
   searchId: number | null = null;
@@ -169,6 +173,14 @@ export class HomeComponent {
           console.error("Ошибка при загрузке уведомлений:", error);
         }
       );
+  }
+
+  logout() {
+    sessionStorage.clear();
+    this.isUserLoggedIn = false;
+    this.isAdmin = false;
+    this.loggedInUserEmail = null;
+    this.router.navigate(['/login']);
   }
 
   changeCreateFlag() {

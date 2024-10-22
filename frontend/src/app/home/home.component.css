@@ -474,3 +474,50 @@ li {
 li:hover {
   background-color: #f0f0f0;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+
+.menu-container {
+  flex: 1;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+}
+
+.user-info-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-right: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.user-email {
+  margin-right: 10px;
+}
+
+.notification-btn {
+  margin-right: 10px;
+  background-color: transparent;
+  border: none;
+}
+
+.login-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}

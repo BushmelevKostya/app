@@ -3,13 +3,22 @@
     <div class="menu-container">
       <button class="menu-btn" (click)="changeMenuOpen()">&#9776; Меню</button>
     </div>
+
     <h1>Лабораторная работа</h1>
-    <!-- Условие: только для администраторов -->
-    <button *ngIf="isAdmin" class="notification-btn" (click)="changeNotsFlag()">
-      <i class="fa fa-bell"></i>
-      <span class="notification-count">{{ 1 }}</span>
-    </button>
-    <button class="login-btn" (click)="navigateTo('/login')">Войти</button>
+
+    <div class="user-info-container">
+      <div *ngIf="isUserLoggedIn" class="user-info-box">
+        <span class="user-email">{{ loggedInUserEmail }}</span>
+        <button *ngIf="isAdmin" class="notification-btn" (click)="changeNotsFlag()">
+          <i class="fa fa-bell"></i>
+          <span class="notification-count">{{ 1 }}</span>
+        </button>
+      </div>
+
+      <button class="login-btn" (click)="isUserLoggedIn ? logout() : navigateTo('/login')">
+        {{ isUserLoggedIn ? 'Выйти' : 'Войти' }}
+      </button>
+    </div>
   </header>
 
   <div class="side-menu" [class.open]="menuOpen">
