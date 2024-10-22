@@ -23,10 +23,9 @@ export class LoginComponent {
     const loginData = {
       email: this.email,
       password: this.hashPassword(this.password),
-      isAdmin: this.isAdminLogin
     };
 
-    this.http.post<any>(`/api/users/login`, loginData, {observe: 'response'})
+    this.http.post<any>(`/api/users/login/${this.isAdminLogin}`, loginData, {observe: 'response'})
       .subscribe(
         (response: any) => {
           if (response.status === 200) {

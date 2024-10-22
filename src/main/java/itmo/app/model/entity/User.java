@@ -12,17 +12,18 @@ public class User {
 	
 	private String email;
 	private String password;
+	private boolean isAdminLogin;
 	private boolean isAdmin;
 	private boolean isApprovedAdmin;
 	
 	public User() {
 	}
 	
-	public User(String email, String password, boolean isAdmin) {
+	public User(String email, String password) {
 		this.email = email;
 		this.password = password;
-		this.isAdmin = isAdmin;
 		this.isApprovedAdmin = false;
+		this.isAdmin = false;
 	}
 	
 	public Long getId() {

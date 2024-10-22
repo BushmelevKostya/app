@@ -61,19 +61,20 @@ public class UserController {
 		}
 	}
 	
-	@PostMapping("/login")
-	public ResponseEntity<String> loginUser(@RequestBody User loginUser) {
+	@PostMapping("/login/{isAdminLogin}")
+	public ResponseEntity<String> loginUser(@RequestBody User loginUser, @PathVariable boolean isAdminLogin) {
 		Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
-		
 		if (userOptional.isPresent()) {
 			User user = userOptional.get();
 			if (user.getPassword().equals(loginUser.getPassword())) {
-				System.out.println(user.isAdmin());
-				System.out.println(user.isApprovedAdmin());
-				if (user.isAdmin() && !user.isApprovedAdmin()) {
+				if (user.isAdmin() && !user.isApprovedAdmin() && isAdminLogin) {
 					return ResponseEntity.accepted().body("{\"message\":\"Your administration request has not yet been approved\"}");
+				} else if (user.isAdmin() && !user.isApprovedAdmin() && !isAdminLogin) {
+					return ResponseEntity.ok("{\"message\":\"The user has successfully logged in\"}");
 				} else if (user.isAdmin() && user.isApprovedAdmin()) {
 					return ResponseEntity.ok("{\"message\":\"The administrator has successfully logged in\"}");
+				} else if (!user.isAdmin() && isAdminLogin) {
+					return ResponseEntity.accepted().body("{\"message\":\"Firstly, you need to register as an admin\"}");
 				} else {
 					return ResponseEntity.ok("{\"message\":\"The user has successfully logged in\"}");
 				}
