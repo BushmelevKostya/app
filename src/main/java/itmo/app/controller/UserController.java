@@ -2,6 +2,7 @@ package itmo.app.controller;
 
 import itmo.app.controller.services.PasswordUtil;
 import itmo.app.controller.services.UserContext;
+import itmo.app.controller.services.UserValidationService;
 import itmo.app.model.entity.Notification;
 import itmo.app.model.entity.User;
 import itmo.app.model.repository.NotificationRepository;
@@ -24,6 +25,9 @@ public class UserController {
 	
 	@Autowired
 	private NotificationRepository notificationRepository;
+	
+	@Autowired
+	private UserValidationService userValidationService;
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> registerUser(@RequestBody User user, @RequestParam boolean isAdminRequest) {
@@ -63,10 +67,18 @@ public class UserController {
 	
 	@PostMapping("/login/{isAdminLogin}")
 	public ResponseEntity<String> loginUser(@RequestBody User loginUser, @PathVariable boolean isAdminLogin) {
+		try {
+			userValidationService.validateUserCredentials(loginUser);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			return ResponseEntity.accepted().body("{\"message\":\"" + message + "\"}");
+		}
+		
 		Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
 		if (userOptional.isPresent()) {
 			User user = userOptional.get();
-			if (user.getPassword().equals(loginUser.getPassword())) {
+			String hashedPassword = PasswordUtil.hashPassword(loginUser.getPassword());
+			if (hashedPassword.equals(user.getPassword())) {
 				if (user.isAdmin() && !user.isApprovedAdmin() && isAdminLogin) {
 					return ResponseEntity.accepted().body("{\"message\":\"Your administration request has not yet been approved\"}");
 				} else if (user.isAdmin() && !user.isApprovedAdmin() && !isAdminLogin) {
@@ -84,5 +96,11 @@ public class UserController {
 		} else {
 			return ResponseEntity.accepted().body("{\"message\":\"User not found\"}");
 		}
+	}
+	
+	@GetMapping("/check-email")
+	public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+		boolean exists = userRepository.existsByEmail(email);
+		return ResponseEntity.ok(!exists);
 	}
 }

@@ -1,20 +1,54 @@
 <div class="auth-container">
   <h2>Регистрация</h2>
-  <form (ngSubmit)="register()">
+  <form (ngSubmit)="register(registrationForm)" #registrationForm="ngForm">
+
     <label for="email">Email</label>
-    <input type="email" id="email" name="email" [(ngModel)]="email" required />
+    <input
+      type="email"
+      id="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      #emailField="ngModel"
+    />
+    <span *ngIf="emailField.invalid && emailField.touched" class="error">
+      {{ emailError }}
+    </span>
 
     <label for="password">Пароль</label>
-    <input type="password" id="password" name="password" [(ngModel)]="password" required />
+    <input
+      type="password"
+      id="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      minlength="6"
+      #passwordField="ngModel"
+    />
+    <span *ngIf="passwordField.invalid && passwordField.touched" class="error">
+      {{ passwordError }}
+    </span>
 
-    <label for="confirmPassword">Подтвердите пароль</label>
-    <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required />
+    <label for="passwordConfirm">Подтверждение пароля</label>
+    <input
+      type="password"
+      id="passwordConfirm"
+      name="passwordConfirm"
+      [(ngModel)]="confirmPassword"
+      required
+      #passwordConfirmField="ngModel"
+    />
+    <span *ngIf="passwordConfirmField.invalid && passwordConfirmField.touched" class="error">
+      {{ passwordConfirmError}}
+    </span>
 
     <label>
-      <input type="checkbox" name="adminCheckBox" [(ngModel)]="isAdminRequest" /> Зарегистрироваться как администратор
+      <input type="checkbox" name="adminCheckBox" [(ngModel)]="isAdminRequest" />
+      Зарегистрироваться как администратор
     </label>
 
     <button type="submit">Зарегистрироваться</button>
   </form>
+
   <p>Уже есть аккаунт? <a routerLink="/login">Войти</a></p>
 </div>
