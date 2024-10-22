@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "movies")
@@ -11,6 +13,13 @@ public class Movie {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+	
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinColumn(name = "creator_id", nullable = false)
+	private User creator;
+	
+//	@OneToMany(mappedBy = "movie")
+//	private Set<MovieChange> changes = new HashSet<>();
 	
 	@Column(nullable = false)
 	private String name; //Поле не может быть null, Строка не может быть пустой
@@ -189,4 +198,20 @@ public class Movie {
 	public void setGenre(MovieGenre genre) {
 		this.genre = genre;
 	}
+	
+	public User getCreator() {
+		return creator;
+	}
+	
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
+	
+//	public Set<MovieChange> getChanges() {
+//		return changes;
+//	}
+//
+//	public void setChanges(Set<MovieChange> changes) {
+//		this.changes = changes;
+//	}
 }

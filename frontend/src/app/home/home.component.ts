@@ -377,7 +377,7 @@ export class HomeComponent {
   }
 
   createMovie() {
-    this.http.post('http://localhost:8080/api/action', this.movieCreateForm.value).subscribe(
+    this.http.post(`http://localhost:8080/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
       response => {
         this.getMovies()
         this.changeCreateFlag()
@@ -398,7 +398,7 @@ export class HomeComponent {
   }
 
   deleteMovie() {
-    return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}`).subscribe((data: any[]) => {
+    return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
       this.movies = data
       this.changeDeleteFlag()
     });
@@ -415,7 +415,7 @@ export class HomeComponent {
   }
 
   updateMovie() {
-    return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}`, this.movieUpdateForm.value)
+    return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieUpdateForm.value)
       .subscribe((data: any[]) => {
         this.movies = data;
         this.changeUpdateFlag();
@@ -454,5 +454,7 @@ export class HomeComponent {
       );
   }
 
-  protected readonly screen = screen;
+  isMovieCreator(movie: any): boolean {
+    return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');;
+  }
 }

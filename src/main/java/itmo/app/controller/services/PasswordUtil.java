@@ -9,7 +9,6 @@ public class PasswordUtil {
 	
 	public static String hashPassword(String password) {
 		String passwordWithPepper = password + PEPPER;
-		System.out.println(password);
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
 			byte[] hash = digest.digest(passwordWithPepper.getBytes(StandardCharsets.UTF_8));

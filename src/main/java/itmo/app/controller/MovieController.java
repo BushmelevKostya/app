@@ -1,20 +1,15 @@
 package itmo.app.controller;
 
 import itmo.app.controller.enums.Command;
-import itmo.app.model.entity.Coordinates;
-import itmo.app.model.entity.Location;
-import itmo.app.model.entity.Movie;
-import itmo.app.model.entity.Person;
-import itmo.app.model.repository.CoordinatesRepository;
-import itmo.app.model.repository.LocationRepository;
-import itmo.app.model.repository.MovieRepository;
-import itmo.app.model.repository.PersonRepository;
+import itmo.app.model.entity.*;
+import itmo.app.model.repository.*;
 import org.hibernate.PersistentObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,8 +29,14 @@ public class MovieController {
 	@Autowired
 	private LocationRepository locationRepository;
 	
-	@PostMapping("/action")
-	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie) {
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private MovieChangeRepository movieChangeRepository;
+	
+	@PostMapping("/action/{email}")
+	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie, @PathVariable String email) {
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
 		
@@ -69,6 +70,9 @@ public class MovieController {
 			movie.setOperator(person);
 		}
 		
+		System.out.println(email);
+		movie.setCreator(userRepository.findByEmail(email).get());
+		
 		Movie newMovie = movieRepository.save(movie);
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
@@ -78,9 +82,15 @@ public class MovieController {
 		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/action/{id}")
-	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long id) {
+	@DeleteMapping("/action/{id}/{email}")
+	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long id, @PathVariable String email) {
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
+		if (movieToDelete.isPresent()) {
+			Movie movie = movieToDelete.get();
+			if (!movie.getCreator().getEmail().equals(email)) {
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}
+		}
 		
 		deleteSingletoneEntities(movieToDelete, new Movie(), id, Command.DELETE);
 		
@@ -88,12 +98,28 @@ public class MovieController {
 	}
 	
 	
-	@PutMapping("/action/{id}")
-	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @RequestBody Movie movie) {
+	@PutMapping("/action/{id}/{email}")
+	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email, @RequestBody Movie movie) {
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
 		if (existingMovieOpt.isPresent()) {
+			
+			if (!existingMovieOpt.get().getCreator().getEmail().equals(email)) {
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}
+			
 			deleteSingletoneEntities(existingMovieOpt, movie, id, Command.UPDATE);
+			
+			Optional<User> existingUserOpt = userRepository.findByEmail(email);
+			if (existingUserOpt.isPresent()) {
+				User user = existingUserOpt.get();
+				MovieChange change = new MovieChange();
+				change.setMovie(existingMovieOpt.get());
+				change.setUser(user);
+				change.setChangeTime(LocalDateTime.now());
+				
+				movieChangeRepository.save(change);
+			}
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -136,6 +162,11 @@ public class MovieController {
 			if (command.equals(Command.UPDATE)){
 				setFields(optionalMovie, movie);
 			} else if (command.equals(Command.DELETE)){
+				List<MovieChange> moviesWithSameMovieChange = movieChangeRepository.findByMovie(optionalMovie.get());
+				if (!moviesWithSameMovieChange.isEmpty()) {
+					movieChangeRepository.deleteAll(moviesWithSameMovieChange);
+				}
+				
 				movieRepository.deleteById(id);
 			}
 			

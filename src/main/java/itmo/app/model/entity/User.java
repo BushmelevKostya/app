@@ -1,6 +1,10 @@
 package itmo.app.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name = "movie_users")
 @Entity
@@ -9,6 +13,13 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+//	@OneToMany(mappedBy = "creator")
+//	@JsonIgnore
+//	private Set<Movie> createdMovies = new HashSet<>();
+//
+//	@OneToMany(mappedBy = "user")
+//	private Set<MovieChange> changes = new HashSet<>();
 	
 	private String email;
 	private String password;
@@ -64,5 +75,29 @@ public class User {
 	
 	public void setApprovedAdmin(boolean approvedAdmin) {
 		isApprovedAdmin = approvedAdmin;
+	}
+	
+//	public Set<Movie> getCreatedMovies() {
+//		return createdMovies;
+//	}
+//
+//	public void setCreatedMovies(Set<Movie> createdMovies) {
+//		this.createdMovies = createdMovies;
+//	}
+//
+//	public Set<MovieChange> getChanges() {
+//		return changes;
+//	}
+//
+//	public void setChanges(Set<MovieChange> changes) {
+//		this.changes = changes;
+//	}
+	
+	public boolean isAdminLogin() {
+		return isAdminLogin;
+	}
+	
+	public void setAdminLogin(boolean adminLogin) {
+		isAdminLogin = adminLogin;
 	}
 }
