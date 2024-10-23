@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -34,6 +36,9 @@ public class MovieController {
 	
 	@Autowired
 	private MovieChangeRepository movieChangeRepository;
+	
+	@Autowired
+	private MovieRepositoryImpl movieRepositoryImpl;
 	
 	@PostMapping("/action/{email}")
 	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie, @PathVariable String email) {
@@ -150,6 +155,36 @@ public class MovieController {
 	public ResponseEntity<List<Location>> getAllLocations() {
 		List<Location> locations = locationRepository.findAll();
 		return new ResponseEntity<>(locations, HttpStatus.OK);
+	}
+	
+	@GetMapping("/min-director")
+	public ResponseEntity<Movie> getMovieWithMinDirector() {
+		Movie movie = movieRepositoryImpl.findMovieWithMinDirector();
+		return new ResponseEntity<>(movie, HttpStatus.OK);
+	}
+	
+	@GetMapping("/tagline-greater-than")
+	public ResponseEntity<List<Movie>> getMoviesWithTaglineGreaterThan(@RequestParam String tagline) {
+		List<Movie> movies = movieRepositoryImpl.findMoviesWithTaglineGreaterThan(tagline);
+		return new ResponseEntity<>(movies, HttpStatus.OK);
+	}
+	
+	@GetMapping("/unique-usa-box-office")
+	public ResponseEntity<Set<Double>> getUniqueUsaBoxOffice() {
+		Set<Double> uniqueUsaBoxOffices = movieRepositoryImpl.findUniqueUsaBoxOfficeValues();
+		return new ResponseEntity<>(uniqueUsaBoxOffices, HttpStatus.OK);
+	}
+	
+	@GetMapping("/operators-no-oscars")
+	public ResponseEntity<List<Person>> getOperatorsWithNoOscars() {
+		List<Person> operators = movieRepositoryImpl.findOperatorsWithNoOscars();
+		return new ResponseEntity<>(operators, HttpStatus.OK);
+	}
+	
+	@PostMapping("/add-oscar-to-r-rated")
+	public ResponseEntity<Void> addOscarToRRatedMovies() {
+		movieRepositoryImpl.addOscarToRRatedMovies();
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	public void deleteSingletoneEntities(Optional<Movie> optionalMovie, Movie movie, long id, Command command) {

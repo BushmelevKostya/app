@@ -40,6 +40,11 @@ export class HomeComponent {
   deleteFlag = 0
   searchFlag = 0
   notsFlag = 0
+  minDirectorFlag = false;
+  taglineSearchFlag = false;
+  uniqueUsaBoxOfficesFlag = false;
+  operatorsWithoutOscarsFlag = false;
+  addOscarFlag = false;
   coordinatesVisible = false
   directorVisible = false
   screenwriterVisible = false
@@ -54,6 +59,11 @@ export class HomeComponent {
   title = 'Лабораторная работа'
   searchId: number | null = null;
   foundMovie: any = null;
+  minDirector: any;
+  taglineInput: string | undefined;
+  moviesWithTagline: any[] = [];
+  uniqueUsaBoxOffices: any[] = [];
+  operatorsWithoutOscars: any[] = [];
   requests: any[] = []
   movies: any[] = []
   existingCoordinates: any[] = [];
@@ -197,6 +207,10 @@ export class HomeComponent {
 
   changeNotsFlag() {
     this.notsFlag = this.notsFlag ? 0 : 1
+  }
+
+  changeTaglineSearchFlag() {
+    this.taglineSearchFlag = !this.taglineSearchFlag;
   }
 
   toDoMethod() {
@@ -456,5 +470,34 @@ export class HomeComponent {
 
   isMovieCreator(movie: any): boolean {
     return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');;
+  }
+
+  findDirectorWithMinMovies() {
+    this.minDirectorFlag = true;
+    return this.http.get<any>('/api/movies/min-director')
+    .subscribe((data: any) => {
+      this.minDirector = data;
+      this.minDirectorFlag = false;
+    });
+  }
+
+  searchByTagline() {
+    // Вызов API для фильмов с Tagline больше чем заданное значение
+    this.taglineSearchFlag = true;
+  }
+
+  findUniqueUsaBoxOffices() {
+    this.uniqueUsaBoxOfficesFlag = true;
+    // Вызов API для получения уникальных значений USA Box Office
+  }
+
+  findOperatorsWithoutOscars() {
+    this.operatorsWithoutOscarsFlag = true;
+    // Вызов API для поиска операторов без Оскаров
+  }
+
+  addOscarToRratedMovies() {
+    this.addOscarFlag = true;
+    // Вызов API для добавления "Оскара" фильмам с рейтингом R
   }
 }

@@ -31,6 +31,11 @@
   <div class="movie-actions">
     <button (click)="changeCreateFlag()">Создать фильм</button>
     <button (click)="changeSearchFlag()">Поиск</button>
+    <button (click)="findDirectorWithMinMovies()">Найти режиссера с минимальным количеством фильмов</button>
+    <button (click)="changeTaglineSearchFlag()">Поиск по Tagline</button>
+    <button (click)="findUniqueUsaBoxOffices()">Уникальные значения USA Box Office</button>
+    <button (click)="findOperatorsWithoutOscars()">Операторы без Оскаров</button>
+    <button (click)="addOscarToRratedMovies()">Добавить Оскар фильмам с рейтингом R</button>
   </div>
 
   <!-- Табличка -->
@@ -867,5 +872,182 @@
       <button (click)="changeNotsFlag()">Закрыть</button>
     </div>
   </div>
+
+  <!-- Модальное окно для операции 1: Режиссер с минимальным числом фильмов -->
+  <div class="modal" *ngIf="minDirectorFlag">
+    <div class="modal-content">
+      <span class="close-btn" (click)="minDirectorFlag = false">&times;</span>
+      <div *ngIf="minDirector; else notFound">
+        <h2>Режиссер с минимальным количеством фильмов</h2>
+        <table>
+          <thead>
+          <tr>
+            <th>Director</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <!-- Director -->
+            <td>
+              <div class="object-header">Director's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ minDirector.director.name }}</div>
+                <div>Eye Color: {{ minDirector.director.eyeColor }}</div>
+                <div>Hair Color: {{ minDirector.director.hairColor }}</div>
+                <div>Location: {{ minDirector.director.location.name }} ({{ minDirector.director.location.x }}
+                  , {{ minDirector.director.location.y }}, {{ minDirector.director.location.z }})
+                </div>
+                <div>Height: {{ minDirector.director.height }}</div>
+                <div>Nationality: {{ minDirector.director.nationality }}</div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #notFound>
+        <p>Объект не найден</p>
+      </ng-template>
+    </div>
+  </div>
+
+<!--   Модальное окно для операции 2: Фильмы с Tagline больше заданного -->
+    <div class="modal" *ngIf="taglineSearchFlag">
+      <div class="modal-content">
+        <span class="close-btn" (click)="changeTaglineSearchFlag()">&times;</span>
+        <h2>Поиск фильмов по Tagline</h2>
+        <form (ngSubmit)="searchByTagline()">
+          <label for="taglineInput">Tagline больше чем:</label>
+          <input type="text" id="taglineInput" [(ngModel)]="taglineInput" name="taglineInput" required />
+          <button type="submit">Поиск</button>
+        </form>
+        <table *ngIf="moviesWithTagline && moviesWithTagline.length > 0"; else notFound>
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Creation Date</th>
+            <th>Oscars Count</th>
+            <th>Budget</th>
+            <th>Total Box Office</th>
+            <th>MPAA Rating</th>
+            <th>Length</th>
+            <th>Golden Palm Count</th>
+            <th>USA Box Office</th>
+            <th>Tagline</th>
+            <th>Genre</th>
+            <th>Coordinates</th>
+            <th>Director</th>
+            <th>Screenwriter</th>
+            <th>Operator</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let movie of moviesWithTagline">
+            <td>{{ movie.id }}</td>
+            <td>{{ movie.name }}</td>
+            <td>{{ movie.creationDate }}</td>
+            <td>{{ movie.oscarsCount }}</td>
+            <td>{{ movie.budget }}</td>
+            <td>{{ movie.totalBoxOffice }}</td>
+            <td>{{ movie.mpaaRating }}</td>
+            <td>{{ movie.length }}</td>
+            <td>{{ movie.goldenPalmCount }}</td>
+            <td>{{ movie.usaBoxOffice }}</td>
+            <td>{{ movie.tagline }}</td>
+            <td>{{ movie.genre }}</td>
+
+            <!-- Coordinates -->
+            <td>
+              <div class="attribute-label">X:</div>
+              <div>{{ movie.coordinates.x }}</div>
+              <div class="attribute-label">Y:</div>
+              <div>{{ movie.coordinates.y }}</div>
+            </td>
+
+            <!-- Director -->
+            <td>
+              <div class="object-header">Director's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ movie.director.name }}</div>
+                <div>Eye Color: {{ movie.director.eyeColor }}</div>
+                <div>Hair Color: {{ movie.director.hairColor }}</div>
+                <div>Location: {{ movie.director.location.name }} ({{ movie.director.location.x }}
+                  , {{ movie.director.location.y }}, {{ movie.director.location.z }})
+                </div>
+                <div>Height: {{ movie.director.height }}</div>
+                <div>Nationality: {{ movie.director.nationality }}</div>
+              </div>
+            </td>
+
+            <!-- Screenwriter -->
+            <td>
+              <div class="object-header">Screenwriter's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ movie.screenwriter.name }}</div>
+                <div>Eye Color: {{ movie.screenwriter.eyeColor }}</div>
+                <div>Hair Color: {{ movie.screenwriter.hairColor }}</div>
+                <div>Location: {{ movie.screenwriter.location.name }} ({{ movie.screenwriter.location.x }}
+                  , {{ movie.screenwriter.location.y }}, {{ movie.screenwriter.location.z }})
+                </div>
+                <div>Height: {{ movie.screenwriter.height }}</div>
+                <div>Nationality: {{ movie.screenwriter.nationality }}</div>
+              </div>
+            </td>
+
+            <!-- Operator -->
+            <td>
+              <div class="object-header">Operator's info</div>
+              <div class="object-attributes">
+                <div>Name: {{ movie.operator.name }}</div>
+                <div>Eye Color: {{ movie.operator.eyeColor }}</div>
+                <div>Hair Color: {{ movie.operator.hairColor }}</div>
+                <div>Location: {{ movie.operator.location.name }} ({{ movie.operator.location.x }}
+                  , {{ movie.operator.location.y }}, {{ movie.operator.location.z }})
+                </div>
+                <div>Height: {{ movie.operator.height }}</div>
+                <div>Nationality: {{ movie.operator.nationality }}</div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <ng-template #notFound>
+          <p>Объект не найден</p>
+        </ng-template>
+      </div>
+    </div>
+
+  <!-- Модальное окно для операции 3: Уникальные USABoxOffice -->
+    <div class="modal" *ngIf="uniqueUsaBoxOfficesFlag">
+      <div class="modal-content">
+        <span class="close-btn" (click)="uniqueUsaBoxOfficesFlag = false">&times;</span>
+        <h2>Уникальные значения USABoxOffice</h2>
+        <ul>
+          <li *ngFor="let boxOffice of uniqueUsaBoxOffices">{{ boxOffice }}</li>
+        </ul>
+      </div>
+    </div>
+
+  <!-- Модальное окно для операции 4: Операторы без Оскаров -->
+    <div class="modal" *ngIf="operatorsWithoutOscarsFlag">
+      <div class="modal-content">
+        <span class="close-btn" (click)="operatorsWithoutOscarsFlag = false">&times;</span>
+        <h2>Операторы без Оскаров</h2>
+        <ul>
+          <li *ngFor="let operator of operatorsWithoutOscars">{{ operator.name }}</li>
+        </ul>
+      </div>
+    </div>
+
+  <!-- Модальное окно для операции 5: Добавить Оскар фильмам категории R -->
+    <div class="modal" *ngIf="addOscarFlag">
+      <div class="modal-content">
+        <span class="close-btn" (click)="addOscarFlag = false">&times;</span>
+        <h2>Добавлено Оскаров фильмам с рейтингом R</h2>
+        <p>Успешно добавлено по одному "Оскару" каждому фильму с рейтингом R.</p>
+      </div>
+    </div>
 
 </div>

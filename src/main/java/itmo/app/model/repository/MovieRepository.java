@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie, Long> {
+public interface MovieRepository extends JpaRepository<Movie, Long>, MovieRepositoryCustom {
 	List<Movie> findByCoordinates(Coordinates coordinates);
 	
 	List<Movie> findByDirector(Person director);
