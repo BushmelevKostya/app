@@ -3,6 +3,7 @@ import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,7 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 })
 
 export class HomeComponent {
-  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient) {
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location) {
     this.isUserLoggedIn = sessionStorage.getItem('loggedInUser') !== null;
     this.loggedInUserEmail = sessionStorage.getItem('loggedInUserEmail');
     this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
@@ -31,9 +32,17 @@ export class HomeComponent {
     this.movieUpdateForm = this.initMovieForm()
     this.getMovies();
 
-    this.intervalId = setInterval(() => {
-      this.getMovies();
-    }, 5000);
+    // this.intervalId = setInterval(() => {
+    //   this.getMovies();
+    // }, 5000);
+  }
+
+  ngOnInit() {
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function () {
+      history.pushState(null, document.title, location.href);
+    });
+    console.log(1234)
   }
 
   apiUrl = "http://localhost:2580/api/action"
