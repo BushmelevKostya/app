@@ -32,7 +32,7 @@ export class HomeComponent {
     this.getMovies();
   }
 
-  apiUrl = "http://localhost:8080/api/action"
+  apiUrl = "http://localhost:2580/api/action"
   movieCreateForm: FormGroup
   movieUpdateForm: FormGroup
   createFlag = 0
@@ -377,7 +377,7 @@ export class HomeComponent {
   }
 
   createMovie() {
-    this.http.post(`http://localhost:8080/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
+    this.http.post(`http://localhost:2580/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
       response => {
         this.getMovies()
         this.changeCreateFlag()

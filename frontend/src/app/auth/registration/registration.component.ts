@@ -108,7 +108,7 @@ export class RegistrationComponent {
   }
 
   checkUniqueEmail(email: string) {
-    return this.http.get<boolean>(`http://localhost:8080/api/users/check-email?email=${email}`);
+    return this.http.get<boolean>(`http://localhost:2580/api/users/check-email?email=${email}`);
   }
 
   hashPassword(password: string): string {
