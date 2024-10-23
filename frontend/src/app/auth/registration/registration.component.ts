@@ -94,7 +94,7 @@ export class RegistrationComponent {
             if (error.status === 202) {
               alert("A request to register as an administrator has been created, please wait for approval.");
             } else {
-              alert("Registration error:" + error.message);
+              // alert("Registration error:" + error.message);
             }
           }
         );

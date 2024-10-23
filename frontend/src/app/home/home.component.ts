@@ -30,6 +30,10 @@ export class HomeComponent {
     this.movieCreateForm = this.initMovieForm()
     this.movieUpdateForm = this.initMovieForm()
     this.getMovies();
+
+    this.intervalId = setInterval(() => {
+      this.getMovies();
+    }, 5000);
   }
 
   apiUrl = "http://localhost:2580/api/action"
@@ -71,6 +75,7 @@ export class HomeComponent {
   existingScreenwriters: any[] = [];
   existingOperators: any[] = [];
   existingLocations: any[] = [];
+  private intervalId: any;
 
   //TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
