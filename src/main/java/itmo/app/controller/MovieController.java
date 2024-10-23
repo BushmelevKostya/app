@@ -158,14 +158,15 @@ public class MovieController {
 	}
 	
 	@GetMapping("/min-director")
-	public ResponseEntity<Movie> getMovieWithMinDirector() {
-		Movie movie = movieRepositoryImpl.findMovieWithMinDirector();
-		return new ResponseEntity<>(movie, HttpStatus.OK);
+	public ResponseEntity<Person> getMovieWithMinDirector() {
+		Person person = movieRepositoryImpl.findMovieWithMinDirector();
+		return new ResponseEntity<>(person, HttpStatus.OK);
 	}
 	
 	@GetMapping("/tagline-greater-than")
 	public ResponseEntity<List<Movie>> getMoviesWithTaglineGreaterThan(@RequestParam String tagline) {
 		List<Movie> movies = movieRepositoryImpl.findMoviesWithTaglineGreaterThan(tagline);
+		System.out.println(movies.size());
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 	

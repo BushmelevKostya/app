@@ -891,14 +891,14 @@
             <td>
               <div class="object-header">Director's info</div>
               <div class="object-attributes">
-                <div>Name: {{ minDirector.director.name }}</div>
-                <div>Eye Color: {{ minDirector.director.eyeColor }}</div>
-                <div>Hair Color: {{ minDirector.director.hairColor }}</div>
-                <div>Location: {{ minDirector.director.location.name }} ({{ minDirector.director.location.x }}
-                  , {{ minDirector.director.location.y }}, {{ minDirector.director.location.z }})
+                <div>Name: {{ minDirector.name }}</div>
+                <div>Eye Color: {{ minDirector.eyeColor }}</div>
+                <div>Hair Color: {{ minDirector.hairColor }}</div>
+                <div>Location: {{ minDirector.location.name }} ({{ minDirector.location.x }}
+                  , {{ minDirector.location.y }}, {{ minDirector.location.z }})
                 </div>
-                <div>Height: {{ minDirector.director.height }}</div>
-                <div>Nationality: {{ minDirector.director.nationality }}</div>
+                <div>Height: {{ minDirector.height }}</div>
+                <div>Nationality: {{ minDirector.nationality }}</div>
               </div>
             </td>
           </tr>
@@ -912,17 +912,18 @@
     </div>
   </div>
 
-<!--   Модальное окно для операции 2: Фильмы с Tagline больше заданного -->
-    <div class="modal" *ngIf="taglineSearchFlag">
-      <div class="modal-content">
-        <span class="close-btn" (click)="changeTaglineSearchFlag()">&times;</span>
-        <h2>Поиск фильмов по Tagline</h2>
-        <form (ngSubmit)="searchByTagline()">
-          <label for="taglineInput">Tagline больше чем:</label>
-          <input type="text" id="taglineInput" [(ngModel)]="taglineInput" name="taglineInput" required />
-          <button type="submit">Поиск</button>
-        </form>
-        <table *ngIf="moviesWithTagline && moviesWithTagline.length > 0"; else notFound>
+  <!--   Модальное окно для операции 2: Фильмы с Tagline больше заданного -->
+  <div class="modal" *ngIf="taglineSearchFlag">
+    <div class="modal-content">
+      <span class="close-btn" (click)="changeTaglineSearchFlag()">&times;</span>
+      <h2>Поиск фильмов по Tagline</h2>
+      <form (ngSubmit)="searchByTagline(taglineInput)">
+        <label for="taglineInput">Tagline больше чем:</label>
+        <input type="text" id="taglineInput" [(ngModel)]="taglineInput" name="taglineInput" required/>
+        <button type="submit">Поиск</button>
+      </form>
+      <div *ngIf="moviesWithTagline && moviesWithTagline.length > 0">
+        <table>
           <thead>
           <tr>
             <th>ID</th>
@@ -1013,41 +1014,42 @@
           </tr>
           </tbody>
         </table>
-        <ng-template #notFound>
-          <p>Объект не найден</p>
-        </ng-template>
       </div>
+      <ng-template #notFound>
+        <p>Объект не найден</p>
+      </ng-template>
     </div>
+  </div>
 
   <!-- Модальное окно для операции 3: Уникальные USABoxOffice -->
-    <div class="modal" *ngIf="uniqueUsaBoxOfficesFlag">
-      <div class="modal-content">
-        <span class="close-btn" (click)="uniqueUsaBoxOfficesFlag = false">&times;</span>
-        <h2>Уникальные значения USABoxOffice</h2>
-        <ul>
-          <li *ngFor="let boxOffice of uniqueUsaBoxOffices">{{ boxOffice }}</li>
-        </ul>
-      </div>
+  <div class="modal" *ngIf="uniqueUsaBoxOfficesFlag">
+    <div class="modal-content">
+      <span class="close-btn" (click)="uniqueUsaBoxOfficesFlag = false">&times;</span>
+      <h2>Уникальные значения USABoxOffice</h2>
+      <ul>
+        <li *ngFor="let boxOffice of uniqueUsaBoxOffices">{{ boxOffice }}</li>
+      </ul>
     </div>
+  </div>
 
   <!-- Модальное окно для операции 4: Операторы без Оскаров -->
-    <div class="modal" *ngIf="operatorsWithoutOscarsFlag">
-      <div class="modal-content">
-        <span class="close-btn" (click)="operatorsWithoutOscarsFlag = false">&times;</span>
-        <h2>Операторы без Оскаров</h2>
-        <ul>
-          <li *ngFor="let operator of operatorsWithoutOscars">{{ operator.name }}</li>
-        </ul>
-      </div>
+  <div class="modal" *ngIf="operatorsWithoutOscarsFlag">
+    <div class="modal-content">
+      <span class="close-btn" (click)="operatorsWithoutOscarsFlag = false">&times;</span>
+      <h2>Операторы без Оскаров</h2>
+      <ul>
+        <li *ngFor="let operator of operatorsWithoutOscars">{{ operator.name }}</li>
+      </ul>
     </div>
+  </div>
 
   <!-- Модальное окно для операции 5: Добавить Оскар фильмам категории R -->
-    <div class="modal" *ngIf="addOscarFlag">
-      <div class="modal-content">
-        <span class="close-btn" (click)="addOscarFlag = false">&times;</span>
-        <h2>Добавлено Оскаров фильмам с рейтингом R</h2>
-        <p>Успешно добавлено по одному "Оскару" каждому фильму с рейтингом R.</p>
-      </div>
+  <div class="modal" *ngIf="addOscarFlag">
+    <div class="modal-content">
+      <span class="close-btn" (click)="addOscarFlag = false">&times;</span>
+      <h2>Добавлено Оскаров фильмам с рейтингом R</h2>
+      <p>Успешно добавлено по одному "Оскару" каждому фильму с рейтингом R.</p>
     </div>
+  </div>
 
 </div>

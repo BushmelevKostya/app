@@ -1,6 +1,7 @@
 package itmo.app.model.repository;
 
 import itmo.app.model.entity.Movie;
+import itmo.app.model.entity.MpaaRating;
 import itmo.app.model.entity.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -18,10 +19,11 @@ public class MovieRepositoryImpl implements MovieRepositoryCustom{
 	MovieRepository movieRepository;
 	
 	@Override
-	public Movie findMovieWithMinDirector() {
+	public Person findMovieWithMinDirector() {
 		return movieRepository.findAll()
 				.stream()
 				.min(Comparator.comparing(movie -> movie.getDirector().getName()))
+				.map(Movie::getDirector)
 				.orElse(null);
 	}
 	
@@ -55,9 +57,10 @@ public class MovieRepositoryImpl implements MovieRepositoryCustom{
 	public void addOscarToRRatedMovies() {
 		List<Movie> rRatedMovies = movieRepository.findAll()
 				.stream()
-				.filter(movie -> movie.getMpaaRating().equals("R"))
+				.filter(movie -> movie.getMpaaRating().equals(MpaaRating.R))
 				.collect(Collectors.toList());
 		rRatedMovies.forEach(movie -> movie.setOscarsCount(movie.getOscarsCount() + 1));
+		System.out.println(rRatedMovies.size());
 		movieRepository.saveAll(rRatedMovies);
 	}
 }

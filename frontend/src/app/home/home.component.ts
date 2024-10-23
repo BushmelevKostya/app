@@ -265,9 +265,9 @@ export class HomeComponent {
     this.movieCreateForm.get('coordinates.x')?.setValue(coordinate.x);
     this.movieCreateForm.get('coordinates.y')?.setValue(coordinate.y);
 
-    this.movieUpdateForm .get('coordinates.id')?.setValue(coordinate.id);
-    this.movieUpdateForm .get('coordinates.x')?.setValue(coordinate.x);
-    this.movieUpdateForm .get('coordinates.y')?.setValue(coordinate.y);
+    this.movieUpdateForm.get('coordinates.id')?.setValue(coordinate.id);
+    this.movieUpdateForm.get('coordinates.x')?.setValue(coordinate.x);
+    this.movieUpdateForm.get('coordinates.y')?.setValue(coordinate.y);
   }
 
   selectDirector(director: any) {
@@ -469,35 +469,54 @@ export class HomeComponent {
   }
 
   isMovieCreator(movie: any): boolean {
-    return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');;
+    return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');
+    ;
   }
 
   findDirectorWithMinMovies() {
     this.minDirectorFlag = true;
-    return this.http.get<any>('/api/movies/min-director')
-    .subscribe((data: any) => {
-      this.minDirector = data;
-      this.minDirectorFlag = false;
-    });
+    this.http.get<any>('/api/min-director')
+      .subscribe((data: any) => {
+        this.minDirector = data
+      });
   }
 
-  searchByTagline() {
-    // Вызов API для фильмов с Tagline больше чем заданное значение
+  searchByTagline(tagline: string | undefined) {
     this.taglineSearchFlag = true;
+    if (tagline) {
+      this.http.get<any[]>('/api/tagline-greater-than', {
+        params: {tagline}
+      }).subscribe((data: any[]) => {
+        this.moviesWithTagline = data
+      });
+    }
   }
+
 
   findUniqueUsaBoxOffices() {
     this.uniqueUsaBoxOfficesFlag = true;
-    // Вызов API для получения уникальных значений USA Box Office
+    this.http.get<number[]>('/api/unique-usa-box-office')
+      .subscribe((data: any[]) => {
+        this.uniqueUsaBoxOffices = data
+      });
   }
 
   findOperatorsWithoutOscars() {
     this.operatorsWithoutOscarsFlag = true;
-    // Вызов API для поиска операторов без Оскаров
+    this.http.get<any[]>('/api/operators-no-oscars')
+      .subscribe((data: any[]) => {
+        this.operatorsWithoutOscars = data
+      });
   }
 
   addOscarToRratedMovies() {
     this.addOscarFlag = true;
-    // Вызов API для добавления "Оскара" фильмам с рейтингом R
+    this.http.post(`/api/add-oscar-to-r-rated`, {})
+      .subscribe(
+        () => {
+        },
+        (error) => {
+        }
+      );
   }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface MovieRepositoryCustom {
-	Movie findMovieWithMinDirector();
+	Person findMovieWithMinDirector();
 	
 	List<Movie> findMoviesWithTaglineGreaterThan(String tagline);
 	
