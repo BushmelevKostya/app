@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
+import { AuthGuard } from './auth.guard';
 import {ReactiveFormsModule} from '@angular/forms';
 
 @Component({
@@ -7,8 +8,15 @@ import {ReactiveFormsModule} from '@angular/forms';
   standalone: true,
   imports: [RouterOutlet, ReactiveFormsModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
+
 export class AppComponent {
-  title = 'frontend';
+  constructor(private router: Router, private authGuard: AuthGuard) {
+  }
+
+  ngOnInit() {
+    this.authGuard.markProgrammaticNavigation();
+    this.router.navigate(['/login']);
+  }
 }

@@ -10,10 +10,11 @@
       [(ngModel)]="email"
       required
       #emailField="ngModel"
+      (input)="checkEmailRequirements()"
     />
-    <span *ngIf="emailField.invalid && emailField.touched" class="error">
-      {{ emailError }}
-    </span>
+    <ul class="requirements">
+      <li [class.met]="emailCriteria.isEmail">Email format with gmail.com, yandex.ru, mail.ru</li>
+    </ul>
 
     <label for="password">Пароль</label>
     <input
@@ -24,10 +25,14 @@
       required
       minlength="6"
       #passwordField="ngModel"
+      (input)="checkPasswordRequirements()"
     />
-    <span *ngIf="passwordField.invalid && passwordField.touched" class="error">
-      {{ passwordError }}
-    </span>
+    <ul class="requirements">
+      <li [class.met]="passwordCriteria.hasLowercase">One lowercase character</li>
+      <li [class.met]="passwordCriteria.hasUppercase">One uppercase character</li>
+      <li [class.met]="passwordCriteria.minLength">6 characters minimum</li>
+      <li [class.met]="passwordCriteria.hasNumberOrSymbol">Contains a number or symbol</li>
+    </ul>
 
     <label for="passwordConfirm">Подтверждение пароля</label>
     <input
@@ -37,18 +42,19 @@
       [(ngModel)]="confirmPassword"
       required
       #passwordConfirmField="ngModel"
+      (input)="checkRepeatPasswordRequirements()"
     />
-    <span *ngIf="passwordConfirmField.invalid && passwordConfirmField.touched" class="error">
-      {{ passwordConfirmError}}
-    </span>
+    <ul class="requirements">
+      <li [class.met]="passwordRepeatCriteria.isEquals">Passwords must be equals</li>
+    </ul>
 
     <label>
       <input type="checkbox" name="adminCheckBox" [(ngModel)]="isAdminRequest" />
       Зарегистрироваться как администратор
     </label>
 
-    <button type="submit">Зарегистрироваться</button>
+    <button type="submit" [disabled]="!(isPasswordValid() && isRepeatPasswordValid() && isEmailValid())">Зарегистрироваться</button>
   </form>
 
-  <p>Уже есть аккаунт? <a routerLink="/login">Войти</a></p>
+  <p>Уже есть аккаунт? <a (click)="navigateToLogin()">Войти</a></p>
 </div>

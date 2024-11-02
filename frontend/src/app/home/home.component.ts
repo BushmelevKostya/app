@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { Location } from '@angular/common';
+import {AuthGuard} from '../auth.guard';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,7 @@ import { Location } from '@angular/common';
 })
 
 export class HomeComponent {
-  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location) {
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location, private authGuard: AuthGuard) {
     this.isUserLoggedIn = sessionStorage.getItem('loggedInUser') !== null;
     this.loggedInUserEmail = sessionStorage.getItem('loggedInUserEmail');
     this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
@@ -204,6 +205,7 @@ export class HomeComponent {
     this.isUserLoggedIn = false;
     this.isAdmin = false;
     this.loggedInUserEmail = null;
+    this.authGuard.markProgrammaticNavigation();
     this.router.navigate(['/login']);
   }
 
@@ -232,6 +234,7 @@ export class HomeComponent {
   }
 
   navigateTo(address: String) {
+    this.authGuard.markProgrammaticNavigation();
     this.router.navigate([address])
   }
 

@@ -176,4 +176,17 @@ input.ng-invalid.ng-touched {
   margin-top: 5px;
 }
 
+.requirements {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+}
 
+.requirements li {
+  color: #666;
+}
+
+.requirements li.met {
+  text-decoration: line-through;
+  color: #ccc;
+}

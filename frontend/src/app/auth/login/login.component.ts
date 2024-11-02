@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import CryptoJS from 'crypto-js';
 import {NgIf} from '@angular/common';
+import {AuthGuard} from '../../auth.guard';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,7 @@ import {NgIf} from '@angular/common';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private authGuard: AuthGuard) {}
 
   email: string = '';
   password: string = '';
@@ -68,6 +69,7 @@ export class LoginComponent {
             sessionStorage.setItem('loggedInUserEmail', this.email);
 
             alert(response.body?.message || "Login successful");
+            this.authGuard.markProgrammaticNavigation();
             this.router.navigate(['/home']);
           } else if (response.status === 202) {
             alert(response.body?.message);
@@ -101,5 +103,10 @@ export class LoginComponent {
     }
     const passwordPattern = /^[a-zA-Z0-9!@#\$%\^&\*\(\)_\+]+$/;
     return passwordPattern.test(password);
+  }
+
+  navigateToRegister(): void {
+    this.authGuard.markProgrammaticNavigation();
+    this.router.navigate(['/register']);
   }
 }
