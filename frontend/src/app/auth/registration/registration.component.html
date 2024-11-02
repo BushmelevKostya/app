@@ -1,6 +1,6 @@
 <div class="auth-container">
   <h2>Регистрация</h2>
-  <form (ngSubmit)="register(registrationForm)" #registrationForm="ngForm">
+  <form (ngSubmit)="register()">
 
     <label for="email">Email</label>
     <input
@@ -9,7 +9,6 @@
       name="email"
       [(ngModel)]="email"
       required
-      #emailField="ngModel"
       (input)="checkEmailRequirements()"
     />
     <ul class="requirements">
@@ -24,7 +23,6 @@
       [(ngModel)]="password"
       required
       minlength="6"
-      #passwordField="ngModel"
       (input)="checkPasswordRequirements()"
     />
     <ul class="requirements">
@@ -41,7 +39,6 @@
       name="passwordConfirm"
       [(ngModel)]="confirmPassword"
       required
-      #passwordConfirmField="ngModel"
       (input)="checkRepeatPasswordRequirements()"
     />
     <ul class="requirements">

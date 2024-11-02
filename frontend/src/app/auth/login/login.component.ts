@@ -20,44 +20,22 @@ export class LoginComponent {
   password: string = '';
   isAdminLogin: boolean = false;
 
-  emailError: string | null = null;
-  passwordError: string | null = null;
+  emailCriteria = {
+    isEmail: false
+  }
 
-  login(form: NgForm) {
-    this.resetErrors();
-    const emailControl = form.controls['email'];
-    const passwordControl = form.controls['password'];
+  passwordCriteria = {
+    hasLowercase: false,
+    hasUppercase: false,
+    minLength: false,
+    hasNumberOrSymbol: false
+  };
 
-    if (!this.validateEmail(this.email)) {
-      this.emailError = "Invalid email format (use gmail, yandex, or mail)";
-      emailControl.setErrors({'incorrect': true});
-      emailControl.markAsTouched();
-    }
-    if (this.email === '') {
-      this.emailError = 'Email can not be empty';
-      emailControl.setErrors({'incorrect': true});
-      emailControl.markAsTouched();
-    }
-    if (!this.validatePassword(this.password)) {
-      this.passwordError = "Password must be at least 6 characters, no spaces, and contain letters or numbers";
-      passwordControl.setErrors({'incorrect': true});
-      passwordControl.markAsTouched();
-    }
-    if (this.password === '') {
-      this.passwordError = 'Password can not be empty';
-      passwordControl.setErrors({'incorrect': true});
-      passwordControl.markAsTouched();
-    }
-
-    if (emailControl.invalid || passwordControl.invalid) {
-      return;
-    }
-
+  login() {
     const loginData = {
       email: this.email,
       password: this.password,
     };
-    console.log(loginData)
     this.http.post<any>(`/api/users/login/${this.isAdminLogin}`, loginData, { observe: 'response' })
       .subscribe(
         (response: any) => {
@@ -81,28 +59,23 @@ export class LoginComponent {
       );
   }
 
-  resetErrors() {
-    this.emailError = '';
-    this.passwordError = '';
+  checkEmailRequirements(): void {
+    this.emailCriteria.isEmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yandex\.ru|mail\.ru)$/.test(this.email);
   }
 
-  hashPassword(password: string): string {
-    const pepper = 'MXiJw7Hz';
-    return CryptoJS.SHA256(password + pepper).toString(CryptoJS.enc.Hex);
+  isEmailValid(): boolean {
+    return Object.values(this.emailCriteria).every(criterion => criterion);
   }
 
-  validateEmail(email: string): boolean {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yandex\.ru|mail\.ru)$/;
-    return emailPattern.test(email);
+  checkPasswordRequirements(): void {
+    this.passwordCriteria.hasLowercase = /[a-z]/.test(this.password);
+    this.passwordCriteria.hasUppercase = /[A-Z]/.test(this.password);
+    this.passwordCriteria.minLength = this.password.length >= 6;
+    this.passwordCriteria.hasNumberOrSymbol = /[\d!@#\$%\^&\*\(\)_\+]/.test(this.password);
   }
 
-  validatePassword(password: string): boolean {
-    const minLength = 6;
-    if (!password || password.length < minLength || /\s/.test(password)) {
-      return false;
-    }
-    const passwordPattern = /^[a-zA-Z0-9!@#\$%\^&\*\(\)_\+]+$/;
-    return passwordPattern.test(password);
+  isPasswordValid(): boolean {
+    return Object.values(this.passwordCriteria).every(criterion => criterion);
   }
 
   navigateToRegister(): void {

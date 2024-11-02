@@ -3,7 +3,6 @@ import {FormsModule, NgForm} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {NgClass, NgIf} from '@angular/common';
-import CryptoJS from 'crypto-js';
 import {AuthGuard} from '../../auth.guard';
 
 @Component({
@@ -27,6 +26,7 @@ export class RegistrationComponent {
   password: string = '';
   confirmPassword: string = '';
   isAdminRequest: boolean = false;
+
   emailCriteria = {
     isEmail: false
   }
@@ -42,11 +42,7 @@ export class RegistrationComponent {
     isEquals: false
   }
 
-  register(form: NgForm) {
-    const emailControl = form.controls['email'];
-    const passwordControl = form.controls['password'];
-    const confirmPasswordControl = form.controls['passwordConfirm'];
-
+  register() {
     this.checkUniqueEmail(this.email).subscribe((isUnique: boolean) => {
       if (!isUnique) {
         alert('This email already exist');

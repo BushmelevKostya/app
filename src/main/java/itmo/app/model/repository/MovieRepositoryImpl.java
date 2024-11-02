@@ -60,7 +60,6 @@ public class MovieRepositoryImpl implements MovieRepositoryCustom{
 				.filter(movie -> movie.getMpaaRating().equals(MpaaRating.R))
 				.collect(Collectors.toList());
 		rRatedMovies.forEach(movie -> movie.setOscarsCount(movie.getOscarsCount() + 1));
-		System.out.println(rRatedMovies.size());
 		movieRepository.saveAll(rRatedMovies);
 	}
 }

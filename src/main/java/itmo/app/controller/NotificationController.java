@@ -41,11 +41,9 @@ public class NotificationController {
 			Notification notification = request.get();
 			notification.setApproved(true);
 			notificationRepository.save(notification);
-			System.out.println(notification.getUserEmail());
 			Optional<User> isUser = userRepository.findByEmail(notification.getUserEmail());
 			User user;
 			if (isUser.isPresent()) {
-				System.out.println(123);
 				user = isUser.get();
 				user.setApprovedAdmin(true);
 				userRepository.save(user);

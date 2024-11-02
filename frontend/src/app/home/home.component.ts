@@ -43,7 +43,6 @@ export class HomeComponent {
     window.addEventListener('popstate', function () {
       history.pushState(null, document.title, location.href);
     });
-    console.log(1234)
   }
 
   apiUrl = "http://localhost:2580/api/action"
@@ -456,18 +455,14 @@ export class HomeComponent {
 
   searchMovie() {
     this.http.get<any>(`${this.apiUrl}/${this.searchId}`).subscribe((data: any) => {
-        console.log("start")
         if (data !== null) {
           this.foundMovie = data;
-          console.log(11)
         } else {
           this.foundMovie = null
         }
-        console.log(data)
       },
       (error) => {
         this.foundMovie = null;
-        console.log(error)
       }
     )
   }

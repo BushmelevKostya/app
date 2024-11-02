@@ -1,6 +1,6 @@
 <div class="auth-container">
   <h2>Вход</h2>
-  <form (ngSubmit)="login(loginForm)" #loginForm="ngForm">
+  <form (ngSubmit)="login()">
 
     <label for="email">Email</label>
     <input
@@ -9,11 +9,11 @@
       name="email"
       [(ngModel)]="email"
       required
-      #emailField="ngModel"
+      (input)="checkEmailRequirements()"
     />
-    <span *ngIf="emailField.invalid && emailField.touched" class="error">
-      {{ emailError }}
-    </span>
+    <ul class="requirements">
+      <li [class.met]="emailCriteria.isEmail">Email format with gmail.com, yandex.ru, mail.ru</li>
+    </ul>
 
     <label for="password">Пароль</label>
     <input
@@ -23,17 +23,20 @@
       [(ngModel)]="password"
       required
       minlength="6"
-      #passwordField="ngModel"
+      (input)="checkPasswordRequirements()"
     />
-    <span *ngIf="passwordField.invalid && passwordField.touched" class="error">
-      {{ passwordError }}
-    </span>
+    <ul class="requirements">
+      <li [class.met]="passwordCriteria.hasLowercase">One lowercase character</li>
+      <li [class.met]="passwordCriteria.hasUppercase">One uppercase character</li>
+      <li [class.met]="passwordCriteria.minLength">6 characters minimum</li>
+      <li [class.met]="passwordCriteria.hasNumberOrSymbol">Contains a number or symbol</li>
+    </ul>
 
     <label>
       <input type="checkbox" name="adminCheckBox" [(ngModel)]="isAdminLogin" /> Войти как администратор
     </label>
 
-    <button type="submit">Войти</button>
+    <button type="submit" [disabled]="!(isPasswordValid() && isEmailValid())">Войти</button>
   </form>
   <p>Нет аккаунта? <a (click)="navigateToRegister()">Зарегистрироваться</a></p>
 </div>

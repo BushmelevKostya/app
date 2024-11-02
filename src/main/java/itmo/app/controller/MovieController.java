@@ -75,7 +75,6 @@ public class MovieController {
 			movie.setOperator(person);
 		}
 		
-		System.out.println(email);
 		movie.setCreator(userRepository.findByEmail(email).get());
 		
 		Movie newMovie = movieRepository.save(movie);
@@ -166,7 +165,6 @@ public class MovieController {
 	@GetMapping("/tagline-greater-than")
 	public ResponseEntity<List<Movie>> getMoviesWithTaglineGreaterThan(@RequestParam String tagline) {
 		List<Movie> movies = movieRepositoryImpl.findMoviesWithTaglineGreaterThan(tagline);
-		System.out.println(movies.size());
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 	
