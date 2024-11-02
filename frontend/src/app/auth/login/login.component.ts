@@ -49,12 +49,12 @@ export class LoginComponent {
             alert(response.body?.message || "Login successful");
             this.authGuard.markProgrammaticNavigation();
             this.router.navigate(['/home']);
-          } else if (response.status === 202) {
+          } else {
             alert(response.body?.message);
           }
         },
         (error) => {
-          alert("Error: " + error.message);
+          alert(error.error?.message);
         }
       );
   }

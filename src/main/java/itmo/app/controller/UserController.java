@@ -7,6 +7,7 @@ import itmo.app.model.entity.Notification;
 import itmo.app.model.entity.User;
 import itmo.app.model.repository.NotificationRepository;
 import itmo.app.model.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class UserController {
 			notification.setUserEmail(user.getEmail());
 			notificationRepository.save(notification);
 			
-			return ResponseEntity.accepted().body("{\"message\":\"Administration request sent\"}");
+			return ResponseEntity.ok("{\"message\":\"Administration request sent\"}");
 		} else if (isAdminRequest && adminCount == 0) {
 			user.setAdmin(true);
 			user.setApprovedAdmin(true);
@@ -71,7 +72,8 @@ public class UserController {
 			userValidationService.validateUserCredentials(loginUser);
 		} catch (Exception e) {
 			String message = e.getMessage();
-			return ResponseEntity.accepted().body("{\"message\":\"" + message + "\"}");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("{\"message\":\"" + message + "\"}");
 		}
 		
 		Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
@@ -80,23 +82,28 @@ public class UserController {
 			String hashedPassword = PasswordUtil.hashPassword(loginUser.getPassword());
 			if (hashedPassword.equals(user.getPassword())) {
 				if (user.isAdmin() && !user.isApprovedAdmin() && isAdminLogin) {
-					return ResponseEntity.accepted().body("{\"message\":\"Your administration request has not yet been approved\"}");
+					return ResponseEntity.status(HttpStatus.FORBIDDEN)
+							.body("{\"message\":\"Your administration request has not yet been approved\"}");
 				} else if (user.isAdmin() && !user.isApprovedAdmin() && !isAdminLogin) {
 					return ResponseEntity.ok("{\"message\":\"The user has successfully logged in\"}");
 				} else if (user.isAdmin() && user.isApprovedAdmin()) {
 					return ResponseEntity.ok("{\"message\":\"The administrator has successfully logged in\"}");
 				} else if (!user.isAdmin() && isAdminLogin) {
-					return ResponseEntity.accepted().body("{\"message\":\"Firstly, you need to register as an admin\"}");
+					return ResponseEntity.status(HttpStatus.FORBIDDEN)
+							.body("{\"message\":\"Firstly, you need to register as an admin\"}");
 				} else {
 					return ResponseEntity.ok("{\"message\":\"The user has successfully logged in\"}");
 				}
 			} else {
-				return ResponseEntity.accepted().body("{\"message\":\"Wrong password\"}");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body("{\"message\":\"Wrong password\"}");
 			}
 		} else {
-			return ResponseEntity.accepted().body("{\"message\":\"User not found\"}");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body("{\"message\":\"User not found\"}");
 		}
 	}
+
 	
 	@GetMapping("/check-email")
 	public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
