@@ -281,8 +281,8 @@
 
               <fieldset class="fieldset-group">
                 <!-- Вложенный блок для Location -->
-                <legend>Location</legend>
-                <button type="button" (click)="toggleDirectorLocation()">Создать Location</button>
+                <legend>Локация</legend>
+                <button type="button" (click)="toggleDirectorLocation()">Создать локацию</button>
                 <div *ngIf="directorLocationVisible" formGroupName="location">
 
                   <fieldset class="fieldset-group">
@@ -318,7 +318,7 @@
               </fieldset>
               <fieldset class="fieldset-group">
                 <div>
-                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Directors</button>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих режиссеров</button>
                   <ul *ngIf="existingDirectors.length > 0">
                     <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
                       {{ director.id }}, {{ director.name }}
@@ -333,8 +333,8 @@
         <div class="first-group">
           <!-- Блок для Screenwriter -->
           <fieldset class="fieldset-group">
-            <legend>Screenwriter</legend>
-            <button type="button" (click)="toggleScreenwriter()">Создать Screenwriter</button>
+            <legend>Сценарист</legend>
+            <button type="button" (click)="toggleScreenwriter()">Создать сценариста</button>
             <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
 
               <fieldset class="fieldset-group">
@@ -372,8 +372,8 @@
               </fieldset>
               <fieldset class="fieldset-group">
                 <!-- Вложенный блок для Location -->
-                <legend>Location</legend>
-                <button type="button" (click)="toggleScreenwriterLocation()">Создать Location</button>
+                <legend>Локация</legend>
+                <button type="button" (click)="toggleScreenwriterLocation()">Создать локацию</button>
                 <div *ngIf="screenwriterLocationVisible" formGroupName="location">
 
                   <fieldset class="fieldset-group">
@@ -409,7 +409,7 @@
               </fieldset>
               <fieldset class="fieldset-group">
                 <div>
-                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Screenwriters</button>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих сценаристов</button>
                   <ul *ngIf="existingScreenwriters.length > 0">
                     <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
                       {{ screenwriter.id }}, {{ screenwriter.name }}
@@ -422,8 +422,8 @@
 
           <!-- Блок для Operator -->
           <fieldset class="fieldset-group">
-            <legend>Operator</legend>
-            <button type="button" (click)="toggleOperator()">Создать Operator</button>
+            <legend>Оператор</legend>
+            <button type="button" (click)="toggleOperator()">Создать оператора</button>
             <div *ngIf="operatorVisible" formGroupName="operator">
 
               <fieldset class="fieldset-group">
@@ -461,8 +461,8 @@
               </fieldset>
               <fieldset class="fieldset-group">
                 <!-- Вложенный блок для Location -->
-                <legend>Location</legend>
-                <button type="button" (click)="toggleOperatorLocation()">Создать Location</button>
+                <legend>Локация</legend>
+                <button type="button" (click)="toggleOperatorLocation()">Создать локацию</button>
                 <div *ngIf="operatorLocationVisible" formGroupName="location">
                   <fieldset class="fieldset-group">
                     <label for="idOperatorLocationCreate">ID:</label>
@@ -495,7 +495,7 @@
               </fieldset>
               <fieldset class="fieldset-group">
                 <div>
-                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Operators</button>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих операторов</button>
                   <ul *ngIf="existingOperators.length > 0">
                     <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
                       {{ operator.id }}, {{ operator.name }}
@@ -507,7 +507,7 @@
           </fieldset>
         </div>
 
-        <button type="submit">Create Movie</button>
+        <button type="submit">Создать фильм</button>
       </form>
     </div>
   </div>
