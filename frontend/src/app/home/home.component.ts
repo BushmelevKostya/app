@@ -20,7 +20,7 @@ import {BehaviorSubject} from 'rxjs';
     AsyncPipe
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css']
 })
 
 export class HomeComponent implements OnInit {
@@ -88,9 +88,7 @@ export class HomeComponent implements OnInit {
   existingScreenwriters: any[] = [];
   existingOperators: any[] = [];
   existingLocations: any[] = [];
-  private intervalId: any;
-
-  //TODO сделать потокобезопасной
+//TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
 
   initVars() {

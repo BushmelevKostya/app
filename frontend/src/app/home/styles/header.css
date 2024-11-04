@@ -1,0 +1,103 @@
+/* Верхнее меню */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+
+.menu-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 50px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.menu-btn {
+  background-color: #333;
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #333;
+  color: white;
+  padding-top: 50px;
+  transition: left 0.3s ease;
+  z-index: 999;
+}
+
+.side-menu.open {
+  left: 0;
+}
+
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.side-menu ul li {
+  margin-bottom: 20px;
+  padding-left: 15px;
+}
+
+.side-menu ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+}
+
+.user-info-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-right: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.user-email {
+  margin-right: 10px;
+}
+
+.notification-btn {
+  position: relative;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.notification-btn .fa-bell {
+  font-size: 24px;
+}
+
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 12px;
+}
