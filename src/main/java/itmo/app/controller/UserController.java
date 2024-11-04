@@ -54,8 +54,7 @@ public class UserController {
 			String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
 			user.setPassword(hashedPassword);
 			userRepository.save(user);
-			return ResponseEntity.ok("{\"message\":\"\n" +
-					"The first administrator has been successfully registered\"}");
+			return ResponseEntity.ok("{\"message\":\"The first administrator has been successfully registered\"}");
 		} else {
 			user.setAdmin(false);
 			user.setApprovedAdmin(false);

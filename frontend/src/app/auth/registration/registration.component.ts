@@ -62,11 +62,9 @@ export class RegistrationComponent {
             this.router.navigate(['/login']);
           },
           (error) => {
-            if (error.status === 202) {
-              alert("A request to register as an administrator has been created, please wait for approval.");
-            } else {
-              alert("Registration error:" + error.message);
-            }
+            const errorMessage = error.error?.message || 'Unknown error occurred';
+            alert(`Error: ${errorMessage}`);
+            console.error('Full error details:', error); // Выводит всю информацию об ошибке в консоль
           }
         );
     });
