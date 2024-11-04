@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { Location } from '@angular/common';
 import {AuthGuard} from '../auth.guard';
+import {WebSocketService} from '../services/websocket';
 
 @Component({
   selector: 'app-home',
@@ -20,8 +21,8 @@ import {AuthGuard} from '../auth.guard';
   styleUrls: ['./home.component.css']
 })
 
-export class HomeComponent {
-  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location, private authGuard: AuthGuard) {
+export class HomeComponent implements OnInit {
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location, private authGuard: AuthGuard, private webSocketService: WebSocketService) {
     this.isUserLoggedIn = sessionStorage.getItem('loggedInUser') !== null;
     this.loggedInUserEmail = sessionStorage.getItem('loggedInUserEmail');
     this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
@@ -32,10 +33,6 @@ export class HomeComponent {
     this.movieCreateForm = this.initMovieForm()
     this.movieUpdateForm = this.initMovieForm()
     this.getMovies();
-
-    // this.intervalId = setInterval(() => {
-    //   this.getMovies();
-    // }, 5000);
   }
 
   ngOnInit() {
@@ -43,7 +40,17 @@ export class HomeComponent {
     window.addEventListener('popstate', function () {
       history.pushState(null, document.title, location.href);
     });
+
+    this.messages = this.webSocketService.messages;
+
   }
+
+  sendMessage(): void {
+    this.webSocketService.sendMessage("Your message here");
+  }
+
+  message = "";
+  messages: string[] = [];
 
   apiUrl = "http://localhost:2580/api/action"
   movieCreateForm: FormGroup
@@ -522,6 +529,7 @@ export class HomeComponent {
   }
 
   addOscarToRratedMovies() {
+    this.sendMessage()
     this.addOscarFlag = true;
     this.http.post(`/api/add-oscar-to-r-rated`, {})
       .subscribe(
