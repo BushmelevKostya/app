@@ -145,291 +145,366 @@
       <span class="close-btn" (click)="changeCreateFlag()">&times;</span>
       <h2>Создать фильм</h2>
       <form [formGroup]="movieCreateForm" (ngSubmit)="createMovie()">
-        <label for="nameCreate">Name:</label>
-        <input id="nameCreate" formControlName="name"/>
+        <div class="first-group">
+          <!-- Основная информация о фильме -->
+          <fieldset class="fieldset-group">
+            <legend>Основная информация</legend>
+            <div class="field-group">
+              <label for="nameCreate">Название:</label>
+              <input id="nameCreate" formControlName="name" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="creationDateCreate">Дата создания:</label>
+              <input id="creationDateCreate" formControlName="creationDate" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="oscarsCountCreate">Количество Оскаров:</label>
+              <input id="oscarsCountCreate" type="number" formControlName="oscarsCount" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="budgetCreate">Бюджет:</label>
+              <input id="budgetCreate" type="number" formControlName="budget" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="totalBoxOfficeCreate">Сборы:</label>
+              <input id="totalBoxOfficeCreate" type="number" formControlName="totalBoxOffice" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="mpaaRatingCreate">Рейтинг MPAA:</label>
+              <select id="mpaaRatingCreate" formControlName="mpaaRating" class="compact-input">
+                <option value="G">G</option>
+                <option value="PG">PG</option>
+                <option value="PG_13">PG-13</option>
+                <option value="R">R</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="lengthCreate">Продолжительность:</label>
+              <input id="lengthCreate" type="number" formControlName="length" class="compact-input"/>
+            </div>
+          </fieldset>
 
-        <label for="creationDateCreate">Creation Date: </label>
-        <input id="creationDateCreate" formControlName="creationDate"/>
-
-        <label for="oscarsCountCreate">Oscars Count:</label>
-        <input id="oscarsCountCreate" type="number" formControlName="oscarsCount"/>
-
-        <label for="budgetCreate">Budget:</label>
-        <input id="budgetCreate" type="number" formControlName="budget"/>
-
-        <label for="totalBoxOfficeCreate">Total Box Office:</label>
-        <input id="totalBoxOfficeCreate" type="number" formControlName="totalBoxOffice"/>
-
-        <label for="mpaaRatingCreate">MPAA Rating:</label>
-        <select id="mpaaRatingCreate" formControlName="mpaaRating">
-          <option value="G">G</option>
-          <option value="PG">PG</option>
-          <option value="PG_13">PG-13</option>
-          <option value="R">R</option>
-        </select>
-
-        <label for="lengthCreate">Length:</label>
-        <input id="lengthCreate" type="number" formControlName="length"/>
-
-        <label for="goldenPalmCountCreate">Golden Palm Count:</label>
-        <input id="goldenPalmCountCreate" type="number" formControlName="goldenPalmCount"/>
-
-        <label for="usaBoxOfficeCreate">Usa Box Office:</label>
-        <input id="usaBoxOfficeCreate" type="number" formControlName="usaBoxOffice"/>
-
-        <label for="taglineCreate">Tagline:</label>
-        <input id="taglineCreate" formControlName="tagline"/>
-
-        <label for="genreCreate">Genre:</label>
-        <select id="genreCreate" formControlName="genre">
-          <option value="ACTION">ACTION</option>
-          <option value="TRAGEDY">TRAGEDY</option>
-          <option value="THRILLER">THRILLER</option>
-          <option value="FANTASY">FANTASY</option>
-          <option value="SCIENCE_FICTION">SCIENCE_FICTION</option>
-        </select>
-
-        <!-- Блок для Coordinates -->
-        <button type="button" (click)="toggleCoordinates()">Create Coordinates</button>
-        <div *ngIf="coordinatesVisible" formGroupName="coordinates">
-          <h3>Coordinates</h3>
-          <label for="idCoordinatesCreate">ID:</label>
-          <input id="idCoordinatesCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
-
-          <label for="xCreate">X:</label>
-          <input id="xCreate" type="number" formControlName="x"/>
-
-          <label for="yCreate">Y:</label>
-          <input id="yCreate" type="number" formControlName="y"/>
-
-          <div>
-            <button type="button" (click)="loadExistingCoordinates()">Load Existing Coordinates</button>
-            <ul *ngIf="existingCoordinates.length > 0">
-              <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
-                {{ coordinate.id }}, {{ coordinate.x }}, {{ coordinate.y }}
-              </li>
-            </ul>
-          </div>
+          <!-- Дополнительные параметры -->
+          <fieldset class="fieldset-group">
+            <legend>Дополнительные параметры</legend>
+            <div class="field-group">
+              <label for="goldenPalmCountCreate">Золотая пальма:</label>
+              <input id="goldenPalmCountCreate" type="number" formControlName="goldenPalmCount" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="usaBoxOfficeCreate">Сборы в США:</label>
+              <input id="usaBoxOfficeCreate" type="number" formControlName="usaBoxOffice" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="taglineCreate">Слоган:</label>
+              <input id="taglineCreate" formControlName="tagline" class="compact-input"/>
+            </div>
+            <div class="field-group">
+              <label for="genreCreate">Жанр:</label>
+              <select id="genreCreate" formControlName="genre" class="compact-input">
+                <option value="ACTION">Экшен</option>
+                <option value="TRAGEDY">Трагедия</option>
+                <option value="THRILLER">Триллер</option>
+                <option value="FANTASY">Фэнтези</option>
+                <option value="SCIENCE_FICTION">Научная фантастика</option>
+              </select>
+            </div>
+          </fieldset>
         </div>
 
-        <!-- Блок для Person -->
-        <button type="button" (click)="toggleDirector()">Create Director</button>
-        <div *ngIf="directorVisible" formGroupName="director">
-          <h3>Director</h3>
-          <label for="idDirectorCreate">ID:</label>
-          <input id="idDirectorCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+        <div class="first-group">
+          <!-- Блок Coordinates -->
+          <fieldset class="fieldset-group">
+            <legend>Координаты</legend>
 
-          <label for="directorNameCreate">director Name:</label>
-          <input id="directorNameCreate" formControlName="name"/>
 
-          <label for="directorEyeColorCreate">Eye Color:</label>
-          <select id="directorEyeColorCreate" formControlName="eyeColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
+            <button type="button" (click)="toggleCoordinates()">Создать координаты</button>
+            <div *ngIf="coordinatesVisible" formGroupName="coordinates">
+              <fieldset class="fieldset-group">
+                <label for="idCoordinatesCreate">ID:</label>
+                <input id="idCoordinatesCreate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                       class="compact-input"/>
+                <label for="xCreate">X:</label>
+                <input id="xCreate" type="number" formControlName="x" class="compact-input"/>
+                <label for="yCreate">Y:</label>
+                <input id="yCreate" type="number" formControlName="y" class="compact-input"/>
 
-          <label for="directorHairColorCreate">Hair Color:</label>
-          <select id="directorHairColorCreate" formControlName="hairColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
-
-          <label for="directorHeightCreate">Height:</label>
-          <input id="directorHeightCreate" type="number" formControlName="height"/>
-
-          <label for="directorNationalityCreate">Nationality:</label>
-          <select id="directorNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
-
-          <!-- Вложенный блок для Location -->
-          <button type="button" (click)="toggleDirectorLocation()">Create Location</button>
-          <div *ngIf="directorLocationVisible" formGroupName="location">
-            <h4>Location</h4>
-            <label for="idDirectorLocationCreate">ID:</label>
-            <input id="idDirectorLocationCreate" formControlName="id" placeholder="Will be generate automatically"
-                   readonly/>
-
-            <label for="directorLocationXCreate">Location X:</label>
-            <input id="directorLocationXCreate" type="number" formControlName="x"/>
-
-            <label for="directorLocationYCreate">Location Y:</label>
-            <input id="directorLocationYCreate" type="number" formControlName="y"/>
-
-            <label for="directorLocationZCreate">Location Z:</label>
-            <input id="directorLocationZCreate" type="number" formControlName="z"/>
-
-            <label for="directorLocationNameCreate">Location Name:</label>
-            <input id="directorLocationNameCreate" formControlName="name"/>
-
-            <div>
-              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
-              <ul *ngIf="existingLocations.length > 0">
-                <li *ngFor="let location of existingLocations" (click)="selectDirectorLocation(location)">
-                  {{ location.id }}, {{ location.name }}
-                </li>
-              </ul>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <div>
+                  <button type="button" (click)="loadExistingCoordinates()">Загрузить координаты</button>
+                  <ul *ngIf="existingCoordinates.length > 0">
+                    <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
+                      {{ coordinate.id }}, {{ coordinate.x }}, {{ coordinate.y }}
+                    </li>
+                  </ul>
+                </div>
+              </fieldset>
             </div>
-          </div>
+          </fieldset>
 
-          <div>
-            <button type="button" (click)="loadExistingPersons()">Load Existing Directors</button>
-            <ul *ngIf="existingDirectors.length > 0">
-              <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
-                {{ director.id }}, {{ director.name }}
-              </li>
-            </ul>
-          </div>
+          <!-- Блок Director -->
+          <fieldset class="fieldset-group">
+            <legend>Режиссер</legend>
+            <button type="button" (click)="toggleDirector()">Создать режиссера</button>
+            <div *ngIf="directorVisible" formGroupName="director">
+
+              <fieldset class="fieldset-group">
+
+                <label for="idDirectorCreate">ID:</label>
+                <input id="idDirectorCreate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                       class="compact-input"/>
+                <label for="directorNameCreate">Имя:</label>
+                <input id="directorNameCreate" formControlName="name" class="compact-input"/>
+                <label for="directorEyeColorCreate">Цвет глаз:</label>
+                <select id="directorEyeColorCreate" formControlName="eyeColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
+                <label for="directorHairColorCreate">Цвет волос:</label>
+                <select id="directorHairColorCreate" formControlName="hairColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
+                <label for="directorHeightCreate">Рост:</label>
+                <input id="directorHeightCreate" type="number" formControlName="height" class="compact-input"/>
+                <label for="directorNationalityCreate">Национальность:</label>
+                <select id="directorNationalityCreate" formControlName="nationality" class="compact-input">
+                  <option value="SPAIN">Испания</option>
+                  <option value="INDIA">Индия</option>
+                  <option value="VATICAN">Ватикан</option>
+                </select>
+
+              </fieldset>
+
+              <fieldset class="fieldset-group">
+                <!-- Вложенный блок для Location -->
+                <legend>Location</legend>
+                <button type="button" (click)="toggleDirectorLocation()">Создать Location</button>
+                <div *ngIf="directorLocationVisible" formGroupName="location">
+
+                  <fieldset class="fieldset-group">
+
+                    <label for="idDirectorLocationCreate">ID:</label>
+                    <input id="idDirectorLocationCreate" formControlName="id" placeholder="Генерируется автоматически"
+                           readonly class="compact-input"/>
+
+                    <label for="directorLocationXCreate">X:</label>
+                    <input id="directorLocationXCreate" type="number" formControlName="x" class="compact-input"/>
+
+                    <label for="directorLocationYCreate">Y:</label>
+                    <input id="directorLocationYCreate" type="number" formControlName="y" class="compact-input"/>
+
+                    <label for="directorLocationZCreate">Z:</label>
+                    <input id="directorLocationZCreate" type="number" formControlName="z" class="compact-input"/>
+
+                    <label for="directorLocationNameCreate">Название:</label>
+                    <input id="directorLocationNameCreate" formControlName="name" class="compact-input"/>
+
+                  </fieldset>
+                  <fieldset class="fieldset-group">
+                    <div>
+                      <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                      <ul *ngIf="existingLocations.length > 0">
+                        <li *ngFor="let location of existingLocations" (click)="selectDirectorLocation(location)">
+                          {{ location.id }}, {{ location.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </fieldset>
+                </div>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <div>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Directors</button>
+                  <ul *ngIf="existingDirectors.length > 0">
+                    <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
+                      {{ director.id }}, {{ director.name }}
+                    </li>
+                  </ul>
+                </div>
+              </fieldset>
+            </div>
+          </fieldset>
         </div>
 
-        <button type="button" (click)="toggleScreenwriter()">Create Screenwriter</button>
-        <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
-          <h3>Screenwriter</h3>
-          <label for="idScreenwriterCreate">ID:</label>
-          <input id="idScreenwriterCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+        <div class="first-group">
+          <!-- Блок для Screenwriter -->
+          <fieldset class="fieldset-group">
+            <legend>Screenwriter</legend>
+            <button type="button" (click)="toggleScreenwriter()">Создать Screenwriter</button>
+            <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
 
-          <label for="screenwriterPersonNameCreate">Name:</label>
-          <input id="screenwriterPersonNameCreate" formControlName="name"/>
+              <fieldset class="fieldset-group">
 
-          <label for="screenwriterEyeColorCreate">Eye Color:</label>
-          <select id="screenwriterEyeColorCreate" formControlName="eyeColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
+                <label for="idScreenwriterCreate">ID:</label>
+                <input id="idScreenwriterCreate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                       class="compact-input"/>
 
-          <label for="screenwriterHairColorCreate">Hair Color:</label>
-          <select id="screenwriterHairColorCreate" formControlName="hairColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
+                <label for="screenwriterPersonNameCreate">Имя:</label>
+                <input id="screenwriterPersonNameCreate" formControlName="name" class="compact-input"/>
 
-          <label for="screenwriterHeightCreate">Height:</label>
-          <input id="screenwriterHeightCreate" type="number" formControlName="height"/>
+                <label for="screenwriterEyeColorCreate">Цвет глаз:</label>
+                <select id="screenwriterEyeColorCreate" formControlName="eyeColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
 
-          <label for="screenwriterNationalityCreate">Nationality:</label>
-          <select id="screenwriterNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
+                <label for="screenwriterHairColorCreate">Цвет волос:</label>
+                <select id="screenwriterHairColorCreate" formControlName="hairColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
 
-          <!-- Вложенный блок для Location -->
-          <button type="button" (click)="toggleScreenwriterLocation()">Create Location</button>
-          <div *ngIf="screenwriterLocationVisible" formGroupName="location">
-            <h4>Location</h4>
-            <label for="idScreenwriterLocationCreate">ID:</label>
-            <input id="idScreenwriterLocationCreate" formControlName="id" placeholder="Will be generate automatically"
-                   readonly/>
+                <label for="screenwriterHeightCreate">Рост:</label>
+                <input id="screenwriterHeightCreate" type="number" formControlName="height" class="compact-input"/>
 
-            <label for="screenwriterLocationXCreate">Location X:</label>
-            <input id="screenwriterLocationXCreate" type="number" formControlName="x"/>
+                <label for="screenwriterNationalityCreate">Национальность:</label>
+                <select id="screenwriterNationalityCreate" formControlName="nationality" class="compact-input">
+                  <option value="SPAIN">Испания</option>
+                  <option value="INDIA">Индия</option>
+                  <option value="VATICAN">Ватикан</option>
+                </select>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <!-- Вложенный блок для Location -->
+                <legend>Location</legend>
+                <button type="button" (click)="toggleScreenwriterLocation()">Создать Location</button>
+                <div *ngIf="screenwriterLocationVisible" formGroupName="location">
 
-            <label for="screenwriterLocationYCreate">Location Y:</label>
-            <input id="screenwriterLocationYCreate" type="number" formControlName="y"/>
+                  <fieldset class="fieldset-group">
 
-            <label for="screenwriterLocationZCreate">Location Z:</label>
-            <input id="screenwriterLocationZCreate" type="number" formControlName="z"/>
+                    <label for="idScreenwriterLocationCreate">ID:</label>
+                    <input id="idScreenwriterLocationCreate" formControlName="id"
+                           placeholder="Генерируется автоматически"
+                           readonly class="compact-input"/>
 
-            <label for="screenwriterLocationNameCreate">Location Name:</label>
-            <input id="screenwriterLocationNameCreate" formControlName="name"/>
+                    <label for="screenwriterLocationXCreate">X:</label>
+                    <input id="screenwriterLocationXCreate" type="number" formControlName="x" class="compact-input"/>
 
-            <div>
-              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
-              <ul *ngIf="existingLocations.length > 0">
-                <li *ngFor="let location of existingLocations" (click)="selectScreenwriterLocation(location)">
-                  {{ location.id }}, {{ location.name }}
-                </li>
-              </ul>
+                    <label for="screenwriterLocationYCreate">Y:</label>
+                    <input id="screenwriterLocationYCreate" type="number" formControlName="y" class="compact-input"/>
+
+                    <label for="screenwriterLocationZCreate">Z:</label>
+                    <input id="screenwriterLocationZCreate" type="number" formControlName="z" class="compact-input"/>
+
+                    <label for="screenwriterLocationNameCreate">Название:</label>
+                    <input id="screenwriterLocationNameCreate" formControlName="name" class="compact-input"/>
+                  </fieldset>
+                  <fieldset class="fieldset-group">
+                    <div>
+                      <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                      <ul *ngIf="existingLocations.length > 0">
+                        <li *ngFor="let location of existingLocations" (click)="selectScreenwriterLocation(location)">
+                          {{ location.id }}, {{ location.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </fieldset>
+                </div>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <div>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Screenwriters</button>
+                  <ul *ngIf="existingScreenwriters.length > 0">
+                    <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
+                      {{ screenwriter.id }}, {{ screenwriter.name }}
+                    </li>
+                  </ul>
+                </div>
+              </fieldset>
             </div>
-          </div>
+          </fieldset>
 
-          <div>
-            <button type="button" (click)="loadExistingPersons()">Load Existing Screenwriters</button>
-            <ul *ngIf="existingScreenwriters.length > 0">
-              <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
-                {{ screenwriter.id }}, {{ screenwriter.name }}
-              </li>
-            </ul>
-          </div>
-        </div>
+          <!-- Блок для Operator -->
+          <fieldset class="fieldset-group">
+            <legend>Operator</legend>
+            <button type="button" (click)="toggleOperator()">Создать Operator</button>
+            <div *ngIf="operatorVisible" formGroupName="operator">
 
-        <button type="button" (click)="toggleOperator()">Create Operator</button>
-        <div *ngIf="operatorVisible" formGroupName="operator">
-          <h3>Person</h3>
-          <label for="idOperatorCreate">ID:</label>
-          <input id="idOperatorCreate" formControlName="id" placeholder="Will be generate automatically" readonly/>
+              <fieldset class="fieldset-group">
 
-          <label for="operatorNameCreate">Name:</label>
-          <input id="operatorNameCreate" formControlName="name"/>
+                <label for="idOperatorCreate">ID:</label>
+                <input id="idOperatorCreate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                       class="compact-input"/>
 
-          <label for="operatorEyeColorCreate">Eye Color:</label>
-          <select id="operatorEyeColorCreate" formControlName="eyeColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
+                <label for="operatorNameCreate">Имя:</label>
+                <input id="operatorNameCreate" formControlName="name" class="compact-input"/>
 
-          <label for="operatorHairColorCreate">Hair Color:</label>
-          <select id="operatorHairColorCreate" formControlName="hairColor">
-            <option value="BLACK">BLACK</option>
-            <option value="ORANGE">ORANGE</option>
-            <option value="BROWN">BROWN</option>
-          </select>
+                <label for="operatorEyeColorCreate">Цвет глаз:</label>
+                <select id="operatorEyeColorCreate" formControlName="eyeColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
 
-          <label for="operatorHeightCreate">Height:</label>
-          <input id="operatorHeightCreate" type="number" formControlName="height"/>
+                <label for="operatorHairColorCreate">Цвет волос:</label>
+                <select id="operatorHairColorCreate" formControlName="hairColor" class="compact-input">
+                  <option value="BLACK">Черный</option>
+                  <option value="ORANGE">Оранжевый</option>
+                  <option value="BROWN">Коричневый</option>
+                </select>
 
-          <label for="operatorNationalityCreate">Nationality:</label>
-          <select id="operatorNationalityCreate" formControlName="nationality">
-            <option value="SPAIN">SPAIN</option>
-            <option value="INDIA">INDIA</option>
-            <option value="VATICAN">VATICAN</option>
-          </select>
+                <label for="operatorHeightCreate">Рост:</label>
+                <input id="operatorHeightCreate" type="number" formControlName="height" class="compact-input"/>
 
-          <!-- Вложенный блок для Location -->
-          <button type="button" (click)="toggleOperatorLocation()">Create Location</button>
-          <div *ngIf="operatorLocationVisible" formGroupName="location">
-            <h4>Location</h4>
-            <label for="idOperatorLocationCreate">ID:</label>
-            <input id="idOperatorLocationCreate" formControlName="id" placeholder="Will be generate automatically"
-                   readonly/>
+                <label for="operatorNationalityCreate">Национальность:</label>
+                <select id="operatorNationalityCreate" formControlName="nationality" class="compact-input">
+                  <option value="SPAIN">Испания</option>
+                  <option value="INDIA">Индия</option>
+                  <option value="VATICAN">Ватикан</option>
+                </select>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <!-- Вложенный блок для Location -->
+                <legend>Location</legend>
+                <button type="button" (click)="toggleOperatorLocation()">Создать Location</button>
+                <div *ngIf="operatorLocationVisible" formGroupName="location">
+                  <fieldset class="fieldset-group">
+                    <label for="idOperatorLocationCreate">ID:</label>
+                    <input id="idOperatorLocationCreate" formControlName="id" placeholder="Генерируется автоматически"
+                           readonly class="compact-input"/>
 
-            <label for="operatorLocationXCreate">Location X:</label>
-            <input id="operatorLocationXCreate" type="number" formControlName="x"/>
+                    <label for="operatorLocationXCreate">X:</label>
+                    <input id="operatorLocationXCreate" type="number" formControlName="x" class="compact-input"/>
 
-            <label for="operatorLocationYCreate">Location Y:</label>
-            <input id="operatorLocationYCreate" type="number" formControlName="y"/>
+                    <label for="operatorLocationYCreate">Y:</label>
+                    <input id="operatorLocationYCreate" type="number" formControlName="y" class="compact-input"/>
 
-            <label for="operatorLocationZCreate">Location Z:</label>
-            <input id="operatorLocationZCreate" type="number" formControlName="z"/>
+                    <label for="operatorLocationZCreate">Z:</label>
+                    <input id="operatorLocationZCreate" type="number" formControlName="z" class="compact-input"/>
 
-            <label for="operatorLocationNameCreate">Location Name:</label>
-            <input id="operatorLocationNameCreate" formControlName="name"/>
-
-            <div>
-              <button type="button" (click)="loadExistingLocations()">Load Existing Locations</button>
-              <ul *ngIf="existingLocations.length > 0">
-                <li *ngFor="let location of existingLocations" (click)="selectOperatorLocation(location)">
-                  {{ location.id }}, {{ location.name }}
-                </li>
-              </ul>
+                    <label for="operatorLocationNameCreate">Название:</label>
+                    <input id="operatorLocationNameCreate" formControlName="name" class="compact-input"/>
+                  </fieldset>
+                  <fieldset class="fieldset-group">
+                    <div>
+                      <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                      <ul *ngIf="existingLocations.length > 0">
+                        <li *ngFor="let location of existingLocations" (click)="selectOperatorLocation(location)">
+                          {{ location.id }}, {{ location.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </fieldset>
+                </div>
+              </fieldset>
+              <fieldset class="fieldset-group">
+                <div>
+                  <button type="button" (click)="loadExistingPersons()">Загрузить существующих Operators</button>
+                  <ul *ngIf="existingOperators.length > 0">
+                    <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
+                      {{ operator.id }}, {{ operator.name }}
+                    </li>
+                  </ul>
+                </div>
+              </fieldset>
             </div>
-          </div>
-
-          <div>
-            <button type="button" (click)="loadExistingPersons()">Load Existing Operators</button>
-            <ul *ngIf="existingOperators.length > 0">
-              <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
-                {{ operator.id }}, {{ operator.name }}
-              </li>
-            </ul>
-          </div>
+          </fieldset>
         </div>
 
         <button type="submit">Create Movie</button>
