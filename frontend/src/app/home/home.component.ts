@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import { Location } from '@angular/common';
 import {AuthGuard} from '../auth.guard';
 import {WebSocketService} from '../services/websocket';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ import {WebSocketService} from '../services/websocket';
     NgForOf,
     NgIf,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    AsyncPipe
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
@@ -43,7 +45,7 @@ export class HomeComponent implements OnInit {
 
     this.webSocketService.connect();
     this.webSocketService.messages.subscribe((data) => {
-      this.movies = JSON.parse(data);
+      this.movies.next(JSON.parse(data));
       console.log("Updated movies:", this.movies);
     });
   }
@@ -81,7 +83,7 @@ export class HomeComponent implements OnInit {
   uniqueUsaBoxOffices: any[] = [];
   operatorsWithoutOscars: any[] = [];
   requests: any[] = []
-  movies: any[] = []
+  public movies = new BehaviorSubject<any[]>([]);
   existingCoordinates: any[] = [];
   existingDirectors: any[] = [];
   existingScreenwriters: any[] = [];
@@ -405,7 +407,7 @@ export class HomeComponent implements OnInit {
 
   getMovies() {
     this.http.get<any[]>(this.apiUrl).subscribe((data: any[]) => {
-      this.movies = data
+      this.movies.next(data)
     });
   }
 
@@ -432,7 +434,7 @@ export class HomeComponent implements OnInit {
 
   deleteMovie() {
     return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
-      this.movies = data
+      this.movies.next(data)
       this.changeDeleteFlag()
     });
   }
@@ -450,7 +452,7 @@ export class HomeComponent implements OnInit {
   updateMovie() {
     return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieUpdateForm.value)
       .subscribe((data: any[]) => {
-        this.movies = data;
+        this.movies.next(data);
         this.changeUpdateFlag();
         this.initVars();
       });
