@@ -1,23 +1,22 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class WebSocketService {
   private webSocket!: WebSocket;
-  public messages: string[] = [];
+  private messageSubject = new Subject<string>();
 
-  constructor() {
-    this.connect();
+  get messages(): Observable<string> {
+    return this.messageSubject.asObservable();
   }
 
-  private connect() {
+  connect(): void {
     this.webSocket = new WebSocket('ws://localhost:2580/stocks');
 
     this.webSocket.onmessage = (event) => {
-      const message = event.data;
-      this.messages.push(message);
-      console.log("Received:", message);
+      this.messageSubject.next(event.data);
     };
 
     this.webSocket.onerror = (error) => {
@@ -25,15 +24,9 @@ export class WebSocketService {
     };
   }
 
-  sendMessage(message: string) {
-    if (this.webSocket.readyState === WebSocket.OPEN) {
-      this.webSocket.send(message);
-    } else {
-      console.error("WebSocket is not open.");
+  disconnect(): void {
+    if (this.webSocket) {
+      this.webSocket.close();
     }
-  }
-
-  disconnect() {
-    this.webSocket.close();
   }
 }

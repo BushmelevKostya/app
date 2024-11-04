@@ -1,6 +1,7 @@
 package itmo.app.controller;
 
 import itmo.app.controller.enums.Command;
+import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class MovieController{
 	
 	@Autowired
 	private MovieRepositoryImpl movieRepositoryImpl;
+	
+	@Autowired
+	private MovieWebSocketHandler movieWebSocketHandler;
 	
 	@PostMapping("/action/{email}")
 	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie, @PathVariable String email) {
@@ -76,6 +80,7 @@ public class MovieController{
 		movie.setCreator(userRepository.findByEmail(email).get());
 		
 		Movie newMovie = movieRepository.save(movie);
+		notifyClients(movieRepository.findAll());
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 	
@@ -262,5 +267,13 @@ public class MovieController{
 		existingMovie.setOperator(movie.getOperator());
 		
 		movieRepository.save(existingMovie);
+	}
+	
+	private void notifyClients(List<Movie> movies) {
+		try {
+			movieWebSocketHandler.sendToAllSessions(movies);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

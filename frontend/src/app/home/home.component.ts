@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
@@ -41,16 +41,12 @@ export class HomeComponent implements OnInit {
       history.pushState(null, document.title, location.href);
     });
 
-    this.messages = this.webSocketService.messages;
-
+    this.webSocketService.connect();
+    this.webSocketService.messages.subscribe((data) => {
+      this.movies = JSON.parse(data);
+      console.log("Updated movies:", this.movies);
+    });
   }
-
-  sendMessage(): void {
-    this.webSocketService.sendMessage("Your message here");
-  }
-
-  message = "";
-  messages: string[] = [];
 
   apiUrl = "http://localhost:2580/api/action"
   movieCreateForm: FormGroup
@@ -529,7 +525,6 @@ export class HomeComponent implements OnInit {
   }
 
   addOscarToRratedMovies() {
-    this.sendMessage()
     this.addOscarFlag = true;
     this.http.post(`/api/add-oscar-to-r-rated`, {})
       .subscribe(
