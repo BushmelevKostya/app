@@ -13,7 +13,7 @@ export class WebSocketService {
   }
 
   connect(): void {
-    this.webSocket = new WebSocket('ws://localhost:2580/stocks');
+    this.webSocket = new WebSocket('ws://localhost:2580/socket');
 
     this.webSocket.onmessage = (event) => {
       this.messageSubject.next(event.data);

@@ -32,18 +32,12 @@ public class MovieWebSocketHandler extends TextWebSocketHandler {
 		try {
 			String message = objectMapper.writeValueAsString(movies);
 			TextMessage textMessage = new TextMessage(message);
-			System.out.println("отправляю сообщение");
-			System.out.println(sessions);
-			System.out.println(sessions.size());
 			for (WebSocketSession session : sessions) {
-				System.out.println(session.isOpen());
 				if (session.isOpen()) {
-					System.out.println("сообщение отправлено");
 					session.sendMessage(textMessage);
 				}
 			}
 		} catch (Exception e) {
-			System.err.println("Ошибка при отправке сообщения: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -56,7 +50,6 @@ public class MovieWebSocketHandler extends TextWebSocketHandler {
 	
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-		System.err.println("Ошибка транспортировки в сессии " + session.getId() + ": " + exception.getMessage());
 		session.close(CloseStatus.SERVER_ERROR);
 	}
 }

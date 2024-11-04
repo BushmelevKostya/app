@@ -46,7 +46,6 @@ export class HomeComponent implements OnInit {
     this.webSocketService.connect();
     this.webSocketService.messages.subscribe((data) => {
       this.movies.next(JSON.parse(data));
-      console.log("Updated movies:", this.movies);
     });
   }
 
