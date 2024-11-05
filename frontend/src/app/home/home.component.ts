@@ -1,4 +1,4 @@
-import {Component, ErrorHandler, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
@@ -38,15 +38,15 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function () {
       history.pushState(null, document.title, location.href);
-      window.addEventListener('popstate', function () {
-        history.pushState(null, document.title, location.href);
-      });
+    });
 
-      this.webSocketService.connect();
-      this.webSocketService.messages.subscribe((data) => {
-        this.movies.next(JSON.parse(data));
-      });
+    this.webSocketService.connect();
+    this.webSocketService.messages.subscribe((data) => {
+      this.movies.next(JSON.parse(data));
+    });
   }
 
   apiUrl = "http://localhost:2580/api/action"
@@ -88,7 +88,6 @@ export class HomeComponent implements OnInit {
   existingScreenwriters: any[] = [];
   existingOperators: any[] = [];
   existingLocations: any[] = [];
-//TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
   deleteIdFlag = 0;
   idInput: number = 0;
@@ -127,66 +126,66 @@ export class HomeComponent implements OnInit {
 
   initMovieForm() {
     return this.fb.group({
-      name: ['defaultName', Validators.required],
-      creationDate: ["2024-10-15 14:30:55", Validators.required],
+      name: ['defaultName', [Validators.required, Validators.minLength(1)]],
+      creationDate: ["2024-10-15 14:30:55", [Validators.required]],
       oscarsCount: [1, [Validators.required, Validators.min(1)]],
       budget: [1, [Validators.required, Validators.min(1)]],
-      totalBoxOffice: [1, [Validators.required, Validators.min(1)]],
-      mpaaRating: ['G', Validators.required],
-      length: [1, Validators.required],
-      goldenPalmCount: [1, Validators.required],
-      usaBoxOffice: [1, Validators.required],
-      tagline: ['defaultTagline', Validators.required],
-      genre: ['ACTION', Validators.required],
+      totalBoxOffice: [1, [Validators.min(1)]],
+      mpaaRating: ['G', [Validators.required]],
+      length: [1, [Validators.required, Validators.min(1)]],
+      goldenPalmCount: [1, [Validators.min(1)]],
+      usaBoxOffice: [1, [Validators.required, Validators.min(1)]],
+      tagline: ['defaultTagline', [Validators.required]],
+      genre: ['ACTION'],
       coordinates: this.fb.group({
-        id: ['', Validators.required],
-        x: [0, Validators.required],
-        y: [0, Validators.required]
+        id: [''],
+        x: [0, [Validators.required]],
+        y: [0, [Validators.required]]
       }),
       director: this.fb.group({
-        id: ['', Validators.required],
-        name: ['defaultName', Validators.required],
-        eyeColor: ['BLACK', Validators.required],
-        hairColor: ['BLACK', Validators.required],
+        id: [''],
+        name: ['defaultName', [Validators.required, Validators.minLength(1)]],
+        eyeColor: ['BLACK', [Validators.required]],
+        hairColor: ['BLACK', [Validators.required]],
         location: this.fb.group({
-          id: ['', Validators.required],
-          x: [0, Validators.required],
-          y: [0, Validators.required],
-          z: [0, Validators.required],
-          name: ['defaultLocationName', Validators.required]
+          id: [''],
+          x: [0, [Validators.required]],
+          y: [0, [Validators.required]],
+          z: [0, [Validators.required]],
+          name: ['defaultLocationName', [Validators.required, Validators.minLength(1)]]
         }),
-        height: [0, Validators.required],
-        nationality: ['SPAIN', Validators.required]
+        height: [1, [Validators.required, Validators.min(1)]],
+        nationality: ['SPAIN']
       }),
       screenwriter: this.fb.group({
-        id: ['', Validators.required],
-        name: ['defaultName', Validators.required],
-        eyeColor: ['BLACK', Validators.required],
-        hairColor: ['BLACK', Validators.required],
+        id: [''],
+        name: ['defaultName', [Validators.required, Validators.minLength(1)]],
+        eyeColor: ['BLACK', [Validators.required]],
+        hairColor: ['BLACK', [Validators.required]],
         location: this.fb.group({
-          id: ['', Validators.required],
-          x: [0, Validators.required],
-          y: [0, Validators.required],
-          z: [0, Validators.required],
-          name: ['defaultLocationName', Validators.required]
+          id: [''],
+          x: [0, [Validators.required]],
+          y: [0, [Validators.required]],
+          z: [0, [Validators.required]],
+          name: ['defaultLocationName', [Validators.required, Validators.minLength(1)]]
         }),
-        height: [0, Validators.required],
-        nationality: ['SPAIN', Validators.required]
+        height: [1, [Validators.required, Validators.min(1)]],
+        nationality: ['SPAIN']
       }),
       operator: this.fb.group({
-        id: ['', Validators.required],
-        name: ['defaultName', Validators.required],
-        eyeColor: ['BLACK', Validators.required],
-        hairColor: ['BLACK', Validators.required],
+        id: [''],
+        name: ['defaultName', [Validators.required, Validators.minLength(1)]],
+        eyeColor: ['BLACK', [Validators.required]],
+        hairColor: ['BLACK', [Validators.required]],
         location: this.fb.group({
-          id: ['', Validators.required],
-          x: [0, Validators.required],
-          y: [0, Validators.required],
-          z: [0, Validators.required],
-          name: ['defaultLocationName', Validators.required]
+          id: [''],
+          x: [0, [Validators.required]],
+          y: [0, [Validators.required]],
+          z: [0, [Validators.required]],
+          name: ['defaultLocationName', [Validators.required, Validators.minLength(1)]]
         }),
-        height: [0, Validators.required],
-        nationality: ['SPAIN', Validators.required]
+        height: [1, [Validators.required, Validators.min(1)]],
+        nationality: ['SPAIN']
       })
     });
   }
@@ -229,6 +228,35 @@ export class HomeComponent implements OnInit {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  getFormErrors(command: String): string[] {
+    const errors: string[] = [];
+
+    const errorMessages: { [key: string]: string } = {
+      required: 'Поле обязательно для заполнения',
+      min: 'Значение должно быть больше или равно минимальному допустимому',
+      minLength: 'Длина должна быть больше или равна минимальной допустимой'
+    };
+
+    function getErrors(control: any, prefix: string) {
+      if (control instanceof FormGroup) {
+        Object.keys(control.controls).forEach((key) => {
+          getErrors(control.get(key), `${prefix}${key}.`);
+        });
+      } else if (control.errors) {
+        Object.keys(control.errors).forEach((errorKey) => {
+          const errorMessage = errorMessages[errorKey] || `Ошибка: ${errorKey}`;
+          errors.push(`${prefix.slice(0, -1)}: ${errorMessage}`);
+        });
+      }
+    }
+    if (command === 'create') {
+      getErrors(this.movieCreateForm, '');
+    } else if (command === 'update') {
+      getErrors(this.movieUpdateForm, '')
+    }
+    return errors;
+  }
+
 
   changeSearchFlag() {
     this.searchFlag = this.searchFlag ? 0 : 1
@@ -244,10 +272,6 @@ export class HomeComponent implements OnInit {
 
   changeTaglineSearchFlag() {
     this.taglineSearchFlag = !this.taglineSearchFlag;
-  }
-
-  toDoMethod() {
-    //TODO
   }
 
   navigateTo(address: String) {

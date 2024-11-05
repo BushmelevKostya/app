@@ -507,7 +507,14 @@
           </fieldset>
         </div>
 
-        <button type="submit">Создать фильм</button>
+        <div *ngIf="getFormErrors('create').length > 0" class="error-list">
+          <h3>Form Errors:</h3>
+          <ul>
+            <li *ngFor="let error of getFormErrors('create')">{{ error }}</li>
+          </ul>
+        </div>
+
+        <button type="submit" [disabled]="movieCreateForm.invalid">Создать фильм</button>
       </form>
     </div>
   </div>
@@ -880,7 +887,14 @@
           </fieldset>
         </div>
 
-        <button type="submit">Обновить фильм</button>
+        <div *ngIf="getFormErrors('update').length > 0" class="error-list">
+          <h3>Form Errors:</h3>
+          <ul>
+            <li *ngFor="let error of getFormErrors('update')">{{ error }}</li>
+          </ul>
+        </div>
+
+        <button type="submit" [disabled]="movieUpdateForm.invalid">Обновить фильм</button>
       </form>
     </div>
   </div>

@@ -140,7 +140,6 @@ public class MovieController {
 		
 		if (existingMovieOpt.isPresent()) {
 			Movie oldMovie = existingMovieOpt.get();
-			System.out.println(movie.getCreationDate());
 			Optional<User> optUser = userRepository.findByEmail(email);
 			if (optUser.isPresent()) {
 				User curUser = optUser.get();
