@@ -94,12 +94,16 @@ public class MovieController{
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
 		if (movieToDelete.isPresent()) {
 			Movie movie = movieToDelete.get();
-			if (!movie.getCreator().getEmail().equals(email)) {
-				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			Optional<User> user = userRepository.findByEmail(email);
+			if (user.isPresent()) {
+				User curUser = user.get();
+				if (!movie.getCreator().getEmail().equals(email) && !curUser.isApprovedAdmin()) {
+					return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+				}
 			}
 		}
 		
-		deleteSingletoneEntities(movieToDelete, new Movie(), id, Command.DELETE);
+//		deleteSingletoneEntities(movieToDelete, new Movie(), id, Command.DELETE);
 		
 		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
 	}
@@ -110,9 +114,12 @@ public class MovieController{
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
 		if (existingMovieOpt.isPresent()) {
-			
-			if (!existingMovieOpt.get().getCreator().getEmail().equals(email)) {
-				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			Optional<User> optUser = userRepository.findByEmail(email);
+			if (optUser.isPresent()) {
+				User curUser = optUser.get();
+				if (!existingMovieOpt.get().getCreator().getEmail().equals(email) && !curUser.isApprovedAdmin()) {
+					return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+				}
 			}
 			
 			deleteSingletoneEntities(existingMovieOpt, movie, id, Command.UPDATE);

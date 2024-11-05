@@ -130,7 +130,7 @@
           </div>
         </td>
 
-        <td *ngIf="isMovieCreator(movie)">
+        <td *ngIf="isMovieCreator(movie) || isAdmin">
           <button (click)="openUpdateModal(movie.id)">Обновить</button>
           <button (click)="openDeleteModal(movie.id)">Удалить</button>
         </td>

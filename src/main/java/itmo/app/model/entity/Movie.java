@@ -18,9 +18,6 @@ public class Movie {
 	@JoinColumn(name = "creator_id", nullable = false)
 	private User creator;
 	
-//	@OneToMany(mappedBy = "movie")
-//	private Set<MovieChange> changes = new HashSet<>();
-	
 	@Column(nullable = false)
 	private String name; //Поле не может быть null, Строка не может быть пустой
 	
