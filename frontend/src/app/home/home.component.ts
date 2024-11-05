@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ErrorHandler, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import { Location } from '@angular/common';
+import {Location} from '@angular/common';
 import {AuthGuard} from '../auth.guard';
 import {WebSocketService} from '../services/websocket';
 import {BehaviorSubject} from 'rxjs';
@@ -31,27 +31,27 @@ export class HomeComponent implements OnInit {
     if (this.isAdmin) {
       this.loadRequests()
     }
-
     this.movieCreateForm = this.initMovieForm()
     this.movieUpdateForm = this.initMovieForm()
     this.getMovies();
+
   }
 
   ngOnInit() {
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', function () {
       history.pushState(null, document.title, location.href);
-    });
+      window.addEventListener('popstate', function () {
+        history.pushState(null, document.title, location.href);
+      });
 
-    this.webSocketService.connect();
-    this.webSocketService.messages.subscribe((data) => {
-      this.movies.next(JSON.parse(data));
-    });
+      this.webSocketService.connect();
+      this.webSocketService.messages.subscribe((data) => {
+        this.movies.next(JSON.parse(data));
+      });
   }
 
   apiUrl = "http://localhost:2580/api/action"
-  movieCreateForm: FormGroup
-  movieUpdateForm: FormGroup
+  movieCreateForm!: FormGroup
+  movieUpdateForm!: FormGroup
   createFlag = 0
   updateFlag = 0
   deleteFlag = 0
@@ -78,7 +78,7 @@ export class HomeComponent implements OnInit {
   foundMovie: any = null;
   minDirector: any;
   taglineInput: string | undefined;
-  moviesWithTagline: any[] = [];
+  public moviesWithTagline = new BehaviorSubject<any[]>([]);
   uniqueUsaBoxOffices: any[] = [];
   operatorsWithoutOscars: any[] = [];
   requests: any[] = []
@@ -484,7 +484,6 @@ export class HomeComponent implements OnInit {
 
   isMovieCreator(movie: any): boolean {
     return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');
-    ;
   }
 
   findDirectorWithMinMovies() {
@@ -501,7 +500,7 @@ export class HomeComponent implements OnInit {
       this.http.get<any[]>('/api/tagline-greater-than', {
         params: {tagline}
       }).subscribe((data: any[]) => {
-        this.moviesWithTagline = data
+        this.moviesWithTagline.next(data)
       });
     }
   }

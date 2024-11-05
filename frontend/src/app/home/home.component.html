@@ -1072,7 +1072,7 @@
         <input type="text" id="taglineInput" [(ngModel)]="taglineInput" name="taglineInput" required/>
         <button type="submit">Поиск</button>
       </form>
-      <div *ngIf="moviesWithTagline && moviesWithTagline.length > 0">
+      <div *ngIf="moviesWithTagline && moviesWithTagline.value.length > 0">
         <table>
           <thead>
           <tr>
@@ -1095,7 +1095,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let movie of moviesWithTagline">
+          <tr *ngFor="let movie of moviesWithTagline | async">
             <td>{{ movie.id }}</td>
             <td>{{ movie.name }}</td>
             <td>{{ movie.creationDate }}</td>
