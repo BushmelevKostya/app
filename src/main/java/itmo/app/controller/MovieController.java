@@ -1,6 +1,5 @@
 package itmo.app.controller;
 
-import itmo.app.controller.enums.Command;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
@@ -17,7 +16,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api")
 @CrossOrigin(origins = "http://localhost:4200")
-public class MovieController{
+public class MovieController {
 	@Autowired
 	private MovieRepository movieRepository;
 	
@@ -101,19 +100,42 @@ public class MovieController{
 					return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 				}
 			}
+			Coordinates coordinates = movie.getCoordinates();
+			Person director = movie.getDirector();
+			Person screenwriter = movie.getScreenwriter();
+			Person operator = movie.getOperator();
+			
+			List<MovieChange> moviesWithSameMovieChange = movieChangeRepository.findByMovie(movie);
+			if (!moviesWithSameMovieChange.isEmpty()) {
+				movieChangeRepository.deleteAll(moviesWithSameMovieChange);
+			}
+			if (user.isPresent()) {
+				User curUser = user.get();
+				long choosenId = 1L;
+				Optional<Movie> optionalMovie = movieRepository.findById(choosenId);
+				if (optionalMovie.isPresent()) {
+					Movie oldMovie = optionalMovie.get();
+					oldMovie.setCoordinates(coordinates);
+					oldMovie.setDirector(director);
+					oldMovie.setScreenwriter(screenwriter);
+					oldMovie.setOperator(operator);
+					updateMovie(choosenId, curUser.getEmail(), oldMovie);
+				}
+			}
+			movieRepository.deleteById(id);
+			return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
 		}
-		
-//		deleteSingletoneEntities(movieToDelete, new Movie(), id, Command.DELETE);
-		
-		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	
 	@PutMapping("/action/{id}/{email}")
-	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email, @RequestBody Movie movie) {
+	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email,
+	                                               @RequestBody Movie movie) {
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
 		if (existingMovieOpt.isPresent()) {
+			Movie oldMovie = existingMovieOpt.get();
 			Optional<User> optUser = userRepository.findByEmail(email);
 			if (optUser.isPresent()) {
 				User curUser = optUser.get();
@@ -122,7 +144,8 @@ public class MovieController{
 				}
 			}
 			
-			deleteSingletoneEntities(existingMovieOpt, movie, id, Command.UPDATE);
+			setFields(oldMovie, movie);
+			
 			
 			Optional<User> existingUserOpt = userRepository.findByEmail(email);
 			if (existingUserOpt.isPresent()) {
@@ -196,84 +219,23 @@ public class MovieController{
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	public void deleteSingletoneEntities(Optional<Movie> optionalMovie, Movie movie, long id, Command command) {
-		if (optionalMovie.isPresent()) {
-			Coordinates coordinates = optionalMovie.get().getCoordinates();
-			Person director = optionalMovie.get().getDirector();
-			Person screenwriter = optionalMovie.get().getScreenwriter();
-			Person operator = optionalMovie.get().getOperator();
-			
-			if (command.equals(Command.UPDATE)){
-				setFields(optionalMovie, movie);
-			} else if (command.equals(Command.DELETE)){
-				List<MovieChange> moviesWithSameMovieChange = movieChangeRepository.findByMovie(optionalMovie.get());
-				if (!moviesWithSameMovieChange.isEmpty()) {
-					movieChangeRepository.deleteAll(moviesWithSameMovieChange);
-				}
-				
-				movieRepository.deleteById(id);
-			}
-			
-			List<Movie> moviesWithSameCoordinates = movieRepository.findByCoordinates(coordinates);
-			List<Movie> moviesWithSameDirector = movieRepository.findByDirector(director);
-			List<Movie> moviesWithSameScreenwriter = movieRepository.findByScreenwriter(screenwriter);
-			List<Movie> moviesWithSameOperator = movieRepository.findByOperator(operator);
-			
-			
-			if (moviesWithSameCoordinates.isEmpty()) {
-				coordinatesRepository.delete(coordinates);
-			}
-			
-			Location location;
-			if (moviesWithSameDirector.isEmpty()) {
-				location = director.getLocation();
-				personRepository.delete(director);
-				
-				List<Person> personsWithSameLocation = personRepository.findByLocation(location);
-				if (personsWithSameLocation.isEmpty()) {
-					locationRepository.delete(location);
-				}
-			}
-			if (moviesWithSameScreenwriter.isEmpty()) {
-				location = screenwriter.getLocation();
-				personRepository.delete(screenwriter);
-				
-				List<Person> personsWithSameLocation = personRepository.findByLocation(location);
-				if (personsWithSameLocation.isEmpty()) {
-					locationRepository.delete(location);
-				}
-			}
-			if (moviesWithSameOperator.isEmpty()) {
-				location = operator.getLocation();
-				personRepository.delete(operator);
-				
-				List<Person> personsWithSameLocation = personRepository.findByLocation(location);
-				if (personsWithSameLocation.isEmpty()) {
-					locationRepository.delete(location);
-				}
-			}
-		}
-	}
-	
-	public void setFields(Optional<Movie> optionalMovie, Movie movie) {
-		Movie existingMovie = optionalMovie.get();
+	public void setFields(Movie oldMovie, Movie newMovie) {
+		oldMovie.setName(newMovie.getName());
+		oldMovie.setCoordinates(newMovie.getCoordinates());
+		oldMovie.setOscarsCount(newMovie.getOscarsCount());
+		oldMovie.setBudget(newMovie.getBudget());
+		oldMovie.setTotalBoxOffice(newMovie.getTotalBoxOffice());
+		oldMovie.setMpaaRating(newMovie.getMpaaRating());
+		oldMovie.setLength(newMovie.getLength());
+		oldMovie.setGoldenPalmCount(newMovie.getGoldenPalmCount());
+		oldMovie.setUsaBoxOffice(newMovie.getUsaBoxOffice());
+		oldMovie.setTagline(newMovie.getTagline());
+		oldMovie.setGenre(newMovie.getGenre());
+		oldMovie.setDirector(newMovie.getDirector());
+		oldMovie.setScreenwriter(newMovie.getScreenwriter());
+		oldMovie.setOperator(newMovie.getOperator());
 		
-		existingMovie.setName(movie.getName());
-		existingMovie.setCoordinates(movie.getCoordinates());
-		existingMovie.setOscarsCount(movie.getOscarsCount());
-		existingMovie.setBudget(movie.getBudget());
-		existingMovie.setTotalBoxOffice(movie.getTotalBoxOffice());
-		existingMovie.setMpaaRating(movie.getMpaaRating());
-		existingMovie.setLength(movie.getLength());
-		existingMovie.setGoldenPalmCount(movie.getGoldenPalmCount());
-		existingMovie.setUsaBoxOffice(movie.getUsaBoxOffice());
-		existingMovie.setTagline(movie.getTagline());
-		existingMovie.setGenre(movie.getGenre());
-		existingMovie.setDirector(movie.getDirector());
-		existingMovie.setScreenwriter(movie.getScreenwriter());
-		existingMovie.setOperator(movie.getOperator());
-		
-		movieRepository.save(existingMovie);
+		movieRepository.save(oldMovie);
 	}
 	
 	private void notifyClients(List<Movie> movies) {
