@@ -10,8 +10,7 @@
       <div *ngIf="isUserLoggedIn" class="user-info-box">
         <span class="user-email">{{ loggedInUserEmail }}</span>
         <button *ngIf="isAdmin" class="notification-btn" (click)="changeNotsFlag()">
-          <i class="fa fa-bell"></i>
-          <span class="notification-count">{{ 1 }}</span>
+          <span *ngIf="notificationCount > 0" class="notification-count">{{ notificationCount }}</span>
         </button>
       </div>
 

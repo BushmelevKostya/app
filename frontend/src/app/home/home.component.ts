@@ -71,6 +71,7 @@ export class HomeComponent implements OnInit {
   operatorLocationVisible = false
   isAdmin = false
   isUserLoggedIn: boolean = false
+  notificationCount = 0
   loggedInUserEmail: string | null = ''
   menuOpen = 0
   title = 'Лабораторная работа'
@@ -195,6 +196,7 @@ export class HomeComponent implements OnInit {
       .subscribe(
         (data) => {
           this.requests = data;
+          this.notificationCount = data.length
         },
         (error) => {
           console.error("Ошибка при загрузке уведомлений:", error);
@@ -518,7 +520,7 @@ export class HomeComponent implements OnInit {
     this.http.post(`/api/notifications/approve/${id}`, {})
       .subscribe(
         () => {
-          alert("Application approved");
+          alert("Request approve");
           this.loadRequests();
         },
         (error) => {
