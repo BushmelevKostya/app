@@ -88,8 +88,8 @@ public class MovieController {
 		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/action/{id}/{email}")
-	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long id, @PathVariable String email) {
+	@DeleteMapping("/action/{linkId}/{id}/{email}")
+	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long linkId, @PathVariable long id, @PathVariable String email) {
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
 		if (movieToDelete.isPresent()) {
 			Movie movie = movieToDelete.get();
@@ -109,17 +109,21 @@ public class MovieController {
 			if (!moviesWithSameMovieChange.isEmpty()) {
 				movieChangeRepository.deleteAll(moviesWithSameMovieChange);
 			}
-			if (user.isPresent()) {
-				User curUser = user.get();
-				long choosenId = 1L;
-				Optional<Movie> optionalMovie = movieRepository.findById(choosenId);
-				if (optionalMovie.isPresent()) {
-					Movie oldMovie = optionalMovie.get();
-					oldMovie.setCoordinates(coordinates);
-					oldMovie.setDirector(director);
-					oldMovie.setScreenwriter(screenwriter);
-					oldMovie.setOperator(operator);
-					updateMovie(choosenId, curUser.getEmail(), oldMovie);
+			if (linkId != 0) {
+				if (user.isPresent()) {
+					User curUser = user.get();
+					Optional<Movie> optionalMovie = movieRepository.findById(linkId);
+					if (optionalMovie.isPresent()) {
+						Movie oldMovie = optionalMovie.get();
+						oldMovie.setCoordinates(coordinates);
+						oldMovie.setDirector(director);
+						oldMovie.setScreenwriter(screenwriter);
+						oldMovie.setOperator(operator);
+						updateMovie(linkId, curUser.getEmail(), oldMovie);
+					}
+					else {
+						return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+					}
 				}
 			}
 			movieRepository.deleteById(id);
@@ -136,6 +140,7 @@ public class MovieController {
 		
 		if (existingMovieOpt.isPresent()) {
 			Movie oldMovie = existingMovieOpt.get();
+			System.out.println(movie.getCreationDate());
 			Optional<User> optUser = userRepository.findByEmail(email);
 			if (optUser.isPresent()) {
 				User curUser = optUser.get();
@@ -221,6 +226,7 @@ public class MovieController {
 	
 	public void setFields(Movie oldMovie, Movie newMovie) {
 		oldMovie.setName(newMovie.getName());
+		oldMovie.setCreationDate(newMovie.getCreationDate() );
 		oldMovie.setCoordinates(newMovie.getCoordinates());
 		oldMovie.setOscarsCount(newMovie.getOscarsCount());
 		oldMovie.setBudget(newMovie.getBudget());

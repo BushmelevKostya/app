@@ -90,6 +90,8 @@ export class HomeComponent implements OnInit {
   existingLocations: any[] = [];
 //TODO сделать потокобезопасной
   selectedMovieId: number | null = null;
+  deleteIdFlag = 0;
+  idInput: number = 0;
 
   initVars() {
     this.coordinatesVisible = false
@@ -211,8 +213,22 @@ export class HomeComponent implements OnInit {
   }
 
   changeCreateFlag() {
+    this.movieCreateForm.get("creationDate")?.setValue(this.setCurrentTime())
     this.createFlag = this.createFlag ? 0 : 1
   }
+
+  setCurrentTime(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Добавляем 1, так как месяцы от 0 до 11
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
 
   changeSearchFlag() {
     this.searchFlag = this.searchFlag ? 0 : 1
@@ -429,8 +445,12 @@ export class HomeComponent implements OnInit {
     this.deleteFlag = this.deleteFlag ? 0 : 1
   }
 
-  deleteMovie() {
-    return this.http.delete<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
+  changeDeleteIdFlag() {
+    this.deleteIdFlag = this.deleteIdFlag ? 0 : 1
+  }
+
+  deleteMovie(id: number) {
+    return this.http.delete<any[]>(`${this.apiUrl}/${id}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
       this.movies.next(data)
       this.changeDeleteFlag()
     });
@@ -443,6 +463,7 @@ export class HomeComponent implements OnInit {
   }
 
   changeUpdateFlag() {
+    this.movieUpdateForm.get("creationDate")?.setValue(this.setCurrentTime())
     this.updateFlag = this.updateFlag ? 0 : 1
   }
 

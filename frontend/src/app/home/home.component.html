@@ -891,8 +891,18 @@
       <span class="close-btn" (click)="changeDeleteFlag()">&times;</span>
       <h2>Удалить фильм</h2>
       <p>Вы уверены, что хотите удалить фильм "{{ selectedMovieId }}"?</p>
-      <button (click)="deleteMovie()">Да</button>
+      <button (click)="changeDeleteIdFlag()">Да</button>
       <button (click)="changeDeleteFlag()">Нет</button>
+      <div class="modal" *ngIf="deleteIdFlag">
+        <div class="modal-content">
+          <h2>Введите Id фильма, к которому хотите привязать зависимые объекты, или 0, если хотите удалить их.</h2>
+          <form (ngSubmit)="deleteMovie(idInput)">
+            <label for="idInput">ID:</label>
+            <input type="number" id="idInput" [(ngModel)]="idInput" name="idInput" required/>
+            <button type="submit" [disabled]="idInput == null">Удалить</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
