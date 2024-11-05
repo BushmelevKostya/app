@@ -2,71 +2,90 @@ package itmo.app.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "movies")
 public class Movie {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+	private long id;
 	
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "creator_id", nullable = false)
 	private User creator;
 	
+	@NotNull
+	@Size(min = 1)
 	@Column(nullable = false)
-	private String name; //Поле не может быть null, Строка не может быть пустой
+	private String name;
 	
+	@NotNull
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "coordinates_id")
-	private Coordinates coordinates; //Поле не может быть null
+	private Coordinates coordinates;
 	
+	@NotNull
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(nullable = false, updatable = false)
-	private java.time.LocalDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+	private java.time.LocalDateTime creationDate;
 	
+	@NotNull
+	@Min(1)
 	@Column
-	private int oscarsCount; //Значение поля должно быть больше 0
+	private int oscarsCount;
 	
+	@NotNull
+	@Min(1)
 	@Column(nullable = false)
-	private Float budget; //Значение поля должно быть больше 0, Поле не может быть null
+	private Float budget;
 	
+	@Min(1)
 	@Column
-	private int totalBoxOffice; //Значение поля должно быть больше 0
+	private int totalBoxOffice;
 	
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private MpaaRating mpaaRating; //Поле не может быть null
+	private MpaaRating mpaaRating;
 	
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "person_id")
-	private Person director; //Поле может быть null
+	private Person director;
 	
+	@NotNull
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "screenwriter_id")
 	private Person screenwriter;
 	
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "operator_id")
-	private Person operator; //Поле может быть null
+	private Person operator;
 	
+	@NotNull
+	@Min(1)
 	@Column
-	private int length; //Значение поля должно быть больше 0
+	private int length;
 	
-	private long goldenPalmCount; //Значение поля должно быть больше 0
+	@Min(1)
+	private long goldenPalmCount;
+	
+	@NotNull
+	@Min(1)
 	@Column
-	private Double usaBoxOffice; //Поле может быть null, Значение поля должно быть больше 0
+	private Double usaBoxOffice;
 	
+	@NotNull
 	@Column(nullable = false)
-	private String tagline; //Поле не может быть null
+	private String tagline;
 	
 	@Enumerated(EnumType.STRING)
 	@Column
-	private MovieGenre genre; //Поле может быть null
+	private MovieGenre genre;
 	
 	public long getId() {
 		return id;

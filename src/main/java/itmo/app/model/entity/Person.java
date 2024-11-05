@@ -1,6 +1,9 @@
 package itmo.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "persons")
@@ -9,25 +12,31 @@ public class Person {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name = "PersonName", nullable = false) // Поле не может быть null, Строка не может быть пустой
+	@NotNull
+	@Size(min = 1)
+	@Column(name = "PersonName", nullable = false)
 	private String name;
 	
-	@Column(name = "PersonEyeColor", nullable = false) // Поле не может быть null
+	@NotNull
+	@Column(name = "PersonEyeColor", nullable = false)
 	private Color eyeColor;
 	
-	@Column(name = "PersonHairColor", nullable = false) // Поле не может быть null
+	@NotNull
+	@Column(name = "PersonHairColor", nullable = false)
 	private Color hairColor;
 	
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "location_id")
 	private Location location;
 	
+	@NotNull
+	@Min(1)
 	@Column
-	private float height; // Значение поля должно быть больше 0
+	private float height;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false) // Поле не может быть null
-	private Country nationality; // Поле не может быть null
+	@Column(nullable = false)
+	private Country nationality;
 	
 	public long getId() {
 		return id;

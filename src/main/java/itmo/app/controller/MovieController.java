@@ -3,6 +3,7 @@ package itmo.app.controller;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class MovieController {
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
 	@PostMapping("/action/{email}")
-	public ResponseEntity<Movie> createMovie(@RequestBody Movie movie, @PathVariable String email) {
+	public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
 		
@@ -135,7 +136,7 @@ public class MovieController {
 	
 	@PutMapping("/action/{id}/{email}")
 	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email,
-	                                               @RequestBody Movie movie) {
+	                                               @RequestBody @Valid Movie movie) {
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
 		if (existingMovieOpt.isPresent()) {

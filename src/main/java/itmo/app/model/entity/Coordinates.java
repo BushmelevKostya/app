@@ -1,6 +1,7 @@
 package itmo.app.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "coordinates")
@@ -9,10 +10,12 @@ public class Coordinates {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(nullable = false) // Поле не может быть null
+	@NotNull
+	@Column(nullable = false)
 	private float x;
 	
-	@Column(nullable = false) // Поле не может быть null
+	@NotNull
+	@Column(nullable = false)
 	private int y;
 	
 	public long getId() {
