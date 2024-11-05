@@ -27,4 +27,8 @@ public class GlobalLogger {
 		});
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
+	
+	public static Logger getLogger() {
+		return logger;
+	}
 }
