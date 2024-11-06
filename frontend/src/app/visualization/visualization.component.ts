@@ -1,9 +1,9 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { WebSocketService } from '../services/websocket';
-import { BehaviorSubject } from 'rxjs';
+import {Component, OnInit, ElementRef, ViewChild} from '@angular/core';
+import {WebSocketService} from '../services/websocket';
+import {BehaviorSubject} from 'rxjs';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import { AuthGuard } from '../auth.guard';
-import { Router } from '@angular/router';
+import {AuthGuard} from '../auth.guard';
+import {Router} from '@angular/router';
 import {NgForOf, NgIf} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
@@ -15,7 +15,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   imports: [HttpClientModule, NgForOf, NgIf, ReactiveFormsModule]
 })
 export class VisualizationComponent implements OnInit {
-  @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', {static: true}) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D | null;
   public movies = new BehaviorSubject<any[]>([]);
   public selectedMovie: any = null;
@@ -50,7 +50,9 @@ export class VisualizationComponent implements OnInit {
     this.webSocketService.messages.subscribe((data) => {
       const moviesArray = JSON.parse(data);
       this.movies.next(moviesArray);
-      this.drawMovies(moviesArray);
+      if (Array.isArray(moviesArray)) {
+        this.drawMovies(moviesArray);
+      }
     });
 
     this.movieUpdateForm = this.initMovieForm()
@@ -387,6 +389,7 @@ export class VisualizationComponent implements OnInit {
         });
       }
     }
+
     getErrors(this.movieUpdateForm, '')
     return errors;
   }

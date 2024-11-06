@@ -60,7 +60,6 @@ tbody td {
 
 .sortable-header {
   cursor: pointer;
-  position: relative;
   padding: 5px;
   color: #666666;
 }
