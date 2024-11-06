@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {Location} from '@angular/common';
@@ -34,7 +34,6 @@ export class HomeComponent implements OnInit {
     this.movieCreateForm = this.initMovieForm()
     this.movieUpdateForm = this.initMovieForm()
     this.getMovies();
-
   }
 
   ngOnInit() {
@@ -46,12 +45,16 @@ export class HomeComponent implements OnInit {
     this.webSocketService.connect();
     this.webSocketService.messages.subscribe((data) => {
       this.movies.next(JSON.parse(data));
+      this.allMovies.next(this.movies.getValue());
     });
+
+    this.filterForm.valueChanges.subscribe(() => this.filterTable());
   }
 
   apiUrl = "http://localhost:2580/api/action"
   movieCreateForm!: FormGroup
   movieUpdateForm!: FormGroup
+  filterForm!: FormGroup
   createFlag = 0
   updateFlag = 0
   deleteFlag = 0
@@ -92,6 +95,10 @@ export class HomeComponent implements OnInit {
   selectedMovieId: number | null = null;
   deleteIdFlag = 0;
   idInput: number = 0;
+  sortColumn: string = '';
+  currentSortColumn: string | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
+  public allMovies = new BehaviorSubject<any[]>([]);
 
   initVars() {
     this.coordinatesVisible = false
@@ -126,6 +133,11 @@ export class HomeComponent implements OnInit {
   }
 
   initMovieForm() {
+    this.filterForm = new FormGroup({
+      nameFilter: new FormControl(''),
+      creationDateFilter: new FormControl(''),
+      taglineFilter: new FormControl('')
+    });
     return this.fb.group({
       name: ['defaultName', [Validators.required, Validators.minLength(1)]],
       creationDate: ["2024-10-15 14:30:55", [Validators.required]],
@@ -446,6 +458,7 @@ export class HomeComponent implements OnInit {
   getMovies() {
     this.http.get<any[]>(this.apiUrl).subscribe((data: any[]) => {
       this.movies.next(data)
+      this.allMovies.next(data);
     });
   }
 
@@ -578,5 +591,42 @@ export class HomeComponent implements OnInit {
         (error) => {
         }
       );
+  }
+
+  sortTable(column: string) {
+    if (this.currentSortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.currentSortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    const sortedMovies = this.movies.getValue().sort((a, b) => {
+      const aValue = a[column];
+      const bValue = b[column];
+      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    this.movies.next(sortedMovies);
+  }
+
+  isSorted(column: string, direction: 'asc' | 'desc'): boolean {
+    return this.currentSortColumn === column && this.sortDirection === direction;
+  }
+
+  filterTable() {
+    const { nameFilter, creationDateFilter, taglineFilter } = this.filterForm.value;
+    console.log(this.allMovies.getValue())
+    const filteredMovies = this.allMovies.getValue().filter(movie => {
+      return (
+        (nameFilter ? movie.name.includes(nameFilter) : true) &&
+        (creationDateFilter ? movie.creationDate.includes(creationDateFilter) : true) &&
+        (taglineFilter ? movie.tagline.includes(taglineFilter) : true)
+      );
+    });
+
+    this.movies.next(filteredMovies);
   }
 }

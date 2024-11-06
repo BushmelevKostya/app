@@ -40,3 +40,48 @@ thead th {
 tbody td {
   white-space: nowrap;
 }
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+}
+
+.filter-container input[type="text"] {
+  margin: 5px 0;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.sortable-header {
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+  color: #666666;
+}
+
+.sortable-header:hover {
+  text-decoration: underline;
+}
+
+.sortable-header::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sortable-header.asc::after {
+  content: '▲';
+}
+
+.sortable-header.desc::after {
+  content: '▼';
+}
+

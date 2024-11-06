@@ -37,14 +37,31 @@
     <button (click)="addOscarToRratedMovies()">Добавить Оскар фильмам с рейтингом R</button>
   </div>
 
+  <div class="filter-container">
+    <form [formGroup]="filterForm">
+      <label>Filter name: </label>
+      <input formControlName="nameFilter">
+      <label>Filter date: </label>
+      <input formControlName="creationDateFilter">
+      <label>Filter tagline: </label>
+      <input formControlName="taglineFilter">
+    </form>
+
+  </div>
+
+
   <!-- Табличка -->
   <div class="table-wrapper">
     <table class="movie-table">
       <thead>
       <tr>
         <th>ID</th>
-        <th>Name</th>
-        <th>Creation Date</th>
+        <th (click)="sortTable('name')" class="sortable-header" [class.asc]="isSorted('name', 'asc')" [class.desc]="isSorted('name', 'desc')">
+          Name
+        </th>
+        <th (click)="sortTable('creationDate')" class="sortable-header" [class.asc]="isSorted('creationDate', 'asc')" [class.desc]="isSorted('creationDate', 'desc')">
+          Creation Date
+        </th>
         <th>Oscars Count</th>
         <th>Budget</th>
         <th>Total Box Office</th>
@@ -52,7 +69,9 @@
         <th>Length</th>
         <th>Golden Palm Count</th>
         <th>USA Box Office</th>
-        <th>Tagline</th>
+        <th (click)="sortTable('tagline')" class="sortable-header" [class.asc]="isSorted('tagline', 'asc')" [class.desc]="isSorted('tagline', 'desc')">
+          Tagline
+        </th>
         <th>Genre</th>
         <th>Coordinates</th>
         <th>Director</th>
