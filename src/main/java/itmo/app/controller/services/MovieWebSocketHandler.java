@@ -45,7 +45,6 @@ public class MovieWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		sessions.remove(session);
-		System.out.println("Сессия закрыта: " + session.getId() + ", статус: " + status);
 	}
 	
 	@Override

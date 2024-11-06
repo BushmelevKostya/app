@@ -1,0 +1,484 @@
+<div>
+  <a (click)="navigateTo('/home')">Вернуться на главную</a>
+  <h2>Визуализация объектов</h2>
+  <canvas #canvas width="800" height="600"></canvas>
+</div>
+
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <span class="close-btn" (click)="closeModal()">&times;</span>
+    <h2>Информация об объекте: {{ selectedMovie.name }}</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Creation Date</th>
+        <th>Oscars Count</th>
+        <th>Budget</th>
+        <th>Total Box Office</th>
+        <th>MPAA Rating</th>
+        <th>Length</th>
+        <th>Golden Palm Count</th>
+        <th>USA Box Office</th>
+        <th>Tagline</th>
+        <th>Genre</th>
+        <th>Coordinates</th>
+        <th>Director</th>
+        <th>Screenwriter</th>
+        <th>Operator</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{ selectedMovie.id }}</td>
+        <td>{{ selectedMovie.name }}</td>
+        <td>{{ selectedMovie.creationDate }}</td>
+        <td>{{ selectedMovie.oscarsCount }}</td>
+        <td>{{ selectedMovie.budget }}</td>
+        <td>{{ selectedMovie.totalBoxOffice }}</td>
+        <td>{{ selectedMovie.mpaaRating }}</td>
+        <td>{{ selectedMovie.length }}</td>
+        <td>{{ selectedMovie.goldenPalmCount }}</td>
+        <td>{{ selectedMovie.usaBoxOffice }}</td>
+        <td>{{ selectedMovie.tagline }}</td>
+        <td>{{ selectedMovie.genre }}</td>
+
+        <!-- Coordinates -->
+        <td>
+          <div class="attribute-label">X:</div>
+          <div>{{ selectedMovie.coordinates.x }}</div>
+          <div class="attribute-label">Y:</div>
+          <div>{{ selectedMovie.coordinates.y }}</div>
+        </td>
+
+        <!-- Director -->
+        <td>
+          <div class="object-header">Director's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ selectedMovie.director.name }}</div>
+            <div>Eye Color: {{ selectedMovie.director.eyeColor }}</div>
+            <div>Hair Color: {{ selectedMovie.director.hairColor }}</div>
+            <div>Location: {{ selectedMovie.director.location.name }} ({{ selectedMovie.director.location.x }}
+              , {{ selectedMovie.director.location.y }}, {{ selectedMovie.director.location.z }})
+            </div>
+            <div>Height: {{ selectedMovie.director.height }}</div>
+            <div>Nationality: {{ selectedMovie.director.nationality }}</div>
+          </div>
+        </td>
+
+        <!-- Screenwriter -->
+        <td>
+          <div class="object-header">Screenwriter's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ selectedMovie.screenwriter.name }}</div>
+            <div>Eye Color: {{ selectedMovie.screenwriter.eyeColor }}</div>
+            <div>Hair Color: {{ selectedMovie.screenwriter.hairColor }}</div>
+            <div>Location: {{ selectedMovie.screenwriter.location.name }} ({{ selectedMovie.screenwriter.location.x }}
+              , {{ selectedMovie.screenwriter.location.y }}, {{ selectedMovie.screenwriter.location.z }})
+            </div>
+            <div>Height: {{ selectedMovie.screenwriter.height }}</div>
+            <div>Nationality: {{ selectedMovie.screenwriter.nationality }}</div>
+          </div>
+        </td>
+
+        <!-- Operator -->
+        <td>
+          <div class="object-header">Operator's info</div>
+          <div class="object-attributes">
+            <div>Name: {{ selectedMovie.operator.name }}</div>
+            <div>Eye Color: {{ selectedMovie.operator.eyeColor }}</div>
+            <div>Hair Color: {{ selectedMovie.operator.hairColor }}</div>
+            <div>Location: {{ selectedMovie.operator.location.name }} ({{ selectedMovie.operator.location.x }}
+              , {{ selectedMovie.operator.location.y }}, {{ selectedMovie.operator.location.z }})
+            </div>
+            <div>Height: {{ selectedMovie.operator.height }}</div>
+            <div>Nationality: {{ selectedMovie.operator.nationality }}</div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <button (click)="openUpdateModal(selectedMovie.id)">Обновить</button>
+  </div>
+</div>
+
+<!-- Модальное окно для обновления фильма -->
+<div class="modal" *ngIf="updateFlag">
+  <div class="modal-content">
+    <span class="close-btn" (click)="changeUpdateFlag()">&times;</span>
+    <h2>Обновить фильм</h2>
+    <form [formGroup]="movieUpdateForm" (ngSubmit)="updateMovie()">
+      <div class="first-group">
+        <!-- Основная информация о фильме -->
+        <fieldset class="fieldset-group">
+          <legend>Основная информация</legend>
+          <div class="field-group">
+            <label for="nameUpdate">Название:</label>
+            <input id="nameUpdate" formControlName="name" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="creationDateUpdate">Дата создания:</label>
+            <input id="creationDateUpdate" formControlName="creationDate" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="oscarsCountUpdate">Количество Оскаров:</label>
+            <input id="oscarsCountUpdate" type="number" formControlName="oscarsCount" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="budgetUpdate">Бюджет:</label>
+            <input id="budgetUpdate" type="number" formControlName="budget" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="totalBoxOfficeUpdate">Сборы:</label>
+            <input id="totalBoxOfficeUpdate" type="number" formControlName="totalBoxOffice" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="mpaaRatingUpdate">Рейтинг MPAA:</label>
+            <select id="mpaaRatingUpdate" formControlName="mpaaRating" class="compact-input">
+              <option value="G">G</option>
+              <option value="PG">PG</option>
+              <option value="PG_13">PG-13</option>
+              <option value="R">R</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="lengthUpdate">Продолжительность:</label>
+            <input id="lengthUpdate" type="number" formControlName="length" class="compact-input"/>
+          </div>
+        </fieldset>
+
+        <!-- Дополнительные параметры -->
+        <fieldset class="fieldset-group">
+          <legend>Дополнительные параметры</legend>
+          <div class="field-group">
+            <label for="goldenPalmCountUpdate">Золотая пальма:</label>
+            <input id="goldenPalmCountUpdate" type="number" formControlName="goldenPalmCount" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="usaBoxOfficeUpdate">Сборы в США:</label>
+            <input id="usaBoxOfficeUpdate" type="number" formControlName="usaBoxOffice" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="taglineUpdate">Слоган:</label>
+            <input id="taglineUpdate" formControlName="tagline" class="compact-input"/>
+          </div>
+          <div class="field-group">
+            <label for="genreUpdate">Жанр:</label>
+            <select id="genreUpdate" formControlName="genre" class="compact-input">
+              <option value="ACTION">Экшен</option>
+              <option value="TRAGEDY">Трагедия</option>
+              <option value="THRILLER">Триллер</option>
+              <option value="FANTASY">Фэнтези</option>
+              <option value="SCIENCE_FICTION">Научная фантастика</option>
+            </select>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="first-group">
+        <!-- Блок Coordinates -->
+        <fieldset class="fieldset-group">
+          <legend>Координаты</legend>
+
+
+          <button type="button" (click)="toggleCoordinates()">Обновить координаты</button>
+          <div *ngIf="coordinatesVisible" formGroupName="coordinates">
+            <fieldset class="fieldset-group">
+              <label for="idCoordinatesUpdate">ID:</label>
+              <input id="idCoordinatesUpdate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                     class="compact-input"/>
+              <label for="xUpdate">X:</label>
+              <input id="xUpdate" type="number" formControlName="x" class="compact-input"/>
+              <label for="yUpdate">Y:</label>
+              <input id="yUpdate" type="number" formControlName="y" class="compact-input"/>
+
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <div>
+                <button type="button" (click)="loadExistingCoordinates()">Загрузить координаты</button>
+                <ul *ngIf="existingCoordinates.length > 0">
+                  <li *ngFor="let coordinate of existingCoordinates" (click)="selectCoordinate(coordinate)">
+                    {{ coordinate.id }}, {{ coordinate.x }}, {{ coordinate.y }}
+                  </li>
+                </ul>
+              </div>
+            </fieldset>
+          </div>
+        </fieldset>
+
+        <!-- Блок Director -->
+        <fieldset class="fieldset-group">
+          <legend>Режиссер</legend>
+          <button type="button" (click)="toggleDirector()">Обновить режиссера</button>
+          <div *ngIf="directorVisible" formGroupName="director">
+
+            <fieldset class="fieldset-group">
+
+              <label for="idDirectorUpdate">ID:</label>
+              <input id="idDirectorUpdate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                     class="compact-input"/>
+              <label for="directorNameUpdate">Имя:</label>
+              <input id="directorNameUpdate" formControlName="name" class="compact-input"/>
+              <label for="directorEyeColorUpdate">Цвет глаз:</label>
+              <select id="directorEyeColorUpdate" formControlName="eyeColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+              <label for="directorHairColorUpdate">Цвет волос:</label>
+              <select id="directorHairColorUpdate" formControlName="hairColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+              <label for="directorHeightUpdate">Рост:</label>
+              <input id="directorHeightUpdate" type="number" formControlName="height" class="compact-input"/>
+              <label for="directorNationalityUpdate">Национальность:</label>
+              <select id="directorNationalityUpdate" formControlName="nationality" class="compact-input">
+                <option value="SPAIN">Испания</option>
+                <option value="INDIA">Индия</option>
+                <option value="VATICAN">Ватикан</option>
+              </select>
+
+            </fieldset>
+
+            <fieldset class="fieldset-group">
+              <!-- Вложенный блок для Location -->
+              <legend>Локация</legend>
+              <button type="button" (click)="toggleDirectorLocation()">Обновить локацию</button>
+              <div *ngIf="directorLocationVisible" formGroupName="location">
+
+                <fieldset class="fieldset-group">
+
+                  <label for="idDirectorLocationUpdate">ID:</label>
+                  <input id="idDirectorLocationUpdate" formControlName="id" placeholder="Генерируется автоматически"
+                         readonly class="compact-input"/>
+
+                  <label for="directorLocationXUpdate">X:</label>
+                  <input id="directorLocationXUpdate" type="number" formControlName="x" class="compact-input"/>
+
+                  <label for="directorLocationYUpdate">Y:</label>
+                  <input id="directorLocationYUpdate" type="number" formControlName="y" class="compact-input"/>
+
+                  <label for="directorLocationZUpdate">Z:</label>
+                  <input id="directorLocationZUpdate" type="number" formControlName="z" class="compact-input"/>
+
+                  <label for="directorLocationNameUpdate">Название:</label>
+                  <input id="directorLocationNameUpdate" formControlName="name" class="compact-input"/>
+
+                </fieldset>
+                <fieldset class="fieldset-group">
+                  <div>
+                    <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                    <ul *ngIf="existingLocations.length > 0">
+                      <li *ngFor="let location of existingLocations" (click)="selectDirectorLocation(location)">
+                        {{ location.id }}, {{ location.name }}
+                      </li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <div>
+                <button type="button" (click)="loadExistingPersons()">Загрузить существующих режиссеров</button>
+                <ul *ngIf="existingDirectors.length > 0">
+                  <li *ngFor="let director of existingDirectors" (click)="selectDirector(director)">
+                    {{ director.id }}, {{ director.name }}
+                  </li>
+                </ul>
+              </div>
+            </fieldset>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="first-group">
+        <!-- Блок для Screenwriter -->
+        <fieldset class="fieldset-group">
+          <legend>Сценарист</legend>
+          <button type="button" (click)="toggleScreenwriter()">Обновить сценариста</button>
+          <div *ngIf="screenwriterVisible" formGroupName="screenwriter">
+
+            <fieldset class="fieldset-group">
+
+              <label for="idScreenwriterUpdate">ID:</label>
+              <input id="idScreenwriterUpdate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                     class="compact-input"/>
+
+              <label for="screenwriterPersonNameUpdate">Имя:</label>
+              <input id="screenwriterPersonNameUpdate" formControlName="name" class="compact-input"/>
+
+              <label for="screenwriterEyeColorUpdate">Цвет глаз:</label>
+              <select id="screenwriterEyeColorUpdate" formControlName="eyeColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+
+              <label for="screenwriterHairColorUpdate">Цвет волос:</label>
+              <select id="screenwriterHairColorUpdate" formControlName="hairColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+
+              <label for="screenwriterHeightUpdate">Рост:</label>
+              <input id="screenwriterHeightUpdate" type="number" formControlName="height" class="compact-input"/>
+
+              <label for="screenwriterNationalityUpdate">Национальность:</label>
+              <select id="screenwriterNationalityUpdate" formControlName="nationality" class="compact-input">
+                <option value="SPAIN">Испания</option>
+                <option value="INDIA">Индия</option>
+                <option value="VATICAN">Ватикан</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <!-- Вложенный блок для Location -->
+              <legend>Локация</legend>
+              <button type="button" (click)="toggleScreenwriterLocation()">Обновить локацию</button>
+              <div *ngIf="screenwriterLocationVisible" formGroupName="location">
+
+                <fieldset class="fieldset-group">
+
+                  <label for="idScreenwriterLocationUpdate">ID:</label>
+                  <input id="idScreenwriterLocationUpdate" formControlName="id"
+                         placeholder="Генерируется автоматически"
+                         readonly class="compact-input"/>
+
+                  <label for="screenwriterLocationXUpdate">X:</label>
+                  <input id="screenwriterLocationXUpdate" type="number" formControlName="x" class="compact-input"/>
+
+                  <label for="screenwriterLocationYUpdate">Y:</label>
+                  <input id="screenwriterLocationYUpdate" type="number" formControlName="y" class="compact-input"/>
+
+                  <label for="screenwriterLocationZUpdate">Z:</label>
+                  <input id="screenwriterLocationZUpdate" type="number" formControlName="z" class="compact-input"/>
+
+                  <label for="screenwriterLocationNameUpdate">Название:</label>
+                  <input id="screenwriterLocationNameUpdate" formControlName="name" class="compact-input"/>
+                </fieldset>
+                <fieldset class="fieldset-group">
+                  <div>
+                    <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                    <ul *ngIf="existingLocations.length > 0">
+                      <li *ngFor="let location of existingLocations" (click)="selectScreenwriterLocation(location)">
+                        {{ location.id }}, {{ location.name }}
+                      </li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <div>
+                <button type="button" (click)="loadExistingPersons()">Загрузить существующих сценаристов</button>
+                <ul *ngIf="existingScreenwriters.length > 0">
+                  <li *ngFor="let screenwriter of existingScreenwriters" (click)="selectScreenwriter(screenwriter)">
+                    {{ screenwriter.id }}, {{ screenwriter.name }}
+                  </li>
+                </ul>
+              </div>
+            </fieldset>
+          </div>
+        </fieldset>
+
+        <!-- Блок для Operator -->
+        <fieldset class="fieldset-group">
+          <legend>Оператор</legend>
+          <button type="button" (click)="toggleOperator()">Обновить оператора</button>
+          <div *ngIf="operatorVisible" formGroupName="operator">
+
+            <fieldset class="fieldset-group">
+
+              <label for="idOperatorUpdate">ID:</label>
+              <input id="idOperatorUpdate" formControlName="id" placeholder="Генерируется автоматически" readonly
+                     class="compact-input"/>
+
+              <label for="operatorNameUpdate">Имя:</label>
+              <input id="operatorNameUpdate" formControlName="name" class="compact-input"/>
+
+              <label for="operatorEyeColorUpdate">Цвет глаз:</label>
+              <select id="operatorEyeColorUpdate" formControlName="eyeColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+
+              <label for="operatorHairColorUpdate">Цвет волос:</label>
+              <select id="operatorHairColorUpdate" formControlName="hairColor" class="compact-input">
+                <option value="BLACK">Черный</option>
+                <option value="ORANGE">Оранжевый</option>
+                <option value="BROWN">Коричневый</option>
+              </select>
+
+              <label for="operatorHeightUpdate">Рост:</label>
+              <input id="operatorHeightUpdate" type="number" formControlName="height" class="compact-input"/>
+
+              <label for="operatorNationalityUpdate">Национальность:</label>
+              <select id="operatorNationalityUpdate" formControlName="nationality" class="compact-input">
+                <option value="SPAIN">Испания</option>
+                <option value="INDIA">Индия</option>
+                <option value="VATICAN">Ватикан</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <!-- Вложенный блок для Location -->
+              <legend>Локация</legend>
+              <button type="button" (click)="toggleOperatorLocation()">Обновить локацию</button>
+              <div *ngIf="operatorLocationVisible" formGroupName="location">
+                <fieldset class="fieldset-group">
+                  <label for="idOperatorLocationUpdate">ID:</label>
+                  <input id="idOperatorLocationUpdate" formControlName="id" placeholder="Генерируется автоматически"
+                         readonly class="compact-input"/>
+
+                  <label for="operatorLocationXUpdate">X:</label>
+                  <input id="operatorLocationXUpdate" type="number" formControlName="x" class="compact-input"/>
+
+                  <label for="operatorLocationYUpdate">Y:</label>
+                  <input id="operatorLocationYUpdate" type="number" formControlName="y" class="compact-input"/>
+
+                  <label for="operatorLocationZUpdate">Z:</label>
+                  <input id="operatorLocationZUpdate" type="number" formControlName="z" class="compact-input"/>
+
+                  <label for="operatorLocationNameUpdate">Название:</label>
+                  <input id="operatorLocationNameUpdate" formControlName="name" class="compact-input"/>
+                </fieldset>
+                <fieldset class="fieldset-group">
+                  <div>
+                    <button type="button" (click)="loadExistingLocations()">Загрузить существующие локации</button>
+                    <ul *ngIf="existingLocations.length > 0">
+                      <li *ngFor="let location of existingLocations" (click)="selectOperatorLocation(location)">
+                        {{ location.id }}, {{ location.name }}
+                      </li>
+                    </ul>
+                  </div>
+                </fieldset>
+              </div>
+            </fieldset>
+            <fieldset class="fieldset-group">
+              <div>
+                <button type="button" (click)="loadExistingPersons()">Загрузить существующих операторов</button>
+                <ul *ngIf="existingOperators.length > 0">
+                  <li *ngFor="let operator of existingOperators" (click)="selectOperator(operator)">
+                    {{ operator.id }}, {{ operator.name }}
+                  </li>
+                </ul>
+              </div>
+            </fieldset>
+          </div>
+        </fieldset>
+      </div>
+
+      <div *ngIf="getFormErrors('update').length > 0" class="error-list">
+        <h3>Form Errors:</h3>
+        <ul>
+          <li *ngFor="let error of getFormErrors('update')">{{ error }}</li>
+        </ul>
+      </div>
+
+      <button type="submit" [disabled]="movieUpdateForm.invalid">Обновить фильм</button>
+    </form>
+  </div>
+</div>

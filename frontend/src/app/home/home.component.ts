@@ -259,7 +259,6 @@ export class HomeComponent implements OnInit {
     return errors;
   }
 
-
   changeSearchFlag() {
     this.searchFlag = this.searchFlag ? 0 : 1
   }
@@ -479,6 +478,7 @@ export class HomeComponent implements OnInit {
     return this.http.delete<any[]>(`${this.apiUrl}/${id}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
       this.movies.next(data)
       this.changeDeleteFlag()
+      this.changeDeleteIdFlag()
     });
   }
 
