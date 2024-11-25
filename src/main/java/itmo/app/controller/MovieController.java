@@ -43,8 +43,8 @@ public class MovieController {
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
-		@PostMapping("/action/{email}")
-		public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
+	@PostMapping("/action/{email}")
+	public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
 		
@@ -81,7 +81,8 @@ public class MovieController {
 		movie.setCreator(userRepository.findByEmail(email).get());
 		
 		Movie newMovie = movieRepository.save(movie);
-		notifyClients(movieRepository.findAll());
+		
+		notifyClients();
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 	
@@ -96,7 +97,7 @@ public class MovieController {
 	}
 	
 	@DeleteMapping("/action/{linkId}/{id}/{email}")
-	public ResponseEntity<List<Movie>> deleteMovie(@PathVariable long linkId, @PathVariable long id, @PathVariable String email) {
+	public ResponseEntity deleteMovie(@PathVariable long linkId, @PathVariable long id, @PathVariable String email) {
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
 		if (movieToDelete.isPresent()) {
 			Movie movie = movieToDelete.get();
@@ -127,14 +128,14 @@ public class MovieController {
 						oldMovie.setScreenwriter(screenwriter);
 						oldMovie.setOperator(operator);
 						updateMovie(linkId, curUser.getEmail(), oldMovie);
-					}
-					else {
+					} else {
 						return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 					}
 				}
 			}
 			movieRepository.deleteById(id);
-			return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+			notifyClients();
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -148,17 +149,33 @@ public class MovieController {
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
 		}
+		List<Movie> allMovies = movieRepository.findAll();
+		allMovies.forEach(movie -> {
+			movie.setCoordinates(null);
+			movie.setDirector(null);
+			movie.setScreenwriter(null);
+			movie.setOperator(null);
+		});
+		movieRepository.saveAll(allMovies);
+		
+		List<Person> allPersons = personRepository.findAll();
+		allPersons.forEach(person -> {
+			person.setLocation(null);
+		});
+		personRepository.saveAll(allPersons);
+		
 		movieRepository.deleteAll();
 		coordinatesRepository.deleteAll();
-		locationRepository.deleteAll();
 		personRepository.deleteAll();
+		locationRepository.deleteAll();
 		movieChangeRepository.deleteAll();
 		
+		notifyClients();
 		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
 	}
 	
 	@PutMapping("/action/{id}/{email}")
-	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email,
+	public ResponseEntity updateMovie(@PathVariable long id, @PathVariable String email,
 	                                               @RequestBody @Valid Movie movie) {
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
@@ -188,8 +205,8 @@ public class MovieController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		
-		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+		notifyClients();
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	
@@ -249,7 +266,7 @@ public class MovieController {
 	
 	public void setFields(Movie oldMovie, Movie newMovie) {
 		oldMovie.setName(newMovie.getName());
-		oldMovie.setCreationDate(newMovie.getCreationDate() );
+		oldMovie.setCreationDate(newMovie.getCreationDate());
 		oldMovie.setCoordinates(newMovie.getCoordinates());
 		oldMovie.setOscarsCount(newMovie.getOscarsCount());
 		oldMovie.setBudget(newMovie.getBudget());
@@ -267,9 +284,9 @@ public class MovieController {
 		movieRepository.save(oldMovie);
 	}
 	
-	private void notifyClients(List<Movie> movies) {
+	private void notifyClients() {
 		try {
-			movieWebSocketHandler.sendToAllSessions(movies);
+			movieWebSocketHandler.sendToAllSessions();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

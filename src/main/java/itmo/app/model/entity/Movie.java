@@ -24,7 +24,6 @@ public class Movie {
 	@Column(nullable = false)
 	private String name;
 	
-	@NotNull
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "coordinates_id")
 	private Coordinates coordinates;
@@ -57,7 +56,6 @@ public class Movie {
 	@JoinColumn(name = "person_id")
 	private Person director;
 	
-	@NotNull
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinColumn(name = "screenwriter_id")
 	private Person screenwriter;

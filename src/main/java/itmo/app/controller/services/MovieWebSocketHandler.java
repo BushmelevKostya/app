@@ -28,9 +28,9 @@ public class MovieWebSocketHandler extends TextWebSocketHandler {
 		session.sendMessage(new TextMessage("{\"message\": \"Соединение установлено\"}"));
 	}
 	
-	public void sendToAllSessions(List<Movie> movies) {
+	public void sendToAllSessions() {
 		try {
-			String message = objectMapper.writeValueAsString(movies);
+			String message = objectMapper.writeValueAsString(true);
 			TextMessage textMessage = new TextMessage(message);
 			for (WebSocketSession session : sessions) {
 				if (session.isOpen()) {

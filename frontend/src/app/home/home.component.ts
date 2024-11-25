@@ -49,9 +49,9 @@ export class HomeComponent implements OnInit {
 
     this.webSocketService.connect();
     this.webSocketService.messages.subscribe((data) => {
-      // TODO
-      // this.movies.next(JSON.parse(data));
-      // this.allMovies.next(this.movies.getValue());
+      if (JSON.parse(data)) {
+        this.pagination.loadMovies();
+      }
     });
     this.filterForm.valueChanges.subscribe(() => this.filterTable());
   }
@@ -461,7 +461,6 @@ export class HomeComponent implements OnInit {
   createMovie() {
     this.http.post(`http://localhost:2580/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
       response => {
-        // TODO
         this.changeCreateFlag()
         this.initVars()
       },
@@ -485,8 +484,6 @@ export class HomeComponent implements OnInit {
 
   deleteMovie(id: number) {
     return this.http.delete<any[]>(`${this.apiUrl}/${id}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
-      // TODO
-      // this.movies.next(data)
       this.changeDeleteFlag()
       this.changeDeleteIdFlag()
     });
@@ -506,7 +503,6 @@ export class HomeComponent implements OnInit {
   updateMovie() {
     return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieUpdateForm.value)
       .subscribe((data: any[]) => {
-        // TODO
         this.changeUpdateFlag();
         this.initVars();
       });
@@ -628,8 +624,6 @@ export class HomeComponent implements OnInit {
 
   clear() {
     return this.http.delete<any[]>(`${this.apiUrl}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
-      // TODO
-      // this.movies.next(data)
     });
   }
 }
