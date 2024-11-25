@@ -1,0 +1,16 @@
+volumes:
+  postgres_data:
+  keycloak-db-volume: {}
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_is
+    environment:
+      POSTGRES_USER: is
+      POSTGRES_PASSWORD: is
+      POSTGRES_DB: is
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
