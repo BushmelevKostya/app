@@ -42,8 +42,8 @@ public class MovieController {
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
-	@PostMapping("/action/{email}")
-	public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
+		@PostMapping("/action/{email}")
+		public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
 		

@@ -1,0 +1,18 @@
+<div class="file-loader">
+  <label for="file-input" class="file-label">
+    <input type="file" id="file-input" (change)="onFileSelected($event)" hidden />
+    <span class="upload-button">Выберите файл</span>
+  </label>
+
+  <div *ngIf="fileName" class="file-name">
+    Выбран файл: <strong>{{ fileName }}</strong>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+</div>
