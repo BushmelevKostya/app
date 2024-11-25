@@ -29,6 +29,8 @@ export class FileLoaderComponent {
     const file = input.files[0];
     this.fileName = file.name;
 
+    input.value = '';
+
     if (file.type !== 'application/json') {
       this.errorMessage = 'File should be json format';
       return;
