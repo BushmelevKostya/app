@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -138,6 +139,23 @@ public class MovieController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
+	@DeleteMapping("/action/{email}")
+	public ResponseEntity<List<Movie>> deleteAllMovie(@PathVariable String email) {
+		Optional<User> user = userRepository.findByEmail(email);
+		if (user.isPresent()) {
+			User curUser = user.get();
+			if (!curUser.isApprovedAdmin()) {
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}
+		}
+		movieRepository.deleteAll();
+		coordinatesRepository.deleteAll();
+		locationRepository.deleteAll();
+		personRepository.deleteAll();
+		movieChangeRepository.deleteAll();
+		
+		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+	}
 	
 	@PutMapping("/action/{id}/{email}")
 	public ResponseEntity<List<Movie>> updateMovie(@PathVariable long id, @PathVariable String email,

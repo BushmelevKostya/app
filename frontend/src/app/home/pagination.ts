@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {BehaviorSubject} from "rxjs";
 
 @Injectable()
-export class Pagination{
+export class Pagination {
     constructor(private http: HttpClient) {
     }
 
@@ -15,19 +15,17 @@ export class Pagination{
     currentPage: number = 1;
     itemsPerPage: number = 5;
 
-    getCountMovies() {
+    loadMovies() {
         this.http.get<any>(`${this.apiUrl}/count`).subscribe((data: any) => {
             this.totalItemsCount = data;
             this.totalPages = Math.ceil(this.totalItemsCount / this.itemsPerPage);
-        });
-    }
 
-    loadMovies() {
-        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-        const endIndex = startIndex + this.itemsPerPage;
-        this.http.get<any[]>(`${this.apiUrl}/${startIndex}/${endIndex}`).subscribe((data: any[]) => {
-            this.movies.next(data)
-            this.allMovies.next(data);
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = Math.min(startIndex + this.itemsPerPage, this.totalItemsCount);
+            this.http.get<any[]>(`${this.apiUrl}/${startIndex}/${endIndex}`).subscribe((data: any[]) => {
+                this.movies.next(data)
+                this.allMovies.next(data);
+            });
         });
     }
 
@@ -48,7 +46,7 @@ export class Pagination{
     previousPage(): void {
         if (this.currentPage > 1) {
             this.currentPage--;
-            this.loadMovies()   ;
+            this.loadMovies();
         }
     }
 
@@ -61,6 +59,6 @@ export class Pagination{
     }
 
     get currentPageItemsCount(): number {
-        return this.currentPage * this.itemsPerPage;
+        return Math.min(this.currentPage * this.itemsPerPage, this.totalItemsCount);
     }
 }

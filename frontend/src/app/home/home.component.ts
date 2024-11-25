@@ -40,7 +40,6 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pagination.getCountMovies();
     this.pagination.loadMovies();
 
     history.pushState(null, document.title, location.href);
@@ -625,5 +624,12 @@ export class HomeComponent implements OnInit {
     });
 
     this.pagination.movies.next(filteredMovies);
+  }
+
+  clear() {
+    return this.http.delete<any[]>(`${this.apiUrl}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
+      // TODO
+      // this.movies.next(data)
+    });
   }
 }

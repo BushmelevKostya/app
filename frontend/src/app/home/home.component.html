@@ -35,6 +35,7 @@
     <button (click)="findUniqueUsaBoxOffices()">Уникальные значения USA Box Office</button>
     <button (click)="findOperatorsWithoutOscars()">Операторы без Оскаров</button>
     <button (click)="addOscarToRratedMovies()">Добавить Оскар фильмам с рейтингом R</button>
+    <button *ngIf="isAdmin" (click)="clear()">Удалить все фильмы</button>
   </div>
 
   <div class="filter-container">
@@ -50,7 +51,7 @@
   </div>
 
   <app-file-loader></app-file-loader>
-
+  <h1>Фильмов в системе: {{ pagination.totalItemsCount }}</h1>
   <!-- Табличка -->
   <div class="table-wrapper">
     <table class="movie-table">
