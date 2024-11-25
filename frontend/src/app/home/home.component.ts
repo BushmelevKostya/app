@@ -7,6 +7,8 @@ import {Location} from '@angular/common';
 import {AuthGuard} from '../auth.guard';
 import {WebSocketService} from '../services/websocket';
 import {BehaviorSubject} from 'rxjs';
+import {FileLoaderComponent} from '../file-loader/file-loader.component';
+import {Pagination} from './pagination';
 
 @Component({
   selector: 'app-home',
@@ -17,14 +19,16 @@ import {BehaviorSubject} from 'rxjs';
     NgIf,
     ReactiveFormsModule,
     HttpClientModule,
-    AsyncPipe
+    AsyncPipe,
+    FileLoaderComponent
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css']
+  styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css'],
+  providers: [Pagination]
 })
 
 export class HomeComponent implements OnInit {
-  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location, private authGuard: AuthGuard, private webSocketService: WebSocketService) {
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient, private location: Location, private authGuard: AuthGuard, private webSocketService: WebSocketService, protected pagination: Pagination) {
     this.isUserLoggedIn = sessionStorage.getItem('loggedInUser') !== null;
     this.loggedInUserEmail = sessionStorage.getItem('loggedInUserEmail');
     this.isAdmin = sessionStorage.getItem('isAdmin') === 'true';
@@ -33,10 +37,12 @@ export class HomeComponent implements OnInit {
     }
     this.movieCreateForm = this.initMovieForm()
     this.movieUpdateForm = this.initMovieForm()
-    this.getMovies();
   }
 
   ngOnInit() {
+    this.pagination.getCountMovies();
+    this.pagination.loadMovies();
+
     history.pushState(null, document.title, location.href);
     window.addEventListener('popstate', function () {
       history.pushState(null, document.title, location.href);
@@ -44,10 +50,10 @@ export class HomeComponent implements OnInit {
 
     this.webSocketService.connect();
     this.webSocketService.messages.subscribe((data) => {
-      this.movies.next(JSON.parse(data));
-      this.allMovies.next(this.movies.getValue());
+      // TODO
+      // this.movies.next(JSON.parse(data));
+      // this.allMovies.next(this.movies.getValue());
     });
-
     this.filterForm.valueChanges.subscribe(() => this.filterTable());
   }
 
@@ -85,8 +91,7 @@ export class HomeComponent implements OnInit {
   public moviesWithTagline = new BehaviorSubject<any[]>([]);
   uniqueUsaBoxOffices: any[] = [];
   operatorsWithoutOscars: any[] = [];
-  requests: any[] = []
-  public movies = new BehaviorSubject<any[]>([]);
+  requests: any[] = [];
   existingCoordinates: any[] = [];
   existingDirectors: any[] = [];
   existingScreenwriters: any[] = [];
@@ -98,7 +103,6 @@ export class HomeComponent implements OnInit {
   sortColumn: string = '';
   currentSortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
-  public allMovies = new BehaviorSubject<any[]>([]);
 
   initVars() {
     this.coordinatesVisible = false
@@ -455,17 +459,10 @@ export class HomeComponent implements OnInit {
     this.operatorLocationVisible = !this.operatorLocationVisible;
   }
 
-  getMovies() {
-    this.http.get<any[]>(this.apiUrl).subscribe((data: any[]) => {
-      this.movies.next(data)
-      this.allMovies.next(data);
-    });
-  }
-
   createMovie() {
     this.http.post(`http://localhost:2580/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
       response => {
-        this.getMovies()
+        // TODO
         this.changeCreateFlag()
         this.initVars()
       },
@@ -489,7 +486,8 @@ export class HomeComponent implements OnInit {
 
   deleteMovie(id: number) {
     return this.http.delete<any[]>(`${this.apiUrl}/${id}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
-      this.movies.next(data)
+      // TODO
+      // this.movies.next(data)
       this.changeDeleteFlag()
       this.changeDeleteIdFlag()
     });
@@ -509,7 +507,7 @@ export class HomeComponent implements OnInit {
   updateMovie() {
     return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieUpdateForm.value)
       .subscribe((data: any[]) => {
-        this.movies.next(data);
+        // TODO
         this.changeUpdateFlag();
         this.initVars();
       });
@@ -601,7 +599,7 @@ export class HomeComponent implements OnInit {
       this.sortDirection = 'asc';
     }
 
-    const sortedMovies = this.movies.getValue().sort((a, b) => {
+    const sortedMovies = this.pagination.movies.getValue().sort((a, b) => {
       const aValue = a[column];
       const bValue = b[column];
       if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
@@ -609,7 +607,7 @@ export class HomeComponent implements OnInit {
       return 0;
     });
 
-    this.movies.next(sortedMovies);
+    this.pagination.movies.next(sortedMovies);
   }
 
   isSorted(column: string, direction: 'asc' | 'desc'): boolean {
@@ -618,8 +616,7 @@ export class HomeComponent implements OnInit {
 
   filterTable() {
     const { nameFilter, creationDateFilter, taglineFilter } = this.filterForm.value;
-    console.log(this.allMovies.getValue())
-    const filteredMovies = this.allMovies.getValue().filter(movie => {
+    const filteredMovies = this.pagination.allMovies.getValue().filter(movie => {
       return (
         (nameFilter ? movie.name.includes(nameFilter) : true) &&
         (creationDateFilter ? movie.creationDate.includes(creationDateFilter) : true) &&
@@ -627,6 +624,6 @@ export class HomeComponent implements OnInit {
       );
     });
 
-    this.movies.next(filteredMovies);
+    this.pagination.movies.next(filteredMovies);
   }
 }

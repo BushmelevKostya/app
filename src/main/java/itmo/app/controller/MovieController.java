@@ -84,9 +84,14 @@ public class MovieController {
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/action")
-	public ResponseEntity<List<Movie>> getAllMovies() {
-		return new ResponseEntity<>(movieRepository.findAll(), HttpStatus.OK);
+	@GetMapping("/action/{start}/{end}")
+	public ResponseEntity<List<Movie>> getMovies(@PathVariable int start, @PathVariable int end) {
+		return new ResponseEntity<>(movieRepository.findAll().subList(start, end), HttpStatus.OK);
+	}
+	
+	@GetMapping("/action/count")
+	public ResponseEntity<Long> getCountMovies() {
+		return new ResponseEntity<>(movieRepository.count(), HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/action/{linkId}/{id}/{email}")

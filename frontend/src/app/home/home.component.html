@@ -49,6 +49,7 @@
 
   </div>
 
+  <app-file-loader></app-file-loader>
 
   <!-- Табличка -->
   <div class="table-wrapper">
@@ -81,7 +82,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let movie of movies | async">
+      <tr *ngFor="let movie of pagination.movies | async">
         <td>{{ movie.id }}</td>
         <td>{{ movie.name }}</td>
         <td>{{ movie.creationDate }}</td>
@@ -155,6 +156,22 @@
       </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Пагинация -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Показано товаров: {{ pagination.currentPageItemsCount }} из {{ pagination.totalItemsCount }}
+    </div>
+    <div class="pagination-controls">
+      <button [disabled]="pagination.currentPage === 1" (click)="pagination.goToPage(1)">«</button>
+      <button [disabled]="pagination.currentPage === 1" (click)="pagination.previousPage()">‹</button>
+      <button *ngFor="let page of pagination.getPages()" [class.active]="page === pagination.currentPage" (click)="pagination.goToPage(page)">
+        {{ page }}
+      </button>
+      <button [disabled]="pagination.currentPage === pagination.totalPages" (click)="pagination.nextPage()">›</button>
+      <button [disabled]="pagination.currentPage === pagination.totalPages" (click)="pagination.goToPage(pagination.totalPages)">»</button>
+    </div>
   </div>
 
   <!-- Модальное окно для создания фильма -->
