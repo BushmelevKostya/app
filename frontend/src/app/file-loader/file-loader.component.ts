@@ -1,6 +1,15 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {NgIf} from '@angular/common';
+import {ImportHistoryComponent} from '../import-history/import-history.component';
+import {ImportHistoryService} from '../import-history/import-history';
+
+interface ImportHistory {
+  id: number;
+  status: string;
+  username: string;
+  countObjects?: number;
+}
 
 @Component({
   selector: 'app-file-loader',
@@ -9,14 +18,15 @@ import {NgIf} from '@angular/common';
   imports: [
     NgIf
   ],
-  styleUrls: ['./file-loader.component.css']
+  styleUrls: ['./file-loader.component.css'],
+  providers: [ImportHistoryComponent]
 })
 export class FileLoaderComponent {
   fileName: string = '';
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private importHistoryComponent: ImportHistoryComponent, private importHistoryService: ImportHistoryService) {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -57,11 +67,20 @@ export class FileLoaderComponent {
 
   uploadData(data: any[]): void {
     this.http.post(`http://localhost:2580/api/upload/${sessionStorage.getItem('loggedInUserEmail')}`, data).subscribe({
-      next: () => {
+      next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
+        this.importHistoryService.addHistoryItem(response);
       },
       error: (error) => {
-        this.errorMessage = `Error loading data: ${error.message}`;
+        this.errorMessage = error.error?.message;
+        this.http.get(`http://localhost:2580/api/history/create/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe({
+          next: (response: any) => {
+            this.importHistoryService.addHistoryItem(response);
+          },
+          error: (err) => {
+            console.error('Failed to update history', err);
+          }
+        });
       }
     });
   }

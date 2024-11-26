@@ -1,14 +1,13 @@
 package itmo.app.controller;
 
 import itmo.app.controller.services.MovieWebSocketHandler;
-import itmo.app.model.entity.Coordinates;
-import itmo.app.model.entity.Location;
-import itmo.app.model.entity.Movie;
-import itmo.app.model.entity.Person;
+import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,8 +37,12 @@ public class FileController {
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
+	@Autowired
+	private ImportHistoryRepository importHistoryRepository;
+	
 	@PostMapping("/upload/{email}")
-	public ResponseEntity createMoviesFromFile(@RequestBody List<Movie> movies, @PathVariable String email) {
+	@Transactional
+	public ResponseEntity<ImportHistory> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
 		for (Movie movie : movies) {
 			Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 			existingCoordinates.ifPresent(movie::setCoordinates);
@@ -79,8 +82,14 @@ public class FileController {
 			movieRepository.save(movie);
 		}
 		
+		ImportHistory importHistory = new ImportHistory();
+		importHistory.setUsername(email);
+		importHistory.setStatus(ImportStatus.OK);
+		importHistory.setCountObjects(movies.size());
+		ImportHistory ih = importHistoryRepository.save(importHistory);
+		
 		notifyClients();
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
 	private void notifyClients() {

@@ -1,0 +1,67 @@
+.import-history-container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  font-family: 'Arial', sans-serif;
+}
+
+.header {
+  text-align: center;
+  font-size: 2rem;
+  color: #0d47a1;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.history-table th,
+.history-table td {
+  padding: 15px 10px;
+  text-align: center;
+}
+
+.history-table thead th {
+  background: #1565c0;
+  color: #fff;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.history-table tbody tr {
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: #f1f8ff;
+}
+
+.history-table tbody tr:hover {
+  background: #dcedff;
+  transform: scale(1.01);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+td:last-child {
+  font-weight: bold;
+  color: #0d47a1;
+}

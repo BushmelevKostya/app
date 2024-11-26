@@ -9,6 +9,7 @@ import {WebSocketService} from '../services/websocket';
 import {BehaviorSubject} from 'rxjs';
 import {FileLoaderComponent} from '../file-loader/file-loader.component';
 import {Pagination} from './pagination';
+import {ImportHistoryComponent} from '../import-history/import-history.component';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,8 @@ import {Pagination} from './pagination';
     ReactiveFormsModule,
     HttpClientModule,
     AsyncPipe,
-    FileLoaderComponent
+    FileLoaderComponent,
+    ImportHistoryComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css'],
@@ -236,7 +238,7 @@ export class HomeComponent implements OnInit {
   setCurrentTime(): string {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Добавляем 1, так как месяцы от 0 до 11
+    const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
