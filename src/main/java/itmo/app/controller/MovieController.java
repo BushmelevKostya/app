@@ -211,8 +211,15 @@ public class MovieController {
 	}
 	
 	@PutMapping("/action/{id}/{email}")
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity updateMovie(@PathVariable long id, @PathVariable String email,
 	                                               @RequestBody @Valid Movie movie) {
+		if (!checkUnique(movie)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("{\"message\":\"Please check unique constraint: " +
+							"movies with same coordinates must be with different names," +
+							" workers must be different people\"}");
+		}
 		Optional<Movie> existingMovieOpt = movieRepository.findById(id);
 		
 		if (existingMovieOpt.isPresent()) {
