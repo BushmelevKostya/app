@@ -25,7 +25,7 @@ import {ImportHistoryComponent} from '../import-history/import-history.component
     ImportHistoryComponent
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css'],
+  styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css', 'styles/filter.css'],
   providers: [Pagination]
 })
 

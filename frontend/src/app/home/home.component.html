@@ -38,24 +38,31 @@
     <button *ngIf="isAdmin" (click)="clear()">Удалить все фильмы</button>
   </div>
 
-  <div class="filter-container">
-    <form [formGroup]="filterForm">
-      <label>Filter name: </label>
-      <input formControlName="nameFilter">
-      <label>Filter date: </label>
-      <input formControlName="creationDateFilter">
-      <label>Filter tagline: </label>
-      <input formControlName="taglineFilter">
-    </form>
-
-  </div>
-
   <div>
   <app-file-loader></app-file-loader>
   <app-import-history></app-import-history>
   </div>
 
   <h1>Фильмов в системе: {{ pagination.totalItemsCount }}</h1>
+
+  <div class="filter-container">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-field">
+        <label for="nameFilter" class="filter-label">🔍 Name:</label>
+        <input id="nameFilter" formControlName="nameFilter" class="filter-input">
+      </div>
+      <div class="filter-field">
+        <label for="creationDateFilter" class="filter-label">📅 Date:</label>
+        <input id="creationDateFilter" formControlName="creationDateFilter" class="filter-input">
+      </div>
+      <div class="filter-field">
+        <label for="taglineFilter" class="filter-label">✏️ Tagline:</label>
+        <input id="taglineFilter" formControlName="taglineFilter" class="filter-input">
+      </div>
+    </form>
+  </div>
+
+
   <!-- Табличка -->
   <div class="table-wrapper">
     <table class="movie-table">

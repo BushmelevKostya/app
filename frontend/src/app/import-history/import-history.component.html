@@ -1,21 +1,24 @@
 <div class="import-history-container">
   <h1 class="header">📜 Import History</h1>
-  <table class="history-table">
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>Status</th>
-      <th>User</th>
-      <th>Added Objects</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let history of importHistory$ | async" [class.success]="history.status === 'OK'" [class.error]="history.status === 'ERROR'">
-      <td>{{ history.id }}</td>
-      <td>{{ history.status }}</td>
-      <td>{{ history.username }}</td>
-      <td>{{ history.countObjects || '-' }}</td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table class="history-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>User</th>
+        <th>Added Objects</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let history of importHistory$ | async" [class.success]="history.status === 'OK'"
+          [class.error]="history.status === 'ERROR'">
+        <td>{{ history.id }}</td>
+        <td>{{ history.status }}</td>
+        <td>{{ history.username }}</td>
+        <td>{{ history.countObjects || '-' }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

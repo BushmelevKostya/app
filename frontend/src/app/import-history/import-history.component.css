@@ -16,6 +16,14 @@
   text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
 }
 
+.table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
 .history-table {
   width: 100%;
   border-collapse: collapse;
@@ -35,6 +43,9 @@
   color: #fff;
   font-size: 1rem;
   text-transform: uppercase;
+  position: sticky; /* Закрепляем заголовок */
+  top: 0;
+  z-index: 1; /* Поверх содержимого */
 }
 
 .history-table tbody tr {
