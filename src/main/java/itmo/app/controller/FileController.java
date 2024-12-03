@@ -9,12 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -44,63 +41,36 @@ public class FileController {
 	@PostMapping("/upload/{email}")
 	@Transactional
 	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
+		List<Movie> validatedMovies = new ArrayList<>();
 		for (Movie movie : movies) {
-			if (!checkUnique(movie)) {
+			if (!checkUnique(movie, validatedMovies)) {
 				return ResponseEntity.status(HttpStatus.CONFLICT)
 						.body("{\"message\":\"Film with the same coordinates and name already exists\"}");
 			}
-		
-			Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
-			existingCoordinates.ifPresent(movie::setCoordinates);
-			
-			Optional<Person> existingPersons = personRepository.findById(movie.getDirector().getId());
-			existingPersons.ifPresent(movie::setDirector);
-			
-			existingPersons = personRepository.findById(movie.getScreenwriter().getId());
-			existingPersons.ifPresent(movie::setScreenwriter);
-			
-			existingPersons = personRepository.findById(movie.getOperator().getId());
-			existingPersons.ifPresent(movie::setOperator);
-			
-			Optional<Location> existingLocations = locationRepository.findById(movie.getDirector().getLocation().getId());
-			if (existingLocations.isPresent()) {
-				Person person = movie.getDirector();
-				person.setLocation(existingLocations.get());
-				movie.setDirector(person);
-			}
-			
-			existingLocations = locationRepository.findById(movie.getScreenwriter().getLocation().getId());
-			if (existingLocations.isPresent()) {
-				Person person = movie.getScreenwriter();
-				person.setLocation(existingLocations.get());
-				movie.setScreenwriter(person);
-			}
-			
-			existingLocations = locationRepository.findById(movie.getOperator().getLocation().getId());
-			if (existingLocations.isPresent()) {
-				Person person = movie.getOperator();
-				person.setLocation(existingLocations.get());
-				movie.setOperator(person);
-			}
-			
 			movie.setCreator(userRepository.findByEmail(email).get());
-			
-			movieRepository.save(movie);
+			validatedMovies.add(movie);
 		}
+		
+		movieRepository.saveAll(validatedMovies);
+		movieRepository.flush();
 		
 		ImportHistory importHistory = new ImportHistory();
 		importHistory.setUsername(email);
 		importHistory.setStatus(ImportStatus.OK);
 		importHistory.setCountObjects(movies.size());
 		ImportHistory ih = importHistoryRepository.save(importHistory);
-		
 		notifyClients();
 		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
-	private boolean checkUnique(Movie movie) {
+	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
 		List<Movie> listMovieWithSameCoordinates = movieRepository.findByCoordinatesXAndCoordinatesY(movie.getCoordinates().getX(), movie.getCoordinates().getY());
 		for (Movie m : listMovieWithSameCoordinates) {
+			if (movie.getName().equals(m.getName())) {
+				return false;
+			}
+		}
+		for (Movie m : validatedMovies) {
 			if (movie.getName().equals(m.getName())) {
 				return false;
 			}
