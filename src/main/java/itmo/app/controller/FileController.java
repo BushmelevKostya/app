@@ -64,6 +64,7 @@ public class FileController {
 		}
 		for (Movie movie : movies) {
 			if (!checkUnique(movie, validatedMovies)) {
+				redisTemplate.opsForValue().set("lock", "");
 				return ResponseEntity.status(HttpStatus.CONFLICT)
 						.body("{\"message\":\"Please check unique constraint: " +
 						 "movies with same coordinates must be with different names," +
