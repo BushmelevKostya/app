@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,16 +45,16 @@ public class MovieController {
 	
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
+
 	
-	@Transactional
 	@PostMapping("/action/{email}")
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Object> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		if (!checkUnique(movie)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("{\"message\":\"Please check unique constraint: " +
 							"movies with same coordinates must be with different names," +
-							" workers must be different people and " +
-							"you can't start two imports together\"}");
+							" workers must be different people\"}");
 		}
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
