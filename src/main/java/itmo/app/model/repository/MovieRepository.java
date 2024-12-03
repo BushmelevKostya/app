@@ -17,4 +17,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, MovieReposi
 	List<Movie> findByScreenwriter(Person screenwriter);
 	
 	List<Movie> findByOperator(Person operator);
+	
+	List<Movie> findByCoordinatesXAndCoordinatesY(float x, int y);
 }

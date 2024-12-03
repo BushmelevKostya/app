@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -42,8 +43,13 @@ public class FileController {
 	
 	@PostMapping("/upload/{email}")
 	@Transactional
-	public ResponseEntity<ImportHistory> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
+	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
 		for (Movie movie : movies) {
+			if (!checkUnique(movie)) {
+				return ResponseEntity.status(HttpStatus.CONFLICT)
+						.body("{\"message\":\"Film with the same coordinates and name already exists\"}");
+			}
+		
 			Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 			existingCoordinates.ifPresent(movie::setCoordinates);
 			
@@ -90,6 +96,16 @@ public class FileController {
 		
 		notifyClients();
 		return new ResponseEntity<>(ih, HttpStatus.OK);
+	}
+	
+	private boolean checkUnique(Movie movie) {
+		List<Movie> listMovieWithSameCoordinates = movieRepository.findByCoordinatesXAndCoordinatesY(movie.getCoordinates().getX(), movie.getCoordinates().getY());
+		for (Movie m : listMovieWithSameCoordinates) {
+			if (movie.getName().equals(m.getName())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private void notifyClients() {

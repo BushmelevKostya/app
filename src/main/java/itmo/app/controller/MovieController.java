@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -43,8 +44,13 @@ public class MovieController {
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
+	@Transactional
 	@PostMapping("/action/{email}")
-	public ResponseEntity<Movie> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
+	public ResponseEntity<Object> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
+		if (!checkUnique(movie)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("{\"message\":\"Film with the same coordinates and name already exists\"}");
+		}
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
 		
@@ -84,6 +90,16 @@ public class MovieController {
 		
 		notifyClients();
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
+	}
+	
+	private boolean checkUnique(Movie movie) {
+		List<Movie> listMovieWithSameCoordinates = movieRepository.findByCoordinatesXAndCoordinatesY(movie.getCoordinates().getX(), movie.getCoordinates().getY());
+		for (Movie m : listMovieWithSameCoordinates) {
+			if (movie.getName().equals(m.getName())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@GetMapping("/action/{start}/{end}")

@@ -104,6 +104,7 @@ export class HomeComponent implements OnInit {
   sortColumn: string = '';
   currentSortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
+  uniqueErrorMessage = '';
 
   initVars() {
     this.coordinatesVisible = false
@@ -467,6 +468,7 @@ export class HomeComponent implements OnInit {
         this.initVars()
       },
       error => {
+        this.uniqueErrorMessage = error.error.message
         console.error('Error creating movie', error)
       });
   }

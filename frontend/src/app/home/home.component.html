@@ -547,10 +547,11 @@
           </fieldset>
         </div>
 
-        <div *ngIf="getFormErrors('create').length > 0" class="error-list">
+        <div *ngIf="getFormErrors('create').length > 0 || uniqueErrorMessage.length > 0" class="error-list">
           <h3>Form Errors:</h3>
           <ul>
             <li *ngFor="let error of getFormErrors('create')">{{ error }}</li>
+            <li *ngIf="uniqueErrorMessage">{{ uniqueErrorMessage }}</li>
           </ul>
         </div>
 

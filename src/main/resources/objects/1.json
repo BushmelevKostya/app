@@ -1,0 +1,66 @@
+[
+	{
+		"name": "defaultName",
+		"creationDate": "2024-11-25 15:23:57",
+		"oscarsCount": 1,
+		"budget": 1,
+		"genre": "ACTION",
+		"goldenPalmCount": 1,
+		"length": 1,
+		"mpaaRating": "G",
+		"tagline": "defaultTagline",
+		"totalBoxOffice": 1,
+		"usaBoxOffice": 1,
+		"coordinates": {
+			"id": "",
+			"x": 0,
+			"y": 0
+		},
+		"director":{
+			"id": "",
+			"name": "defaultName",
+			"eyeColor": "BLACK",
+			"hairColor": "BLACK",
+        	"height": 1,
+        	"nationality": "SPAIN",
+        	"location": {
+				"id": "",
+				"x": 0,
+				"y": 0,
+				"z": 0,
+				"name": "defaultLocationName"
+			}
+		},
+		"screenwriter":{
+			"id": "",
+			"name": "defaultName",
+			"eyeColor": "BLACK",
+			"hairColor": "BLACK",
+        	"height": 1,
+        	"nationality": "SPAIN",
+        	"location": {
+				"id": "",
+				"x": 0,
+				"y": 0,
+				"z": 0,
+				"name": "defaultLocationName"
+			}
+		},
+		"operator":{
+			"id": "",
+			"name": "defaultName",
+			"eyeColor": "BLACK",
+			"hairColor": "BLACK",
+        	"height": 1,
+        	"nationality": "SPAIN",
+        	"location": {
+				"id": "",
+				"x": 0,
+				"y": 0,
+				"z": 0,
+				"name": "defaultLocationName"
+			}
+		}
+	}
+
+]
