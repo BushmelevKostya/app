@@ -53,11 +53,10 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
-    testRuntimeOnly 'org.junit.platform:ju\'org.glassfish.jakarta.validation:jakarta.validation-api:3.0.0\'nit-platform-launcher'
 }
 
 dependencyManagement {

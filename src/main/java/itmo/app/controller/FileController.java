@@ -5,13 +5,16 @@ import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -38,17 +41,23 @@ public class FileController {
 	@Autowired
 	private ImportHistoryRepository importHistoryRepository;
 	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+	
 	@PostMapping("/upload/{email}")
 	@Transactional
 	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
 		List<Movie> validatedMovies = new ArrayList<>();
+		if (!checkImport(email)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("{\"message\":\"you can't start two imports together\"}");
+		}
 		for (Movie movie : movies) {
 			if (!checkUnique(movie, validatedMovies)) {
 				return ResponseEntity.status(HttpStatus.CONFLICT)
 						.body("{\"message\":\"Please check unique constraint: " +
 						 "movies with same coordinates must be with different names," +
-						  " workers must be different people and " +
-						   "you can't start two imports together\"}");
+						  " workers must be different people\"}");
 			}
 			movie.setCreator(userRepository.findByEmail(email).get());
 			validatedMovies.add(movie);
@@ -63,12 +72,14 @@ public class FileController {
 		importHistory.setCountObjects(movies.size());
 		ImportHistory ih = importHistoryRepository.save(importHistory);
 		
+		redisTemplate.opsForValue().set("lock", "");
+		
 		notifyClients();
 		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
 	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
-		return checkName(movie, validatedMovies) & checkPeoples(movie) & checkImport(movie, validatedMovies);
+		return checkName(movie, validatedMovies) & checkPeoples(movie);
 	}
 	
 	private boolean checkName(Movie movie, List<Movie> validatedMovies) {
@@ -97,8 +108,14 @@ public class FileController {
 			(screenwriter + operator == 0);
 	}
 	
-	private boolean checkImport(Movie movie, List<Movie> validatedMovies) {
-		return true;
+	private boolean checkImport(String email) {
+		String value = redisTemplate.opsForValue().get("lock");
+		if (Objects.equals(value, "") || value == null || !value.equals(email)) {
+			redisTemplate.opsForValue().set("lock", email);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private void notifyClients() {
