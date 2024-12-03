@@ -45,7 +45,10 @@ public class FileController {
 		for (Movie movie : movies) {
 			if (!checkUnique(movie, validatedMovies)) {
 				return ResponseEntity.status(HttpStatus.CONFLICT)
-						.body("{\"message\":\"Film with the same coordinates and name already exists\"}");
+						.body("{\"message\":\"Please check unique constraint: " +
+						 "movies with same coordinates must be with different names," +
+						  " workers must be different people and " +
+						   "you can't start two imports together\"}");
 			}
 			movie.setCreator(userRepository.findByEmail(email).get());
 			validatedMovies.add(movie);
@@ -59,11 +62,16 @@ public class FileController {
 		importHistory.setStatus(ImportStatus.OK);
 		importHistory.setCountObjects(movies.size());
 		ImportHistory ih = importHistoryRepository.save(importHistory);
+		
 		notifyClients();
 		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
 	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
+		return checkName(movie, validatedMovies) & checkPeoples(movie) & checkImport(movie, validatedMovies);
+	}
+	
+	private boolean checkName(Movie movie, List<Movie> validatedMovies) {
 		List<Movie> listMovieWithSameCoordinates = movieRepository.findByCoordinatesXAndCoordinatesY(movie.getCoordinates().getX(), movie.getCoordinates().getY());
 		for (Movie m : listMovieWithSameCoordinates) {
 			if (movie.getName().equals(m.getName())) {
@@ -75,6 +83,21 @@ public class FileController {
 				return false;
 			}
 		}
+		return true;
+	}
+	
+	private boolean checkPeoples(Movie movie) {
+		Long director = movie.getDirector().getId();
+		Long screenwriter = movie.getScreenwriter().getId();
+		Long operator = movie.getOperator().getId();
+		return
+			(!director.equals(screenwriter) && !director.equals(operator) && !operator.equals(screenwriter)) ||
+			(director + screenwriter == 0) ||
+			(director + operator == 0) ||
+			(screenwriter + operator == 0);
+	}
+	
+	private boolean checkImport(Movie movie, List<Movie> validatedMovies) {
 		return true;
 	}
 	

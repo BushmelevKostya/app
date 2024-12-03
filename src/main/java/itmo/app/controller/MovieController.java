@@ -49,7 +49,10 @@ public class MovieController {
 	public ResponseEntity<Object> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		if (!checkUnique(movie)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body("{\"message\":\"Film with the same coordinates and name already exists\"}");
+					.body("{\"message\":\"Please check unique constraint: " +
+							"movies with same coordinates must be with different names," +
+							" workers must be different people and " +
+							"you can't start two imports together\"}");
 		}
 		Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 		existingCoordinates.ifPresent(movie::setCoordinates);
@@ -93,6 +96,10 @@ public class MovieController {
 	}
 	
 	private boolean checkUnique(Movie movie) {
+		return checkName(movie) & checkPeoples(movie);
+	}
+	
+	private boolean checkName(Movie movie) {
 		List<Movie> listMovieWithSameCoordinates = movieRepository.findByCoordinatesXAndCoordinatesY(movie.getCoordinates().getX(), movie.getCoordinates().getY());
 		for (Movie m : listMovieWithSameCoordinates) {
 			if (movie.getName().equals(m.getName())) {
@@ -100,6 +107,17 @@ public class MovieController {
 			}
 		}
 		return true;
+	}
+	
+	private boolean checkPeoples(Movie movie) {
+		Long director = movie.getDirector().getId();
+		Long screenwriter = movie.getScreenwriter().getId();
+		Long operator = movie.getOperator().getId();
+		return
+				(!director.equals(screenwriter) && !director.equals(operator) && !operator.equals(screenwriter)) ||
+						(director + screenwriter == 0) ||
+						(director + operator == 0) ||
+						(screenwriter + operator == 0);
 	}
 	
 	@GetMapping("/action/{start}/{end}")
