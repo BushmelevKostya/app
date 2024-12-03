@@ -5,9 +5,14 @@ import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +50,12 @@ public class FileController {
 	private StringRedisTemplate redisTemplate;
 	
 	@PostMapping("/upload/{email}")
-	@Transactional
+	@Retryable(
+			value = { CannotAcquireLockException.class },
+			maxAttempts = 5,
+			backoff = @Backoff(delay = 4000)
+	)
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
 		List<Movie> validatedMovies = new ArrayList<>();
 		if (!checkImport(email)) {

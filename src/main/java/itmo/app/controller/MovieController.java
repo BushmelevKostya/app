@@ -5,8 +5,11 @@ import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +48,14 @@ public class MovieController {
 	
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
-
 	
-	@PostMapping("/action/{email}")
+	@Retryable(
+			value = { CannotAcquireLockException.class },
+			maxAttempts = 5,
+			backoff = @Backoff(delay = 2000)
+	)
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
+	@PostMapping("/action/{email}")
 	public ResponseEntity<Object> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) {
 		if (!checkUnique(movie)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -93,7 +100,7 @@ public class MovieController {
 		
 		Movie newMovie = movieRepository.save(movie);
 		
-		notifyClients();
+//		notifyClients();
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 	
@@ -132,7 +139,13 @@ public class MovieController {
 		return new ResponseEntity<>(movieRepository.count(), HttpStatus.OK);
 	}
 	
+	@Retryable(
+			value = { CannotAcquireLockException.class },
+			maxAttempts = 5,
+			backoff = @Backoff(delay = 2000)
+	)
 	@DeleteMapping("/action/{linkId}/{id}/{email}")
+	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity deleteMovie(@PathVariable long linkId, @PathVariable long id, @PathVariable String email) {
 		Optional<Movie> movieToDelete = movieRepository.findById(id);
 		if (movieToDelete.isPresent()) {
@@ -210,6 +223,11 @@ public class MovieController {
 		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
 	}
 	
+	@Retryable(
+			value = { CannotAcquireLockException.class },
+			maxAttempts = 5,
+			backoff = @Backoff(delay = 2000)
+	)
 	@PutMapping("/action/{id}/{email}")
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity updateMovie(@PathVariable long id, @PathVariable String email,
