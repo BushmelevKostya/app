@@ -24,20 +24,19 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: app_container
-    environment:
-      DB_URL: jdbc:postgresql://postgres:5432/is
-      DB_USER: is
-      DB_PASSWORD: is
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    ports:
-      - '2580:2580'
-    depends_on:
-      - postgres
-      - redis
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: app_container
+#    environment:
+#      DB_URL: jdbc:postgresql://postgres:5432/is
+#      DB_USER: is
+#      DB_PASSWORD: is
+#      REDIS_HOST: redis
+#      REDIS_PORT: 6379
+#    ports:
+#      - '2580:2580'
+#    depends_on:
+#      - postgres
+#      - redis

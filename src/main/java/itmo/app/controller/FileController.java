@@ -53,23 +53,24 @@ public class FileController {
 	@Retryable(
 			value = { CannotAcquireLockException.class },
 			maxAttempts = 5,
-			backoff = @Backoff(delay = 4000)
+			backoff = @Backoff(delay = 2000)
 	)
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
 		List<Movie> validatedMovies = new ArrayList<>();
+		List<String> errorMessages = new ArrayList<>();
 		if (!checkImport(email)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body("{\"message\":\"you can't start two imports together\"}");
+					.body("{\"message\":\"you can't start more than 10 imports\"}");
 		}
 		for (Movie movie : movies) {
 			if (!checkUnique(movie, validatedMovies)) {
-				redisTemplate.opsForValue().set("lock", "");
-				return ResponseEntity.status(HttpStatus.CONFLICT)
-						.body("{\"message\":\"Please check unique constraint: " +
-						 "movies with same coordinates must be with different names," +
-						  " workers must be different people\"}");
+				errorMessages.add("Movie with name '" + movie.getName() + "' has failed uniqueness check. " +
+						"Movies with same coordinates must have different names, " +
+						"and workers must be different people.");
+				continue;
 			}
+			
 			movie.setCreator(userRepository.findByEmail(email).get());
 			validatedMovies.add(movie);
 		}
@@ -83,9 +84,16 @@ public class FileController {
 		importHistory.setCountObjects(movies.size());
 		ImportHistory ih = importHistoryRepository.save(importHistory);
 		
-		redisTemplate.opsForValue().set("lock", "");
+		redisTemplate.opsForValue().set(email, String.valueOf(Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(email))) - 1));
 		
 		notifyClients();
+		
+		if (!errorMessages.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("{\"message\":\"Some movies were not created due to the following reasons:\", " +
+							"\"errors\": " + errorMessages + "}");
+		}
+		
 		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
@@ -120,12 +128,17 @@ public class FileController {
 	}
 	
 	private boolean checkImport(String email) {
-		String value = redisTemplate.opsForValue().get("lock");
-		if (Objects.equals(value, "") || value == null || !value.equals(email)) {
-			redisTemplate.opsForValue().set("lock", email);
+		String value = redisTemplate.opsForValue().get(email);
+		if (value == null) {
+			redisTemplate.opsForValue().set(email, "1");
 			return true;
+		} else {
+			int countImports = Integer.parseInt(value);
+			if (countImports < 10) {
+				redisTemplate.opsForValue().set(email, String.valueOf(countImports + 1));
+				return true;
+			}
 		}
-		
 		return false;
 	}
 	
