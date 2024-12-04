@@ -100,7 +100,7 @@ public class MovieController {
 		
 		Movie newMovie = movieRepository.save(movie);
 		
-//		notifyClients();
+		notifyClients();
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 	
