@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {NgIf} from '@angular/common';
 import {ImportHistoryComponent} from '../import-history/import-history.component';
@@ -22,6 +22,7 @@ interface ImportHistory {
   providers: [ImportHistoryComponent]
 })
 export class FileLoaderComponent {
+  @Input() isLoading: boolean = false;
   fileName: string = '';
   errorMessage: string = '';
   successMessage: string = '';
@@ -66,18 +67,22 @@ export class FileLoaderComponent {
   }
 
   uploadData(data: any[]): void {
+    this.isLoading = true;
     this.http.post(`http://localhost:2580/api/upload/${sessionStorage.getItem('loggedInUserEmail')}`, data).subscribe({
       next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
         this.importHistoryService.addHistoryItem(response);
+        this.isLoading = false;
       },
       error: (error) => {
         this.errorMessage = error.error?.message;
         this.http.get(`http://localhost:2580/api/history/create/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe({
           next: (response: any) => {
+            this.isLoading = false;
             this.importHistoryService.addHistoryItem(response);
           },
           error: (err) => {
+            this.isLoading = false;
             console.error('Failed to update history', err);
           }
         });

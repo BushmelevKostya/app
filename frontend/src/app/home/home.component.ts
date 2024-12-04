@@ -10,6 +10,7 @@ import {BehaviorSubject} from 'rxjs';
 import {FileLoaderComponent} from '../file-loader/file-loader.component';
 import {Pagination} from './pagination';
 import {ImportHistoryComponent} from '../import-history/import-history.component';
+import {LoadingComponent} from '../loading/loading.component';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ import {ImportHistoryComponent} from '../import-history/import-history.component
     HttpClientModule,
     AsyncPipe,
     FileLoaderComponent,
-    ImportHistoryComponent
+    ImportHistoryComponent,
+    LoadingComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./styles/button.css', "./styles/header.css", 'styles/layout.css', 'styles/modal.css', 'styles/table.css', 'styles/search-bar.css', 'styles/filter.css'],
@@ -105,6 +107,7 @@ export class HomeComponent implements OnInit {
   currentSortColumn: string | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
   uniqueErrorMessage = '';
+  isLoading = false;
 
   initVars() {
     this.coordinatesVisible = false
@@ -462,14 +465,17 @@ export class HomeComponent implements OnInit {
   }
 
   createMovie() {
+    this.isLoading = true;
     this.http.post(`http://localhost:2580/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
       response => {
         this.changeCreateFlag()
         this.initVars()
+        this.isLoading = false;
       },
       error => {
         this.uniqueErrorMessage = error.error.message
         console.error('Error creating movie', error)
+        this.isLoading = false;
       });
   }
 
@@ -487,9 +493,11 @@ export class HomeComponent implements OnInit {
   }
 
   deleteMovie(id: number) {
+    this.isLoading = true;
     return this.http.delete<any[]>(`${this.apiUrl}/${id}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
       this.changeDeleteFlag()
       this.changeDeleteIdFlag()
+      this.isLoading = false;
     });
   }
 
@@ -505,36 +513,48 @@ export class HomeComponent implements OnInit {
   }
 
   updateMovie() {
+    this.isLoading = true;
     return this.http.put<any[]>(`${this.apiUrl}/${this.selectedMovieId}/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieUpdateForm.value)
       .subscribe((data: any[]) => {
         this.changeUpdateFlag();
         this.initVars();
-      });
+        this.isLoading = false;
+      },
+      (error) => {
+        this.isLoading = false;
+      }
+    );
   }
 
   searchMovie() {
+    this.isLoading = true;
     this.http.get<any>(`${this.apiUrl}/${this.searchId}`).subscribe((data: any) => {
         if (data !== null) {
           this.foundMovie = data;
         } else {
           this.foundMovie = null
         }
+        this.isLoading = false;
       },
       (error) => {
         this.foundMovie = null;
+        this.isLoading = false;
       }
     )
   }
 
   approveRequest(id: number) {
+    this.isLoading = true;
     this.http.post(`/api/notifications/approve/${id}`, {})
       .subscribe(
         () => {
           alert("Request approve");
           this.loadRequests();
+          this.isLoading = false;
         },
         (error) => {
           alert("Error approving application:" + error.message);
+          this.isLoading = false;
         }
       );
   }
@@ -544,48 +564,59 @@ export class HomeComponent implements OnInit {
   }
 
   findDirectorWithMinMovies() {
+    this.isLoading = true;
     this.minDirectorFlag = true;
     this.http.get<any>('/api/min-director')
       .subscribe((data: any) => {
         this.minDirector = data
+        this.isLoading = false;
       });
   }
 
   searchByTagline(tagline: string | undefined) {
+    this.isLoading = true;
     this.taglineSearchFlag = true;
     if (tagline) {
       this.http.get<any[]>('/api/tagline-greater-than', {
         params: {tagline}
       }).subscribe((data: any[]) => {
         this.moviesWithTagline.next(data)
+        this.isLoading = false;
       });
     }
   }
 
 
   findUniqueUsaBoxOffices() {
+    this.isLoading = true;
     this.uniqueUsaBoxOfficesFlag = true;
     this.http.get<number[]>('/api/unique-usa-box-office')
       .subscribe((data: any[]) => {
         this.uniqueUsaBoxOffices = data
+        this.isLoading = false;
       });
   }
 
   findOperatorsWithoutOscars() {
+    this.isLoading = true;
     this.operatorsWithoutOscarsFlag = true;
     this.http.get<any[]>('/api/operators-no-oscars')
       .subscribe((data: any[]) => {
         this.operatorsWithoutOscars = data
+        this.isLoading = false;
       });
   }
 
   addOscarToRratedMovies() {
+    this.isLoading = true;
     this.addOscarFlag = true;
     this.http.post(`/api/add-oscar-to-r-rated`, {})
       .subscribe(
         () => {
+          this.isLoading = false;
         },
         (error) => {
+          this.isLoading = true;
         }
       );
   }
@@ -627,7 +658,9 @@ export class HomeComponent implements OnInit {
   }
 
   clear() {
+    this.isLoading = true;
     return this.http.delete<any[]>(`${this.apiUrl}/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe((data: any[]) => {
+      this.isLoading = false;
     });
   }
 }

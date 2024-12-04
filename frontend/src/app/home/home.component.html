@@ -20,6 +20,10 @@
     </div>
   </header>
 
+  <div *ngIf="isLoading">
+    <app-loading></app-loading>
+  </div>
+
   <div class="side-menu" [class.open]="menuOpen">
     <ul>
       <li><a (click)="navigateTo('/visualize')">Визуализация объектов</a></li>
@@ -39,8 +43,8 @@
   </div>
 
   <div>
-  <app-file-loader></app-file-loader>
-  <app-import-history></app-import-history>
+    <app-file-loader [isLoading]="isLoading"></app-file-loader>
+    <app-import-history></app-import-history>
   </div>
 
   <h1>Фильмов в системе: {{ pagination.totalItemsCount }}</h1>
@@ -69,10 +73,12 @@
       <thead>
       <tr>
         <th>ID</th>
-        <th (click)="sortTable('name')" class="sortable-header" [class.asc]="isSorted('name', 'asc')" [class.desc]="isSorted('name', 'desc')">
+        <th (click)="sortTable('name')" class="sortable-header" [class.asc]="isSorted('name', 'asc')"
+            [class.desc]="isSorted('name', 'desc')">
           Name
         </th>
-        <th (click)="sortTable('creationDate')" class="sortable-header" [class.asc]="isSorted('creationDate', 'asc')" [class.desc]="isSorted('creationDate', 'desc')">
+        <th (click)="sortTable('creationDate')" class="sortable-header" [class.asc]="isSorted('creationDate', 'asc')"
+            [class.desc]="isSorted('creationDate', 'desc')">
           Creation Date
         </th>
         <th>Oscars Count</th>
@@ -82,7 +88,8 @@
         <th>Length</th>
         <th>Golden Palm Count</th>
         <th>USA Box Office</th>
-        <th (click)="sortTable('tagline')" class="sortable-header" [class.asc]="isSorted('tagline', 'asc')" [class.desc]="isSorted('tagline', 'desc')">
+        <th (click)="sortTable('tagline')" class="sortable-header" [class.asc]="isSorted('tagline', 'asc')"
+            [class.desc]="isSorted('tagline', 'desc')">
           Tagline
         </th>
         <th>Genre</th>
@@ -178,11 +185,14 @@
     <div class="pagination-controls">
       <button [disabled]="pagination.currentPage === 1" (click)="pagination.goToPage(1)">«</button>
       <button [disabled]="pagination.currentPage === 1" (click)="pagination.previousPage()">‹</button>
-      <button *ngFor="let page of pagination.getPages()" [class.active]="page === pagination.currentPage" (click)="pagination.goToPage(page)">
+      <button *ngFor="let page of pagination.getPages()" [class.active]="page === pagination.currentPage"
+              (click)="pagination.goToPage(page)">
         {{ page }}
       </button>
       <button [disabled]="pagination.currentPage === pagination.totalPages" (click)="pagination.nextPage()">›</button>
-      <button [disabled]="pagination.currentPage === pagination.totalPages" (click)="pagination.goToPage(pagination.totalPages)">»</button>
+      <button [disabled]="pagination.currentPage === pagination.totalPages"
+              (click)="pagination.goToPage(pagination.totalPages)">»
+      </button>
     </div>
   </div>
 
