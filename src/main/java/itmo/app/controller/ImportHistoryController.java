@@ -2,6 +2,7 @@ package itmo.app.controller;
 
 import itmo.app.model.entity.ImportHistory;
 import itmo.app.model.entity.ImportStatus;
+import itmo.app.model.entity.User;
 import itmo.app.model.repository.ImportHistoryRepository;
 import itmo.app.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class ImportHistoryController {
 	@Autowired
 	private ImportHistoryRepository importHistoryRepository;
 	
+	@Autowired
+	private UserRepository userRepository;
 	@GetMapping("/all")
 	public ResponseEntity<List<ImportHistory>> getHistoryForAdmin() {
 		List<ImportHistory> list = importHistoryRepository.findAll();
@@ -28,8 +31,15 @@ public class ImportHistoryController {
 	
 	@GetMapping("/user/{email}")
 	public ResponseEntity<List<ImportHistory>> getHistoryForUser(@PathVariable String email) {
-		Optional<List<ImportHistory>> list = importHistoryRepository.findAllByUsername(email);
-		return new ResponseEntity<>(list.orElseGet(ArrayList::new), HttpStatus.OK);
+		User user = userRepository.findByEmail(email).get();
+		List<ImportHistory> list;
+		if (user.isApprovedAdmin()) {
+			list = importHistoryRepository.findAll();
+		} else {
+			Optional<List<ImportHistory>> optList = importHistoryRepository.findAllByUsername(email);
+			list = optList.orElseGet(ArrayList::new);
+		}
+		return new ResponseEntity<>(list, HttpStatus.OK);
 	}
 	
 	@GetMapping("/create/{email}")
