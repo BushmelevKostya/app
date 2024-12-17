@@ -26,6 +26,7 @@ export class FileLoaderComponent {
   fileName: string = '';
   errorMessage: string = '';
   successMessage: string = '';
+  responseId: any;
 
   constructor(private http: HttpClient, private importHistoryComponent: ImportHistoryComponent, private importHistoryService: ImportHistoryService) {}
 
@@ -74,7 +75,20 @@ export class FileLoaderComponent {
       next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
         this.importHistoryService.addHistoryItem(response);
+        this.responseId = response.id;
         this.isLoading = false;
+
+        this.http.post(`http://localhost:2580/api/uploadFile/${this.responseId}`, formData).subscribe({
+          next: (response: any) => {
+            this.successMessage = 'File uploaded successfully';
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.errorMessage = error.error?.message || 'Upload failed';
+            this.isLoading = false;
+          }
+        });
+
       },
       error: (error) => {
         this.errorMessage = error.error?.message;
@@ -82,6 +96,19 @@ export class FileLoaderComponent {
           next: (response: any) => {
             this.isLoading = false;
             this.importHistoryService.addHistoryItem(response);
+            this.responseId = response.id;
+
+            this.http.post(`http://localhost:2580/api/uploadFile/${this.responseId}`, formData).subscribe({
+              next: (response: any) => {
+                this.successMessage = 'File uploaded successfully';
+                this.isLoading = false;
+              },
+              error: (error) => {
+                this.errorMessage = error.error?.message || 'Upload failed';
+                this.isLoading = false;
+              }
+            });
+
           },
           error: (err) => {
             this.isLoading = false;
@@ -90,15 +117,6 @@ export class FileLoaderComponent {
         });
       }
     });
-    this.http.post(`http://localhost:2580/api/uploadFile`, formData).subscribe({
-      next: (response: any) => {
-        this.successMessage = 'File uploaded successfully';
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage = error.error?.message || 'Upload failed';
-        this.isLoading = false;
-      }
-    });
+
   }
 }

@@ -1,5 +1,6 @@
 package itmo.app.controller;
 
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.errors.MinioException;
@@ -10,9 +11,13 @@ import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
 import org.hibernate.PersistentObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -62,6 +67,9 @@ public class FileController {
 	@Autowired
 	private MinioClient minioClient;
 	
+	@Autowired
+	private MinioFilesRepository minioFilesRepository;
+	
 	@PostMapping("/upload/{email}")
 	@Retryable(
 			value = {CannotAcquireLockException.class},
@@ -96,6 +104,13 @@ public class FileController {
 		importHistory.setCountObjects(movies.size());
 		ImportHistory ih = importHistoryRepository.save(importHistory);
 		
+		MinioFiles minioFile = new MinioFiles();
+		minioFile.setHistoryId(importHistory.getId());
+		minioFile.setFileName(importHistory.getId() + ".json");
+		minioFilesRepository.save(minioFile);
+		
+		
+		
 		redisTemplate.opsForValue().set(email, String.valueOf(Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(email))) - 1));
 		
 		notifyClients();
@@ -109,10 +124,11 @@ public class FileController {
 		return new ResponseEntity<>(ih, HttpStatus.OK);
 	}
 	
-	@PostMapping("/uploadFile")
-	public ResponseEntity<Object> saveFile(@RequestParam("file") MultipartFile file) {
+	@PostMapping("/uploadFile/{id}")
+	public ResponseEntity<Object> saveFile(@RequestParam("file") MultipartFile file, @PathVariable long id) {
 		try {
-			saveFileToMinio(file);
+			String filename = id + ".json";
+			saveFileToMinio(file, filename);
 		} catch (MinioException exception) {
 			GlobalLogger.getLogger().info(exception.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -121,13 +137,13 @@ public class FileController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	private void saveFileToMinio(MultipartFile file) throws MinioException{
+	private void saveFileToMinio(MultipartFile file, String filename) throws MinioException{
 		try {
 			InputStream inputStream = file.getInputStream();
 			
 			PutObjectArgs putObjectArgs = PutObjectArgs.builder()
 					.bucket("json-bucket")
-					.object(file.getOriginalFilename())
+					.object(filename)
 					.stream(inputStream, file.getSize(), -1)
 					.contentType(file.getContentType())
 					.build();
@@ -196,6 +212,32 @@ public class FileController {
 			movieWebSocketHandler.sendToAllSessions();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@GetMapping("/download/{fileId}")
+	public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
+		try {
+			String bucketName = "json-bucket";
+			String fileName = fileId + ".json";
+			
+			MinioClient minioClient = MinioClient.builder()
+					.endpoint("http://localhost:9000")
+					.credentials("minioadmin", "minioadmin")
+					.build();
+			
+			InputStream stream = minioClient.getObject(GetObjectArgs.builder()
+					.bucket(bucketName)
+					.object(fileName)
+					.build());
+			
+			ByteArrayResource resource = new ByteArrayResource(stream.readAllBytes());
+			return ResponseEntity.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body(resource);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 }

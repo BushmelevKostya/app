@@ -8,6 +8,7 @@
         <th>Status</th>
         <th>User</th>
         <th>Added Objects</th>
+        <th>Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -17,6 +18,11 @@
         <td>{{ history.status }}</td>
         <td>{{ history.username }}</td>
         <td>{{ history.countObjects || '-' }}</td>
+        <td>
+          <button class="download-btn" (click)="downloadFile(history.id)" title="Download">
+            ⬇️
+          </button>
+        </td>
       </tr>
       </tbody>
     </table>

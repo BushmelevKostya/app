@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {AsyncPipe, NgForOf} from '@angular/common';
-import {BehaviorSubject} from 'rxjs';
-import {ImportHistoryService} from './import-history';
+import { saveAs } from 'file-saver';
+import { AsyncPipe, NgForOf } from '@angular/common';
+import { ImportHistoryService } from './import-history';
 
 interface ImportHistory {
   id: number;
@@ -22,10 +22,13 @@ interface ImportHistory {
   styleUrls: ['./import-history.component.css']
 })
 export class ImportHistoryComponent implements OnInit {
-  importHistory$: any
+  importHistory$: any;
   isAdmin: boolean = false;
 
-  constructor(private http: HttpClient, private importHistoryService: ImportHistoryService) {
+  constructor(
+    private http: HttpClient,
+    private importHistoryService: ImportHistoryService
+  ) {
     this.importHistory$ = this.importHistoryService.history$;
   }
 
@@ -41,5 +44,17 @@ export class ImportHistoryComponent implements OnInit {
       (data) => this.importHistoryService.setHistory(data),
       (error) => console.error('Error fetching import history:', error)
     );
+  }
+
+  downloadFile(fileId: number): void {
+    const url = `/api/download/${fileId}`;
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (response) => {
+        saveAs(response, `import-${fileId}.json`);
+      },
+      error: (error) => {
+        console.error('Failed to download file:', error);
+      }
+    });
   }
 }

@@ -2,8 +2,10 @@ package itmo.app.controller;
 
 import itmo.app.model.entity.ImportHistory;
 import itmo.app.model.entity.ImportStatus;
+import itmo.app.model.entity.MinioFiles;
 import itmo.app.model.entity.User;
 import itmo.app.model.repository.ImportHistoryRepository;
+import itmo.app.model.repository.MinioFilesRepository;
 import itmo.app.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,10 @@ public class ImportHistoryController {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private MinioFilesRepository minioFilesRepository;
+	
 	@GetMapping("/all")
 	public ResponseEntity<List<ImportHistory>> getHistoryForAdmin() {
 		List<ImportHistory> list = importHistoryRepository.findAll();
@@ -47,6 +53,12 @@ public class ImportHistoryController {
 		ImportHistory importHistory = new ImportHistory();
 		importHistory.setUsername(email);
 		importHistory.setStatus(ImportStatus.ERROR);
-		return new ResponseEntity<>(importHistoryRepository.save(importHistory), HttpStatus.CREATED);
+		ImportHistory ih = importHistoryRepository.save(importHistory);
+		
+		MinioFiles minioFile = new MinioFiles();
+		minioFile.setHistoryId(ih.getId());
+		minioFile.setFileName(ih.getId() + ".json");
+		minioFilesRepository.save(minioFile);
+		return new ResponseEntity<>(ih, HttpStatus.CREATED);
 	}
 }
