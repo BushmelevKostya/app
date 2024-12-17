@@ -4,6 +4,7 @@ import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
+import org.hibernate.PersistentObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -51,9 +52,9 @@ public class FileController {
 	
 	@PostMapping("/upload/{email}")
 	@Retryable(
-			value = { CannotAcquireLockException.class },
+			value = {CannotAcquireLockException.class},
 			maxAttempts = 5,
-			backoff = @Backoff(delay = 2000)
+			backoff = @Backoff(delay = 4000)
 	)
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
@@ -75,8 +76,7 @@ public class FileController {
 			validatedMovies.add(movie);
 		}
 		
-		movieRepository.saveAll(validatedMovies);
-		movieRepository.flush();
+		saveMovies(validatedMovies);
 		
 		ImportHistory importHistory = new ImportHistory();
 		importHistory.setUsername(email);
@@ -95,6 +95,14 @@ public class FileController {
 		}
 		
 		return new ResponseEntity<>(ih, HttpStatus.OK);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void saveMovies(List<Movie> validatedMovies) {
+		for (Movie movie : validatedMovies) {
+			movieRepository.save(movie);
+		}
+		movieRepository.flush();
 	}
 	
 	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
@@ -121,10 +129,10 @@ public class FileController {
 		Long screenwriter = movie.getScreenwriter().getId();
 		Long operator = movie.getOperator().getId();
 		return
-			(!director.equals(screenwriter) && !director.equals(operator) && !operator.equals(screenwriter)) ||
-			(director + screenwriter == 0) ||
-			(director + operator == 0) ||
-			(screenwriter + operator == 0);
+				(!director.equals(screenwriter) && !director.equals(operator) && !operator.equals(screenwriter)) ||
+						(director + screenwriter == 0) ||
+						(director + operator == 0) ||
+						(screenwriter + operator == 0);
 	}
 	
 	private boolean checkImport(String email) {

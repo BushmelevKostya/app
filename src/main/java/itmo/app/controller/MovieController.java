@@ -6,6 +6,7 @@ import itmo.app.model.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -198,29 +199,34 @@ public class MovieController {
 				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
 		}
-		List<Movie> allMovies = movieRepository.findAll();
-		allMovies.forEach(movie -> {
-			movie.setCoordinates(null);
-			movie.setDirector(null);
-			movie.setScreenwriter(null);
-			movie.setOperator(null);
-		});
-		movieRepository.saveAll(allMovies);
 		
-		List<Person> allPersons = personRepository.findAll();
-		allPersons.forEach(person -> {
-			person.setLocation(null);
-		});
-		personRepository.saveAll(allPersons);
-		
-		movieRepository.deleteAll();
-		coordinatesRepository.deleteAll();
-		personRepository.deleteAll();
-		locationRepository.deleteAll();
-		movieChangeRepository.deleteAll();
-		
-		notifyClients();
-		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+		try {
+			List<Movie> allMovies = movieRepository.findAll();
+			allMovies.forEach(movie -> {
+				movie.setCoordinates(null);
+				movie.setDirector(null);
+				movie.setScreenwriter(null);
+				movie.setOperator(null);
+			});
+			movieRepository.saveAll(allMovies);
+			
+			List<Person> allPersons = personRepository.findAll();
+			allPersons.forEach(person -> {
+				person.setLocation(null);
+			});
+			personRepository.saveAll(allPersons);
+			
+			movieRepository.deleteAll();
+			coordinatesRepository.deleteAll();
+			personRepository.deleteAll();
+			locationRepository.deleteAll();
+			movieChangeRepository.deleteAll();
+			
+			notifyClients();
+			return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
+		}
 	}
 	
 	@Retryable(
