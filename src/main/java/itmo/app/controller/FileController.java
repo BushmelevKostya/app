@@ -1,5 +1,9 @@
 package itmo.app.controller;
 
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.errors.MinioException;
+import itmo.app.controller.services.GlobalLogger;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
@@ -16,7 +20,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +58,9 @@ public class FileController {
 	
 	@Autowired
 	private StringRedisTemplate redisTemplate;
+	
+	@Autowired
+	private MinioClient minioClient;
 	
 	@PostMapping("/upload/{email}")
 	@Retryable(
@@ -95,6 +107,35 @@ public class FileController {
 		}
 		
 		return new ResponseEntity<>(ih, HttpStatus.OK);
+	}
+	
+	@PostMapping("/uploadFile")
+	public ResponseEntity<Object> saveFile(@RequestParam("file") MultipartFile file) {
+		try {
+			saveFileToMinio(file);
+		} catch (MinioException exception) {
+			GlobalLogger.getLogger().info(exception.getMessage());
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	private void saveFileToMinio(MultipartFile file) throws MinioException{
+		try {
+			InputStream inputStream = file.getInputStream();
+			
+			PutObjectArgs putObjectArgs = PutObjectArgs.builder()
+					.bucket("json-bucket")
+					.object(file.getOriginalFilename())
+					.stream(inputStream, file.getSize(), -1)
+					.contentType(file.getContentType())
+					.build();
+			
+			minioClient.putObject(putObjectArgs);
+		} catch (Exception e) {
+			throw new MinioException("Error saving file: " + e.getMessage());
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

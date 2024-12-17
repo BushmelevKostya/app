@@ -58,7 +58,7 @@ export class FileLoaderComponent {
           throw new Error('Expected json файл');
         }
 
-        this.uploadData(data);
+        this.uploadData(file, data);
       } catch (e) {
         this.errorMessage = `Error parsing file: ${(e as Error).message}`;
       }
@@ -66,8 +66,10 @@ export class FileLoaderComponent {
     reader.readAsText(file);
   }
 
-  uploadData(data: any[]): void {
+  uploadData(file: File, data: any[]): void {
     this.isLoading = true;
+    const formData = new FormData();
+    formData.append('file', file);
     this.http.post(`http://localhost:2580/api/upload/${sessionStorage.getItem('loggedInUserEmail')}`, data).subscribe({
       next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
@@ -86,6 +88,16 @@ export class FileLoaderComponent {
             console.error('Failed to update history', err);
           }
         });
+      }
+    });
+    this.http.post(`http://localhost:2580/api/uploadFile`, formData).subscribe({
+      next: (response: any) => {
+        this.successMessage = 'File uploaded successfully';
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Upload failed';
+        this.isLoading = false;
       }
     });
   }
