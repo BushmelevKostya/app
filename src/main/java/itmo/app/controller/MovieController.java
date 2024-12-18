@@ -7,20 +7,21 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -50,8 +51,14 @@ public class MovieController {
 	@Autowired
 	private MovieWebSocketHandler movieWebSocketHandler;
 	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
+	
+	@Autowired
+	private TaskScheduler taskScheduler;
+	
 	@Retryable(
-			value = { CannotAcquireLockException.class },
+			value = {CannotAcquireLockException.class},
 			maxAttempts = 5,
 			backoff = @Backoff(delay = 2000)
 	)
@@ -101,8 +108,30 @@ public class MovieController {
 		
 		Movie newMovie = movieRepository.save(movie);
 		
+		String redisId = String.valueOf(newMovie.getId());
+		String oldValue = redisTemplate.opsForValue().get(redisId);
+		int newValue = 0;
+		if (oldValue != null) {
+			if (Integer.parseInt(oldValue) == 0) {
+				System.out.println("Первое создание");
+				newValue = 1;
+			}
+		} else {
+			newValue = 1;
+		}
+		redisTemplate.opsForValue().set(redisId, String.valueOf(newValue));
+		
+		
 		notifyClients();
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
+	}
+	
+	private void scheduleFileDeletion(Long movieId, String email) {
+		taskScheduler.schedule(() -> {
+					System.out.println("Удаление movie с id: " + movieId);
+					deleteMovie(0, movieId, email);
+				},
+				Instant.now().plus(Duration.ofSeconds(5)));
 	}
 	
 	private boolean checkUnique(Movie movie) {
@@ -141,7 +170,7 @@ public class MovieController {
 	}
 	
 	@Retryable(
-			value = { CannotAcquireLockException.class },
+			value = {CannotAcquireLockException.class},
 			maxAttempts = 5,
 			backoff = @Backoff(delay = 2000)
 	)
@@ -230,14 +259,14 @@ public class MovieController {
 	}
 	
 	@Retryable(
-			value = { CannotAcquireLockException.class },
+			value = {CannotAcquireLockException.class},
 			maxAttempts = 5,
 			backoff = @Backoff(delay = 2000)
 	)
 	@PutMapping("/action/{id}/{email}")
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity updateMovie(@PathVariable long id, @PathVariable String email,
-	                                               @RequestBody @Valid Movie movie) {
+	                                  @RequestBody @Valid Movie movie) {
 		if (!checkUnique(movie)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("{\"message\":\"Please check unique constraint: " +
@@ -272,6 +301,22 @@ public class MovieController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		
+		
+		String redisId = String.valueOf(id);
+		String oldValue = redisTemplate.opsForValue().get(redisId);
+		int newValue = 0;
+		if (oldValue != null) {
+			if (Integer.parseInt(oldValue) == 0) {
+				System.out.println("Первое обновление");
+				newValue = 1;
+			} else {
+				System.out.println("Второе обновление");
+				scheduleFileDeletion(id, email);
+			}
+		}
+		redisTemplate.opsForValue().set(redisId, String.valueOf(newValue));
+		
 		notifyClients();
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
