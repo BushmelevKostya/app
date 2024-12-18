@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { saveAs } from 'file-saver';
-import { AsyncPipe, NgForOf } from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import { ImportHistoryService } from './import-history';
 
 interface ImportHistory {
@@ -17,7 +17,8 @@ interface ImportHistory {
   standalone: true,
   imports: [
     NgForOf,
-    AsyncPipe
+    AsyncPipe,
+    NgIf
   ],
   styleUrls: ['./import-history.component.css']
 })

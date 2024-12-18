@@ -71,24 +71,13 @@ export class FileLoaderComponent {
     this.isLoading = true;
     const formData = new FormData();
     formData.append('file', file);
-    this.http.post(`http://localhost:2580/api/upload/${sessionStorage.getItem('loggedInUserEmail')}`, data).subscribe({
+    formData.append('movies', JSON.stringify(data));
+    this.http.post(`http://localhost:2580/api/uploadTransaction/${sessionStorage.getItem('loggedInUserEmail')}`, formData).subscribe({
       next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
         this.importHistoryService.addHistoryItem(response);
         this.responseId = response.id;
         this.isLoading = false;
-
-        this.http.post(`http://localhost:2580/api/uploadFile/${this.responseId}`, formData).subscribe({
-          next: (response: any) => {
-            this.successMessage = 'File uploaded successfully';
-            this.isLoading = false;
-          },
-          error: (error) => {
-            this.errorMessage = error.error?.message || 'Upload failed';
-            this.isLoading = false;
-          }
-        });
-
       },
       error: (error) => {
         this.errorMessage = error.error?.message;
@@ -97,18 +86,6 @@ export class FileLoaderComponent {
             this.isLoading = false;
             this.importHistoryService.addHistoryItem(response);
             this.responseId = response.id;
-
-            this.http.post(`http://localhost:2580/api/uploadFile/${this.responseId}`, formData).subscribe({
-              next: (response: any) => {
-                this.successMessage = 'File uploaded successfully';
-                this.isLoading = false;
-              },
-              error: (error) => {
-                this.errorMessage = error.error?.message || 'Upload failed';
-                this.isLoading = false;
-              }
-            });
-
           },
           error: (err) => {
             this.isLoading = false;
@@ -117,6 +94,5 @@ export class FileLoaderComponent {
         });
       }
     });
-
   }
 }

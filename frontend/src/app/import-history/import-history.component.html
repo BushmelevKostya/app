@@ -19,7 +19,7 @@
         <td>{{ history.username }}</td>
         <td>{{ history.countObjects || '-' }}</td>
         <td>
-          <button class="download-btn" (click)="downloadFile(history.id)" title="Download">
+          <button *ngIf="history.status == 'OK'" class="download-btn" (click)="downloadFile(history.id)" title="Download">
             ⬇️
           </button>
         </td>

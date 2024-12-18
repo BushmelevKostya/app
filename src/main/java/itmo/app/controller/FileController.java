@@ -1,15 +1,16 @@
 package itmo.app.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.errors.MinioException;
 import itmo.app.controller.services.GlobalLogger;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
-import jakarta.validation.Valid;
-import org.hibernate.PersistentObjectException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -27,14 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -70,97 +66,92 @@ public class FileController {
 	@Autowired
 	private MinioFilesRepository minioFilesRepository;
 	
-	@PostMapping("/upload/{email}")
+	@Autowired ObjectMapper objectMapper;
+	
 	@Retryable(
 			value = {CannotAcquireLockException.class},
 			maxAttempts = 5,
 			backoff = @Backoff(delay = 4000)
 	)
+	@PostMapping("/uploadTransaction/{email}")
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
-	public ResponseEntity<Object> createMoviesFromFile(@RequestBody @Valid List<Movie> movies, @PathVariable String email) {
-		List<Movie> validatedMovies = new ArrayList<>();
-		List<String> errorMessages = new ArrayList<>();
-		if (!checkImport(email)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body("{\"message\":\"you can't start more than 10 imports\"}");
+	public ResponseEntity<Object> uploadTransaction(
+			@RequestParam("file") MultipartFile file,
+			@RequestParam("movies") String moviesJson,
+			@PathVariable String email) {
+		ImportHistory importHistory = null;
+		try {
+			List<Movie> movies = objectMapper.readValue(moviesJson, new TypeReference<>() {
+			});
+			
+			importHistory = saveMoviesWithHistory(movies, email);
+			
+			saveFileToMinio(file, importHistory.getId());
+			
+			notifyClients();
+			return ResponseEntity.ok(importHistory);
+		} catch (Exception e) {
+			GlobalLogger.getLogger().info(e.getMessage());
+			if (importHistory != null) {
+				rollbackTransaction(email, importHistory.getId());
+			}
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Transaction failed: " + e.getMessage());
 		}
-		for (Movie movie : movies) {
-			if (!checkUnique(movie, validatedMovies)) {
-				errorMessages.add("Movie with name '" + movie.getName() + "' has failed uniqueness check. " +
-						"Movies with same coordinates must have different names, " +
-						"and workers must be different people.");
-				continue;
+	}
+	
+	private void rollbackTransaction(String email, Long historyId) {
+		try {
+			if (historyId != null) {
+				importHistoryRepository.deleteById(historyId);
+				minioFilesRepository.deleteByHistoryId(historyId);
 			}
 			
-			movie.setCreator(userRepository.findByEmail(email).get());
-			validatedMovies.add(movie);
+			redisTemplate.opsForValue().increment(email, 1);
+		} catch (Exception e) {
+			GlobalLogger.getLogger().info("Rollback failed: {}", e.getMessage());
+		}
+	}
+	
+	
+	private ImportHistory saveMoviesWithHistory(List<Movie> movies, String email) {
+		List<Movie> validatedMovies = new ArrayList<>();
+		for (Movie movie : movies) {
+			if (checkUnique(movie, validatedMovies)) {
+				movie.setCreator(userRepository.findByEmail(email).get());
+				validatedMovies.add(movie);
+			} else {
+				throw new RuntimeException("Movie validation failed: " + movie.getName());
+			}
 		}
 		
-		saveMovies(validatedMovies);
-		
+		movieRepository.saveAll(validatedMovies);
 		ImportHistory importHistory = new ImportHistory();
 		importHistory.setUsername(email);
 		importHistory.setStatus(ImportStatus.OK);
 		importHistory.setCountObjects(movies.size());
-		ImportHistory ih = importHistoryRepository.save(importHistory);
-		
-		MinioFiles minioFile = new MinioFiles();
-		minioFile.setHistoryId(importHistory.getId());
-		minioFile.setFileName(importHistory.getId() + ".json");
-		minioFilesRepository.save(minioFile);
-		
-		
-		
-		redisTemplate.opsForValue().set(email, String.valueOf(Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(email))) - 1));
-		
-		notifyClients();
-		
-		if (!errorMessages.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body("{\"message\":\"Some movies were not created due to the following reasons:\", " +
-							"\"errors\": " + errorMessages + "}");
-		}
-		
-		return new ResponseEntity<>(ih, HttpStatus.OK);
+		return importHistoryRepository.save(importHistory);
 	}
 	
-	@PostMapping("/uploadFile/{id}")
-	public ResponseEntity<Object> saveFile(@RequestParam("file") MultipartFile file, @PathVariable long id) {
+	private void saveFileToMinio(MultipartFile file, Long historyId) {
 		try {
-			String filename = id + ".json";
-			saveFileToMinio(file, filename);
-		} catch (MinioException exception) {
-			GlobalLogger.getLogger().info(exception.getMessage());
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
-	private void saveFileToMinio(MultipartFile file, String filename) throws MinioException{
-		try {
-			InputStream inputStream = file.getInputStream();
-			
+			String filename = historyId + ".json";
 			PutObjectArgs putObjectArgs = PutObjectArgs.builder()
 					.bucket("json-bucket")
 					.object(filename)
-					.stream(inputStream, file.getSize(), -1)
+					.stream(file.getInputStream(), file.getSize(), -1)
 					.contentType(file.getContentType())
 					.build();
-			
 			minioClient.putObject(putObjectArgs);
+
+			MinioFiles minioFile = new MinioFiles();
+			minioFile.setHistoryId(historyId);
+			minioFile.setFileName(filename);
+			minioFilesRepository.save(minioFile);
 		} catch (Exception e) {
-			throw new MinioException("Error saving file: " + e.getMessage());
+			throw new RuntimeException("Error saving file: " + e.getMessage());
 		}
 	}
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void saveMovies(List<Movie> validatedMovies) {
-		for (Movie movie : validatedMovies) {
-			movieRepository.save(movie);
-		}
-		movieRepository.flush();
-	}
 	
 	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
 		return checkName(movie, validatedMovies) & checkPeoples(movie);
@@ -239,5 +230,11 @@ public class FileController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@PostConstruct
+	public void init() {
+		objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 	}
 }
