@@ -22,6 +22,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -56,6 +58,8 @@ public class MovieController {
 	
 	@Autowired
 	private TaskScheduler taskScheduler;
+	
+	private final ConcurrentHashMap<Long, ScheduledFuture<?>> deletionTasks = new ConcurrentHashMap<>();
 	
 	@Retryable(
 			value = {CannotAcquireLockException.class},
@@ -108,6 +112,8 @@ public class MovieController {
 		
 		Movie newMovie = movieRepository.save(movie);
 		
+		cancelScheduledDeletion(newMovie.getId());
+		
 		String redisId = String.valueOf(newMovie.getId());
 		String oldValue = redisTemplate.opsForValue().get(redisId);
 		int newValue = 0;
@@ -127,11 +133,21 @@ public class MovieController {
 	}
 	
 	private void scheduleFileDeletion(Long movieId, String email) {
-		taskScheduler.schedule(() -> {
+		ScheduledFuture<?> future = taskScheduler.schedule(() -> {
 					System.out.println("Удаление movie с id: " + movieId);
 					deleteMovie(0, movieId, email);
 				},
-				Instant.now().plus(Duration.ofSeconds(5)));
+				Instant.now().plus(Duration.ofSeconds(6)));
+		deletionTasks.put(movieId, future);
+	}
+	
+	private void cancelScheduledDeletion(Long movieId) {
+		ScheduledFuture<?> future = deletionTasks.remove(movieId);
+		if (future != null && !future.isDone()) {
+			
+			future.cancel(false);
+			System.out.println("Задача удалена: " + movieId);
+		}
 	}
 	
 	private boolean checkUnique(Movie movie) {
@@ -302,6 +318,7 @@ public class MovieController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
+		cancelScheduledDeletion(id);
 		
 		String redisId = String.valueOf(id);
 		String oldValue = redisTemplate.opsForValue().get(redisId);
