@@ -46,18 +46,7 @@ public class GlobalLogger {
 		
 		if (request instanceof ContentCachingRequestWrapper cachingRequest) {
 			String requestBody = new String(cachingRequest.getContentAsByteArray(), cachingRequest.getCharacterEncoding());
-
-//		StringBuilder body = new StringBuilder();
-//		String line;
-//		try (BufferedReader reader = request.getReader()) {
-//			while ((line = reader.readLine()) != null) {
-//				body.append(line);
-//			}
-//		}
-//
-//		String requestBody = body.toString();
-			
-			saveFailedReuest(cachingRequest.getRequestURI(), cachingRequest.getMethod(), requestBody);
+			saveFailedReuest(String.valueOf(cachingRequest.getRequestURL()), cachingRequest.getMethod(), requestBody);
 		}
 		else {
 			System.out.println("не получилось закэшировать");
