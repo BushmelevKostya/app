@@ -57,7 +57,7 @@ public class GlobalLogger {
 //
 //		String requestBody = body.toString();
 			
-			saveFailedReuest(request, ex, requestBody);
+			saveFailedReuest(cachingRequest.getRequestURI(), cachingRequest.getMethod(), requestBody);
 		}
 		else {
 			System.out.println("не получилось закэшировать");
@@ -65,11 +65,8 @@ public class GlobalLogger {
 		System.exit(1);
 	}
 	
-	private void saveFailedReuest(HttpServletRequest request, Exception ex, String body) {
+	private void saveFailedReuest(String url, String method, String body) {
 		System.out.println("Начало сохранения");
-		
-		String url = String.valueOf(request.getRequestURL()).replace("url=", "");
-		String method = request.getMethod();
 		
 		FailedRequest failedRequest = new FailedRequest();
 		failedRequest.setUrl(url);
