@@ -1,19 +1,23 @@
 package itmo.app.filter;
 
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 
-public class RequestCacherFilter implements Filter {
+@Component
+public class RequestCacherFilter extends OncePerRequestFilter {
+	
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
-		if (request instanceof HttpServletRequest httpServletRequest) {
-			ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpServletRequest);
-			chain.doFilter(wrappedRequest, response);
-		} else {
-			chain.doFilter(request, response);
-		}
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
+		filterChain.doFilter(wrappedRequest, response);
 	}
 }
+

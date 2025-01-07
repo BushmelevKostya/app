@@ -11,7 +11,7 @@ public class FailedRequest {
 	private Long id;
 	private String url;
 	private String method;
-	@Lob
+	@Column(columnDefinition = "character varying(100000)")
 	private String body;
 	private LocalDateTime createdAt;
 	

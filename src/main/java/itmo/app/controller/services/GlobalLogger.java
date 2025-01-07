@@ -17,7 +17,9 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +47,12 @@ public class GlobalLogger {
 		logger.error("error occured: {}", ex.getMessage(), ex);
 		
 		if (request instanceof ContentCachingRequestWrapper cachingRequest) {
-			String requestBody = new String(cachingRequest.getContentAsByteArray(), cachingRequest.getCharacterEncoding());
+			byte[] content = cachingRequest.getContentAsByteArray();
+			System.out.println("Тело запроса (в байтах): " + Arrays.toString(content));
+			
+			String requestBody = new String(content, StandardCharsets.UTF_8);
+			System.out.println(requestBody);
+			
 			saveFailedReuest(String.valueOf(cachingRequest.getRequestURL()), cachingRequest.getMethod(), requestBody);
 		}
 		else {
