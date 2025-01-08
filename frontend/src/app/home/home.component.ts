@@ -594,6 +594,9 @@ export class HomeComponent implements OnInit {
       .subscribe((data: any[]) => {
         this.uniqueUsaBoxOffices = data
         this.isLoading = false;
+      },
+      (error) => {
+        this.isLoading = false;
       });
   }
 
