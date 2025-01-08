@@ -5,6 +5,9 @@ import itmo.app.model.repository.FailedRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,7 +34,10 @@ public class FailedRequestProcessor {
 			System.out.println("восстанавливаем реквест");
 			try {
 				if ("POST".equalsIgnoreCase(request.getMethod())) {
-					restTemplate.postForEntity(request.getUrl(), request.getBody(), String.class);
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.APPLICATION_JSON);
+					HttpEntity<String> entity = new HttpEntity<>(request.getBody(), headers);
+					restTemplate.postForEntity(request.getUrl(), entity, String.class);
 				} else if ("GET".equalsIgnoreCase(request.getMethod())) {
 					restTemplate.getForEntity(request.getUrl(), String.class);
 				}

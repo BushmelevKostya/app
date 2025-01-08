@@ -58,7 +58,7 @@ public class MovieController {
 	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	@PostMapping("/action/{email}")
 	public ResponseEntity<Object> createMovie(@RequestBody @Valid Movie movie, @PathVariable String email) throws Exception {
-		if (true) throw new Exception("Example exception");
+//		if (true) throw new Exception("Example exception");
 		if (!checkUnique(movie)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("{\"message\":\"Please check unique constraint: " +
