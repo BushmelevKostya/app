@@ -43,26 +43,24 @@ public class GlobalLogger {
 	
 	@ExceptionHandler(Exception.class)
 	public void handleAllException(Exception ex, HttpServletRequest request) throws IOException {
-		System.out.println("пробуем сохранить");
+		logger.info("пробуем сохранить запрос");
 		logger.error("error occured: {}", ex.getMessage(), ex);
 		
 		if (request instanceof ContentCachingRequestWrapper cachingRequest) {
 			byte[] content = cachingRequest.getContentAsByteArray();
-			System.out.println("Тело запроса (в байтах): " + Arrays.toString(content));
 			
 			String requestBody = new String(content, StandardCharsets.UTF_8);
-			System.out.println(requestBody);
 			
 			saveFailedReuest(String.valueOf(cachingRequest.getRequestURL()), cachingRequest.getMethod(), requestBody);
 		}
 		else {
-			System.out.println("не получилось закэшировать");
+			logger.info("не получилось закэшировать");
 		}
 		System.exit(1);
 	}
 	
 	private void saveFailedReuest(String url, String method, String body) {
-		System.out.println("Начало сохранения");
+		logger.info("Сохраняем запрос");
 		
 		FailedRequest failedRequest = new FailedRequest();
 		failedRequest.setUrl(url);
@@ -71,7 +69,7 @@ public class GlobalLogger {
 		failedRequest.setBody(body);
 		
 		failedRequestRepository.save(failedRequest);
-		System.out.println("Конец сохранения");
+		logger.info("Запрос сохранен");
 	}
 	
 	public static Logger getLogger() {

@@ -11,6 +11,7 @@ import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -80,14 +81,16 @@ public class FileController {
 			@RequestParam("movies") String moviesJson,
 			@PathVariable String email) {
 		ImportHistory importHistory = null;
+		Logger logger = GlobalLogger.getLogger();
 		try {
 			List<Movie> movies = objectMapper.readValue(moviesJson, new TypeReference<>() {
 			});
-			
+			logger.info("Начало транзакции");
 			importHistory = saveMoviesWithHistory(movies, email);
-			
+			logger.info("Сохранили фильмы");
+//			if (true) throw new Exception("Example exception");
 			saveFileToMinio(file, importHistory.getId());
-			
+			logger.info("Сохранили файл");
 			notifyClients();
 			return ResponseEntity.ok(importHistory);
 		} catch (Exception e) {
@@ -100,12 +103,14 @@ public class FileController {
 	}
 	
 	private void rollbackTransaction(String email, Long historyId) {
+		Logger logger = GlobalLogger.getLogger();
 		try {
+			logger.info("начинается ролбэк");
 			if (historyId != null) {
 				importHistoryRepository.deleteById(historyId);
 				minioFilesRepository.deleteByHistoryId(historyId);
 			}
-			
+			logger.info("ролбэк успешен");
 			redisTemplate.opsForValue().increment(email, 1);
 		} catch (Exception e) {
 			GlobalLogger.getLogger().info("Rollback failed: {}", e.getMessage());

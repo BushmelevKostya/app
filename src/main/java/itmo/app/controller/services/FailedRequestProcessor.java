@@ -2,6 +2,7 @@ package itmo.app.controller.services;
 
 import itmo.app.model.entity.FailedRequest;
 import itmo.app.model.repository.FailedRequestRepository;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -28,10 +29,11 @@ public class FailedRequestProcessor {
 	
 	@EventListener(ApplicationReadyEvent.class)
 	public void processFailedRequest() {
-		System.out.println("пробуем восстановить реквесты");
+		Logger logger = GlobalLogger.getLogger();
+		logger.info("пробуем восстановить реквесты");
 		List<FailedRequest> failedRequest = failedRequestRepository.findAll();
 		for (FailedRequest request: failedRequest) {
-			System.out.println("восстанавливаем реквест");
+			logger.info("восстанавливаем реквест");
 			try {
 				if ("POST".equalsIgnoreCase(request.getMethod())) {
 					HttpHeaders headers = new HttpHeaders();
