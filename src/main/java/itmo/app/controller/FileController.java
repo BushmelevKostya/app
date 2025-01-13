@@ -3,9 +3,9 @@ package itmo.app.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.minio.*;
+import io.minio.messages.Item;
 import itmo.app.controller.services.GlobalLogger;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.model.entity.*;
@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +31,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -67,79 +70,69 @@ public class FileController {
 	@Autowired
 	private MinioFilesRepository minioFilesRepository;
 	
-	@Autowired ObjectMapper objectMapper;
+	@Autowired
+	ObjectMapper objectMapper;
 	
-	@Retryable(
-			value = {CannotAcquireLockException.class},
-			maxAttempts = 5,
-			backoff = @Backoff(delay = 4000)
-	)
+	Logger logger = GlobalLogger.getLogger();
+	
+//	@Retryable(
+//			value = {CannotAcquireLockException.class},
+//			maxAttempts = 5,
+//			backoff = @Backoff(delay = 4000)
+//	)
 	@PostMapping("/uploadTransaction/{email}")
-	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
+//	@Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public ResponseEntity<Object> uploadTransaction(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("movies") String moviesJson,
 			@PathVariable String email) {
-		ImportHistory importHistory = null;
-		Logger logger = GlobalLogger.getLogger();
+		String currentTime = String.valueOf(LocalDateTime.now());
+		logger.info("Начало транзакции");
+		List<Movie> movies = new ArrayList<>();
+		String filename = currentTime + "_" + "temp" + ".json";
+		
 		try {
-			List<Movie> movies = objectMapper.readValue(moviesJson, new TypeReference<>() {
+			movies = objectMapper.readValue(moviesJson, new TypeReference<>() {
 			});
-			logger.info("Начало транзакции");
-			importHistory = saveMoviesWithHistory(movies, email);
-			logger.info("Сохранили фильмы");
-//			if (true) throw new Exception("Example exception");
-			saveFileToMinio(file, importHistory.getId());
-			logger.info("Сохранили файл");
-			notifyClients();
-			return ResponseEntity.ok(importHistory);
+			
+			saveFileToMinio(file, filename);
+			
+			saveMoviesToDatabase(movies, email);
+			
 		} catch (Exception e) {
 			GlobalLogger.getLogger().info(e.getMessage());
-			if (importHistory != null) {
-				rollbackTransaction(email, importHistory.getId());
-			}
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Transaction failed: " + e.getMessage());
+		} finally {
+			ImportHistory importHistory = finalizeImportHistoryAndMinioFile(movies, email, filename);
+			notifyClients();
+			logger.info("Конец транзакции");
+			return ResponseEntity.ok(importHistory);
 		}
 	}
+
 	
-	private void rollbackTransaction(String email, Long historyId) {
-		Logger logger = GlobalLogger.getLogger();
+	private void saveMoviesToDatabase(List<Movie> movies, String email) {
 		try {
-			logger.info("начинается ролбэк");
-			if (historyId != null) {
-				importHistoryRepository.deleteById(historyId);
-				minioFilesRepository.deleteByHistoryId(historyId);
+			List<Movie> validatedMovies = new ArrayList<>();
+			
+			for (Movie movie : movies) {
+				if (checkUnique(movie, validatedMovies)) {
+					movie.setCreator(userRepository.findByEmail(email).get());
+					validatedMovies.add(movie);
+				} else {
+					throw new RuntimeException("Movie validation failed: " + movie.getName());
+				}
 			}
-			logger.info("ролбэк успешен");
-			redisTemplate.opsForValue().increment(email, 1);
+			
+			movieRepository.saveAll(validatedMovies);
+			logger.info("фильмы сохранены в бд");
 		} catch (Exception e) {
-			GlobalLogger.getLogger().info("Rollback failed: {}", e.getMessage());
+			throw new RuntimeException("Movie validation failed: " + e.getMessage());
 		}
 	}
 	
-	
-	private ImportHistory saveMoviesWithHistory(List<Movie> movies, String email) {
-		List<Movie> validatedMovies = new ArrayList<>();
-		for (Movie movie : movies) {
-			if (checkUnique(movie, validatedMovies)) {
-				movie.setCreator(userRepository.findByEmail(email).get());
-				validatedMovies.add(movie);
-			} else {
-				throw new RuntimeException("Movie validation failed: " + movie.getName());
-			}
-		}
-		
-		movieRepository.saveAll(validatedMovies);
-		ImportHistory importHistory = new ImportHistory();
-		importHistory.setUsername(email);
-		importHistory.setStatus(ImportStatus.OK);
-		importHistory.setCountObjects(movies.size());
-		return importHistoryRepository.save(importHistory);
-	}
-	
-	private void saveFileToMinio(MultipartFile file, Long historyId) {
+	private void saveFileToMinio(MultipartFile file, String filename) {
 		try {
-			String filename = historyId + ".json";
 			PutObjectArgs putObjectArgs = PutObjectArgs.builder()
 					.bucket("json-bucket")
 					.object(filename)
@@ -147,16 +140,71 @@ public class FileController {
 					.contentType(file.getContentType())
 					.build();
 			minioClient.putObject(putObjectArgs);
-
-			MinioFiles minioFile = new MinioFiles();
-			minioFile.setHistoryId(historyId);
-			minioFile.setFileName(filename);
-			minioFilesRepository.save(minioFile);
+			logger.info("файл сохранен в minio");
 		} catch (Exception e) {
 			throw new RuntimeException("Error saving file: " + e.getMessage());
 		}
 	}
 	
+	private ImportHistory finalizeImportHistoryAndMinioFile(List<Movie> movies, String email, String filename) {
+		ImportHistory importHistory = new ImportHistory();
+		importHistory.setUsername(email);
+		importHistory.setStatus(ImportStatus.OK);
+		importHistory.setCountObjects(movies.size());
+		importHistory = importHistoryRepository.save(importHistory);
+		
+		MinioFiles minioFile = new MinioFiles();
+		minioFile.setHistoryId(importHistory.getId());
+		minioFile.setFileName(filename);
+		minioFilesRepository.save(minioFile);
+		logger.info("importHistory и minioFile сохранены в бд");
+		return importHistory;
+	}
+	
+	@Scheduled(fixedRate = 60000)
+	private void synchronizeMinioAndDatabase() {
+		try {
+			List<MinioFiles> databaseFiles = minioFilesRepository.findAll();
+			List<String> databaseFileNames = new ArrayList<>();
+			for (MinioFiles file : databaseFiles) {
+				databaseFileNames.add(file.getFileName());
+			}
+			
+			Iterable<Result<Item>> minioObjects = minioClient.listObjects(
+					ListObjectsArgs.builder().bucket("json-bucket").build()
+			);
+			
+			List<String> minioFileNames = new ArrayList<>();
+			for (Result<Item> result : minioObjects) {
+				Item item = result.get();
+				minioFileNames.add(item.objectName());
+			}
+			
+			List<String> filesToDeleteFromDb = new ArrayList<>(databaseFileNames);
+			filesToDeleteFromDb.removeAll(minioFileNames);
+			
+			List<String> filesToDeleteFromMinio = new ArrayList<>(minioFileNames);
+			filesToDeleteFromMinio.removeAll(databaseFileNames);
+			
+			for (String fileName : filesToDeleteFromDb) {
+				MinioFiles file = minioFilesRepository.findByFileName(fileName);
+				if (file != null) {
+					minioFilesRepository.delete(file);
+					logger.info("Файл {} удален из базы данных", fileName);
+				}
+			}
+			for (String fileName : filesToDeleteFromMinio) {
+				minioClient.removeObject(
+						RemoveObjectArgs.builder().bucket("json-bucket").object(fileName).build()
+				);
+				logger.info("Файл {} удален из Minio", fileName);
+			}
+			
+			logger.info("Синхронизация Minio и базы данных завершена");
+		} catch (Exception e) {
+			logger.error("Ошибка во время синхронизации Minio и базы данных: {}", e.getMessage());
+		}
+	}
 	
 	private boolean checkUnique(Movie movie, List<Movie> validatedMovies) {
 		return checkName(movie, validatedMovies) & checkPeoples(movie);
@@ -239,7 +287,7 @@ public class FileController {
 	
 	@PostConstruct
 	public void init() {
-		objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+		objectMapper.registerModule(new JavaTimeModule());
 		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 	}
 }
