@@ -29,24 +29,25 @@ public class FailedRequestProcessor {
 	
 	@EventListener(ApplicationReadyEvent.class)
 	public void processFailedRequest() {
-		Logger logger = GlobalLogger.getLogger();
-		logger.info("пробуем восстановить реквесты");
-		List<FailedRequest> failedRequest = failedRequestRepository.findAll();
-		for (FailedRequest request: failedRequest) {
-			logger.info("восстанавливаем реквест");
-			try {
-				if ("POST".equalsIgnoreCase(request.getMethod())) {
-					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.APPLICATION_JSON);
-					HttpEntity<String> entity = new HttpEntity<>(request.getBody(), headers);
-					restTemplate.postForEntity(request.getUrl(), entity, String.class);
-				} else if ("GET".equalsIgnoreCase(request.getMethod())) {
-					restTemplate.getForEntity(request.getUrl(), String.class);
-				}
-				failedRequestRepository.delete(request);
-			} catch (Exception e) {
-				System.err.println("Ошибка при обработке повторного запроса" + e.getMessage());
-			}
-		}
+		return;
+//		Logger logger = GlobalLogger.getLogger();
+//		logger.info("пробуем восстановить реквесты");
+//		List<FailedRequest> failedRequest = failedRequestRepository.findAll();
+//		for (FailedRequest request: failedRequest) {
+//			logger.info("восстанавливаем реквест");
+//			try {
+//				if ("POST".equalsIgnoreCase(request.getMethod())) {
+//					HttpHeaders headers = new HttpHeaders();
+//					headers.setContentType(MediaType.APPLICATION_JSON);
+//					HttpEntity<String> entity = new HttpEntity<>(request.getBody(), headers);
+//					restTemplate.postForEntity(request.getUrl(), entity, String.class);
+//				} else if ("GET".equalsIgnoreCase(request.getMethod())) {
+//					restTemplate.getForEntity(request.getUrl(), String.class);
+//				}
+//				failedRequestRepository.delete(request);
+//			} catch (Exception e) {
+//				System.err.println("Ошибка при обработке повторного запроса" + e.getMessage());
+//			}
+//		}
 	}
 }

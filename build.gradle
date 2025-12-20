@@ -17,8 +17,17 @@ node {
 }
 
 task npmBuild(type: NpmTask) {
+    def distDir = file('frontend/dist')
+    inputs.dir('frontend/src')
+    inputs.file('frontend/angular.json')
+    inputs.file('frontend/package.json')
+    inputs.file('frontend/tsconfig.json')
+    outputs.dir(distDir)
+
     args = ['run', 'build']
     workingDir = file('frontend')
+
+     onlyIf { !distDir.exists() }
 }
 
 processResources.dependsOn npmBuild

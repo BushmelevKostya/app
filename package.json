@@ -1,5 +1,19 @@
 {
   "dependencies": {
-    "@stomp/stompjs": "^7.0.0"
+    "@angular/common": "^19.2.17",
+    "@angular/compiler": "^19.2.17",
+    "@angular/core": "^19.2.17",
+    "@angular/forms": "^19.2.17",
+    "@angular/localize": "^19.2.17",
+    "@angular/platform-browser": "^19.2.17",
+    "@angular/router": "^19.2.17",
+    "@stomp/stompjs": "^7.0.0",
+    "crypto-js": "^4.2.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.19",
+    "@angular/compiler-cli": "^19.2.17",
+    "@types/crypto-js": "^4.2.2",
+    "typescript": "^5.8.3"
   }
 }
