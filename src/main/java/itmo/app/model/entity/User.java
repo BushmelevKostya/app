@@ -2,13 +2,19 @@ package itmo.app.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Table(name = "movie_users")
 @Entity
-public class User {
+public class User implements UserDetails {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,5 +105,48 @@ public class User {
 	
 	public void setAdminLogin(boolean adminLogin) {
 		isAdminLogin = adminLogin;
+	}
+	
+	// UserDetails implementation
+	
+	@Override
+	@JsonIgnore
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		if (isAdmin && isApprovedAdmin) {
+			authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		}
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		return authorities;
+	}
+	
+	@Override
+	@JsonIgnore
+	public String getUsername() {
+		return email;
+	}
+	
+	@Override
+	@JsonIgnore
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+	
+	@Override
+	@JsonIgnore
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+	
+	@Override
+	@JsonIgnore
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+	
+	@Override
+	@JsonIgnore
+	public boolean isEnabled() {
+		return true;
 	}
 }
