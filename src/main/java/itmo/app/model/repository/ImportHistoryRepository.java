@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ImportHistoryRepository extends JpaRepository<ImportHistory, Long> {
 	Optional<List<ImportHistory>> findAllByUsername(String username);
+	
+	List<ImportHistory> findByImportedBy(User user);
 }
