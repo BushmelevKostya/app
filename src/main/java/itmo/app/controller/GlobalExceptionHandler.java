@@ -4,6 +4,7 @@ import itmo.app.dto.response.ErrorResponse;
 import itmo.app.exception.BusinessException;
 import itmo.app.exception.ResourceNotFoundException;
 import itmo.app.exception.UnauthorizedException;
+import itmo.app.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,19 @@ public class GlobalExceptionHandler {
 		ErrorResponse error = new ErrorResponse(
 				HttpStatus.BAD_REQUEST.value(),
 				"Bad Request",
+				ex.getMessage(),
+				request.getRequestURI()
+		);
+		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(ValidationException.class)
+	public ResponseEntity<ErrorResponse> handleValidationException(
+			ValidationException ex, HttpServletRequest request) {
+		logger.error("Validation exception: {}", ex.getMessage());
+		ErrorResponse error = new ErrorResponse(
+				HttpStatus.BAD_REQUEST.value(),
+				"Validation Error",
 				ex.getMessage(),
 				request.getRequestURI()
 		);

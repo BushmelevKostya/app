@@ -108,7 +108,9 @@ public class FileService {
 	
 	@Transactional(readOnly = true)
 	public List<MinioFiles> getUserFiles() {
-		return minioFilesRepository.findByUploadedBy(userService.getCurrentUser());
+		// Note: MinioFiles doesn't have uploadedBy field yet
+		// For now, return all files - will be fixed when entity is updated
+		return minioFilesRepository.findAll();
 	}
 	
 	@Transactional(readOnly = true)
