@@ -458,86 +458,101 @@ _Последнее обновление: 22 декабря 2025 г._
 
 ---
 
-## Этап 1.3: CORS Configuration ✅
+## Этап 1.5: Unit-тесты для сервисного слоя ✅
 
 ### Цель
-Настроить глобальную CORS политику для работы frontend/backend
+Написать unit-тесты для критической бизнес-логики с использованием Mockito
 
-### Выполненные изменения
+### Созданные файлы
 
-**Файл:** [SecurityConfig.java](src/main/java/itmo/app/security/SecurityConfig.java)
+**Тесты сервисов:**
+- [UserServiceTest.java](src/test/java/itmo/app/service/UserServiceTest.java) - 12 тестов
+- [AuthenticationServiceTest.java](src/test/java/itmo/app/service/AuthenticationServiceTest.java) - 9 тестов
+- [MovieServiceTest.java](src/test/java/itmo/app/service/MovieServiceTest.java) - 4 теста
+- [NotificationServiceTest.java](src/test/java/itmo/app/service/NotificationServiceTest.java) - 9 тестов
+- [FileServiceTest.java](src/test/java/itmo/app/service/FileServiceTest.java) - 7 тестов
+- [ImportServiceTest.java](src/test/java/itmo/app/service/ImportServiceTest.java) - 8 тестов
 
-Добавлена конфигурация CORS в SecurityFilterChain:
-- Разрешены все origins (для development)
-- Разрешены методы: GET, POST, PUT, DELETE, OPTIONS
-- Разрешены все headers
-- Включен allowCredentials для работы с cookie/session
+### Покрытие
 
-**Статус:** CORS уже был настроен в рамках этапа 1.1, дополнительных изменений не требуется.
+**UserServiceTest** (12 тестов):
+- ✅ getCurrentUser - успешное получение и обработка отсутствия
+- ✅ getUserByEmail - валидация email
+- ✅ getUserById - поиск по ID
+- ✅ getAllUsers - пагинация
+- ✅ existsByEmail / isEmailAvailable - проверка доступности email
+
+**AuthenticationServiceTest** (9 тестов):
+- ✅ register - регистрация обычного пользователя
+- ✅ register - первый админ (auto-approve)
+- ✅ register - последующие админы (требуют одобрения)
+- ✅ register - проверка дубликатов email
+- ✅ login - успешный вход
+- ✅ login - невалидные креденшиалы
+- ✅ login - проверка прав админа
+
+**MovieServiceTest** (4 теста):
+- ✅ getMoviesCount - подсчет фильмов
+- ✅ getMovieById - получение по ID с обработкой ошибок
+- ✅ getMovies - пагинированный список
+
+**NotificationServiceTest** (9 тестов):
+- ✅ getPendingNotifications - список ожидающих уведомлений
+- ✅ approveAdminRequest - одобрение запроса админа
+- ✅ rejectAdminRequest - отклонение запроса
+- ✅ Проверка прав доступа (только approved admin)
+
+**FileServiceTest** (7 тестов):
+- ✅ uploadFile - загрузка в MinIO
+- ✅ uploadFile - создание bucket если не существует
+- ✅ downloadFile - скачивание файла
+- ✅ deleteFile - удаление файла
+- ✅ Обработка ошибок MinIO
+
+**ImportServiceTest** (8 тестов):
+- ✅ createImportHistory - создание записи импорта
+- ✅ updateImportStatus - обновление статуса
+- ✅ getImportHistory - получение истории пользователя
+- ✅ getAllImportHistory - получение всей истории
+- ✅ getImportHistoryById - поиск по ID
+
+### Результаты
+- **Всего тестов:** 49
+- **Успешно:** 49 ✅
+- **Провалено:** 0
+- **Технологии:** JUnit 5, Mockito, MockitoExtension
+
+### Используемые техники
+- `@Mock` - создание mock-объектов для зависимостей
+- `@InjectMocks` - автоматическое внедрение моков
+- `when().thenReturn()` - настройка поведения моков
+- `verify()` - проверка вызовов методов
+- `assertThrows()` - проверка выброса исключений
+- SecurityContext mocking - тестирование аутентификации
 
 ---
 
-## Этап 1.4: Улучшение обработки ошибок ✅
+## Этап 1: Завершен ✅
 
-### Цель
-Создать единую централизованную систему обработки ошибок с @RestControllerAdvice
+Все подэтапы архитектурного рефакторинга успешно выполнены:
+- ✅ 1.1 Spring Security + JWT
+- ✅ 1.2 Layered Architecture
+- ✅ 1.3 CORS Configuration
+- ✅ 1.4 Error Handling
+- ✅ 1.5 Unit Tests
 
-### Выполненные изменения
-
-#### 1. Создана иерархия исключений
-
-**Файлы:**
-- [BusinessException.java](src/main/java/itmo/app/exception/BusinessException.java) - базовое исключение для бизнес-логики
-- [ResourceNotFoundException.java](src/main/java/itmo/app/exception/ResourceNotFoundException.java) - ресурс не найден (404)
-- [UnauthorizedException.java](src/main/java/itmo/app/exception/UnauthorizedException.java) - ошибка авторизации (401)
-- [ValidationException.java](src/main/java/itmo/app/exception/ValidationException.java) - ошибка валидации (400)
-
-#### 2. Создан глобальный обработчик исключений
-
-**Файл:** [GlobalExceptionHandler.java](src/main/java/itmo/app/exception/GlobalExceptionHandler.java)
-
-Реализованы обработчики для:
-- `ResourceNotFoundException` → 404 NOT_FOUND
-- `UnauthorizedException` → 401 UNAUTHORIZED
-- `BusinessException` → 400 BAD_REQUEST
-- `ValidationException` → 400 BAD_REQUEST
-- `MethodArgumentNotValidException` → 400 BAD_REQUEST (с детализацией ошибок полей)
-- `BadCredentialsException` → 401 UNAUTHORIZED
-- `AccessDeniedException` → 403 FORBIDDEN
-- `Exception` (fallback) → 500 INTERNAL_SERVER_ERROR
-
-#### 3. Стандартизированный формат ответов
-
-**Файл:** [ErrorResponse.java](src/main/java/itmo/app/dto/response/ErrorResponse.java)
-
-Структура ответа:
-```json
-{
-  "status": 400,
-  "error": "Validation Error",
-  "message": "Описание ошибки",
-  "path": "/api/endpoint",
-  "timestamp": "2025-12-22T10:30:00"
-}
-```
-
-### Результаты
-✅ Все REST endpoints теперь возвращают единообразные ошибки  
-✅ Логирование всех исключений через SLF4J  
-✅ Детальная информация для валидационных ошибок  
-✅ Безопасная обработка чувствительных данных (пароли не попадают в логи)
+**Следующий этап:** Этап 2 - Рефакторинг базы данных
 
 ---
 
 ## Следующие шаги
 
-### Этап 1.5: Unit-тесты для сервисного слоя
-- [ ] Написать тесты для UserService (Mockito)
-- [ ] Написать тесты для MovieService
-- [ ] Написать тесты для NotificationService
-- [ ] Написать тесты для FileService
-- [ ] Написать тесты для ImportService
-- [ ] Написать тесты для AuthenticationService
+### Этап 2: Рефакторинг базы данных
+- [ ] Внедрить Flyway/Liquibase для миграций
+- [ ] Провести аудит и оптимизацию схемы БД
+- [ ] Добавить индексы для часто используемых запросов
+- [ ] Нормализовать данные (проверка 3NF)
+- [ ] Добавить аудит полей (created_at, updated_at)
 
 ### Будущие улучшения (Stage 2+)
 - [ ] Обновить frontend для работы с JWT (Interceptor)
