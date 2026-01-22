@@ -154,7 +154,7 @@ public class FileController {
 		importHistory = importHistoryRepository.save(importHistory);
 		
 		MinioFiles minioFile = new MinioFiles();
-		minioFile.setHistoryId(importHistory.getId());
+		minioFile.setImportHistory(importHistory);
 		minioFile.setFileName(filename);
 		minioFilesRepository.save(minioFile);
 		logger.info("importHistory и minioFile сохранены в бд");

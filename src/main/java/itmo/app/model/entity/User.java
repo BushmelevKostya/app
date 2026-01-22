@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Table(name = "movie_users")
 @Entity
-public class User implements UserDetails {
+public class User extends Auditable implements UserDetails {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +27,19 @@ public class User implements UserDetails {
 //	@OneToMany(mappedBy = "user")
 //	private Set<MovieChange> changes = new HashSet<>();
 	
+	@Column(unique = true, nullable = false, length = 255)
 	private String email;
+	
+	@Column(nullable = false, length = 255)
 	private String password;
+	
+	@Column(nullable = false)
 	private boolean isAdminLogin;
+	
+	@Column(nullable = false)
 	private boolean isAdmin;
+	
+	@Column(nullable = false)
 	private boolean isApprovedAdmin;
 	
 	public User() {

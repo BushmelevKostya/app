@@ -1,17 +1,21 @@
 package itmo.app.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
-public class Notification {
+@Table(name = "notifications", indexes = {
+	@Index(name = "idx_notification_email", columnList = "user_email"),
+	@Index(name = "idx_notification_approved", columnList = "is_approved")
+})
+public class Notification extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(name = "user_email", nullable = false, length = 255)
 	private String userEmail;
+	
+	@Column(name = "is_approved", nullable = false)
 	private boolean isApproved = false;
 	
 	public Long getId() {

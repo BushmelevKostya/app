@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "coordinates")
+@Table(name = "coordinates", indexes = {
+	@Index(name = "idx_coordinates_xy", columnList = "x, y")
+})
 public class Coordinates {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
 	@NotNull
 	@Column(nullable = false)
@@ -18,11 +20,11 @@ public class Coordinates {
 	@Column(nullable = false)
 	private int y;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	

@@ -9,23 +9,36 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "movies")
-public class Movie {
+@Table(name = "movies", indexes = {
+	@Index(name = "idx_movie_name", columnList = "name"),
+	@Index(name = "idx_movie_creation_date", columnList = "creation_date"),
+	@Index(name = "idx_movie_mpaa_rating", columnList = "mpaa_rating"),
+	@Index(name = "idx_movie_genre", columnList = "genre"),
+	@Index(name = "idx_movie_creator", columnList = "creator_id")
+})
+public class Movie extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "creator_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "creator_id", 
+		nullable = false,
+		foreignKey = @ForeignKey(name = "fk_movie_creator")
+	)
 	private User creator;
 	
 	@NotNull
-	@Size(min = 1)
-	@Column(nullable = false)
+	@Size(min = 1, max = 500)
+	@Column(nullable = false, length = 500)
 	private String name;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "coordinates_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "coordinates_id",
+		foreignKey = @ForeignKey(name = "fk_movie_coordinates")
+	)
 	private Coordinates coordinates;
 	
 	@NotNull
@@ -52,16 +65,25 @@ public class Movie {
 	@Column(nullable = false)
 	private MpaaRating mpaaRating;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "person_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "person_id",
+		foreignKey = @ForeignKey(name = "fk_movie_director")
+	)
 	private Person director;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "screenwriter_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "screenwriter_id",
+		foreignKey = @ForeignKey(name = "fk_movie_screenwriter")
+	)
 	private Person screenwriter;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "operator_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "operator_id",
+		foreignKey = @ForeignKey(name = "fk_movie_operator")
+	)
 	private Person operator;
 	
 	@NotNull
@@ -78,18 +100,18 @@ public class Movie {
 	private Double usaBoxOffice;
 	
 	@NotNull
-	@Column(nullable = false)
+	@Column(nullable = false, length = 1000)
 	private String tagline;
 	
 	@Enumerated(EnumType.STRING)
-	@Column
+	@Column(length = 50)
 	private MovieGenre genre;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
