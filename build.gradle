@@ -3,6 +3,9 @@ plugins {
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
     id "com.github.node-gradle.node" version "3.5.1"
+    id 'jacoco'
+    id 'com.github.spotbugs' version '6.0.26'
+    id 'org.owasp.dependencycheck' version '10.0.4'
 }
 
 bootJar {
@@ -87,4 +90,71 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+// JaCoCo configuration
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/config/**',
+                '**/dto/**',
+                '**/entity/**',
+                '**/*Application.class'
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.60
+            }
+        }
+    }
+}
+
+// SpotBugs configuration
+spotbugs {
+    ignoreFailures = true
+    showProgress = true
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+    reports {
+        html {
+            required = true
+        }
+        xml {
+            required = false
+        }
+    }
+}
+
+// OWASP Dependency Check configuration
+dependencyCheck {
+    formats = ['HTML', 'JSON']
+    failBuildOnCVSS = 7
+    suppressionFile = file('dependency-check-suppressions.xml').exists() ? 
+        'dependency-check-suppressions.xml' : null
+    analyzers {
+        assemblyEnabled = false
+        nuspecEnabled = false
+        nodeEnabled = false
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification

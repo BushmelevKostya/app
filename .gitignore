@@ -39,3 +39,12 @@ out/
 src/main/resources/env.properties
 
 node_modules
+
+### CI/CD Reports ###
+build/reports/
+dependency-check-data/
+.dependency-check/
+
+### Security ###
+*.sarif
+trivy-results.sarif
