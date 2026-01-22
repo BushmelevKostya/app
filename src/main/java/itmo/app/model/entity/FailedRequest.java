@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class FailedRequest {
+public class FailedRequest extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -13,7 +13,6 @@ public class FailedRequest {
 	private String method;
 	@Column(columnDefinition = "character varying(100000)")
 	private String body;
-	private LocalDateTime createdAt;
 	
 	public Long getId() {
 		return id;
@@ -45,13 +44,5 @@ public class FailedRequest {
 	
 	public void setBody(String body) {
 		this.body = body;
-	}
-	
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-	
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
 	}
 }

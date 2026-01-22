@@ -6,43 +6,51 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "persons")
+@Table(name = "persons", indexes = {
+	@Index(name = "idx_person_name", columnList = "PersonName")
+})
 public class Person {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
 	@NotNull
-	@Size(min = 1)
-	@Column(name = "PersonName", nullable = false)
+	@Size(min = 1, max = 255)
+	@Column(name = "PersonName", nullable = false, length = 255)
 	private String name;
 	
 	@NotNull
-	@Column(name = "PersonEyeColor", nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(name = "PersonEyeColor", nullable = false, length = 50)
 	private Color eyeColor;
 	
 	@NotNull
-	@Column(name = "PersonHairColor", nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(name = "PersonHairColor", nullable = false, length = 50)
 	private Color hairColor;
 	
-	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinColumn(name = "location_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(
+		name = "location_id",
+		foreignKey = @ForeignKey(name = "fk_person_location")
+	)
 	private Location location;
 	
 	@NotNull
 	@Min(1)
-	@Column
+	@Column(nullable = false)
 	private float height;
 	
+	@NotNull
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, length = 50)
 	private Country nationality;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	

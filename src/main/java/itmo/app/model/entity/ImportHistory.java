@@ -4,18 +4,25 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-public class ImportHistory {
+@Table(name = "import_history", indexes = {
+	@Index(name = "idx_import_username", columnList = "username"),
+	@Index(name = "idx_import_status", columnList = "status")
+})
+public class ImportHistory extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 50)
 	private ImportStatus status;
 	
 	@NotNull
+	@Column(nullable = false, length = 255)
 	private String username;
 	
+	@Column(nullable = false)
 	private int countObjects;
 	
 	public Long getId() {

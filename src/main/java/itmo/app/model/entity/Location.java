@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 public class Location {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
 	@NotNull
 	@Column(name = "LocationX", nullable = false)
@@ -19,16 +19,18 @@ public class Location {
 	private Double y;
 	
 	@NotNull
+	@Column(nullable = false)
 	private float z;
 	
-	@Column(name = "LocationName", nullable = false)
+	@NotNull
+	@Column(name = "LocationName", nullable = false, length = 255)
 	private String name;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	
