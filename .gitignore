@@ -36,8 +36,15 @@ out/
 ### VS Code ###
 .vscode/
 
+### Environment Variables ###
+.env
+.env.local
+.env.*.local
 src/main/resources/env.properties
+# Keep .env.example in version control
+!.env.example
 
+### Node.js ###
 node_modules
 
 ### CI/CD Reports ###
