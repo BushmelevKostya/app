@@ -10,6 +10,9 @@ import itmo.app.model.entity.*;
 import itmo.app.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.AccessDeniedException;
@@ -83,16 +86,17 @@ public class MovieService {
 	
 	@Transactional(readOnly = true)
 	public PageResponse<MovieResponse> getMovies(int start, int size) {
-		List<Movie> allMovies = movieRepository.findAll();
-		long totalElements = allMovies.size();
+		// Оптимизированная пагинация с EntityGraph для предотвращения N+1
+		int page = start / size;
+		Pageable pageable = PageRequest.of(page, size);
 		
-		int end = Math.min(start + size, allMovies.size());
-		List<MovieResponse> content = allMovies.subList(start, end).stream()
+		Page<Movie> moviePage = movieRepository.findAllWithDetails(pageable);
+		
+		List<MovieResponse> content = moviePage.getContent().stream()
 				.map(MovieResponse::new)
 				.collect(Collectors.toList());
 		
-		int page = start / size;
-		return new PageResponse<>(content, page, size, totalElements);
+		return new PageResponse<>(content, page, size, moviePage.getTotalElements());
 	}
 	
 	@Transactional(readOnly = true)
@@ -102,7 +106,8 @@ public class MovieService {
 	
 	@Transactional(readOnly = true)
 	public MovieResponse getMovieById(Long id) {
-		Movie movie = movieRepository.findById(id)
+		// Используем оптимизированный метод с загрузкой связанных сущностей
+		Movie movie = movieRepository.findWithDetailsById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Movie", "id", id));
 		return new MovieResponse(movie);
 	}
