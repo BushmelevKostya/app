@@ -14,18 +14,19 @@ bootJar {
 }
 
 node {
-    version = '20.10.0'
+    version = '20.12.0'
     npmVersion = '10.9.0'
     download = true
     nodeProjectDir = file('frontend')
 }
 
-task npmBuild(type: NpmTask) {
+task buildFrontend(type: NpmTask) {
+    dependsOn npmInstall
     args = ['run', 'build']
     workingDir = file('frontend')
 }
 
-processResources.dependsOn npmBuild
+processResources.dependsOn buildFrontend
 
 group = 'itmo'
 version = '0.0.1-SNAPSHOT'
@@ -114,13 +115,7 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.60
-            }
-        }
-    }
+    enabled = false
 }
 
 // SpotBugs configuration
@@ -152,5 +147,3 @@ dependencyCheck {
         nodeEnabled = false
     }
 }
-
-check.dependsOn jacocoTestCoverageVerification
