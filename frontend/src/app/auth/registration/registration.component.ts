@@ -1,9 +1,10 @@
 import {Component} from '@angular/core';
 import {FormsModule, NgForm} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {NgClass, NgIf} from '@angular/common';
 import {AuthGuard} from '../../auth.guard';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-registration',
@@ -11,7 +12,6 @@ import {AuthGuard} from '../../auth.guard';
   imports: [
     FormsModule,
     RouterLink,
-    HttpClientModule,
     NgIf,
     NgClass
   ],
@@ -19,7 +19,12 @@ import {AuthGuard} from '../../auth.guard';
   styleUrl: './registration.component.css'
 })
 export class RegistrationComponent {
-  constructor(private http: HttpClient, private router: Router, private authGuard: AuthGuard) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authGuard: AuthGuard,
+    private authService: AuthService
+  ) {
   }
 
   email: string = '';
@@ -52,14 +57,28 @@ export class RegistrationComponent {
       const userData = {
         email: this.email,
         password: this.password,
+        isAdminRequest: this.isAdminRequest
       };
 
-      this.http.post(`/api/users/register?isAdminRequest=${this.isAdminRequest}`, userData)
+      this.http.post<any>(`/api/auth/register`, userData)
         .subscribe(
           (response) => {
-            alert("Registration sucessful!");
-            this.authGuard.markProgrammaticNavigation()
-            this.router.navigate(['/login']);
+            if (response?.token) {
+              // Auto-login after registration
+              this.authService.setToken(response.token);
+              sessionStorage.setItem('loggedInUser', 'true');
+              sessionStorage.setItem('loggedInUserEmail', response.email || this.email);
+              sessionStorage.setItem('isAdmin', response.isAdmin ? 'true' : 'false');
+              sessionStorage.setItem('isApprovedAdmin', response.isApprovedAdmin ? 'true' : 'false');
+              
+              alert("Registration successful!");
+              this.authGuard.markProgrammaticNavigation();
+              this.router.navigate(['/home']);
+            } else {
+              alert("Registration successful! Please login.");
+              this.authGuard.markProgrammaticNavigation();
+              this.router.navigate(['/login']);
+            }
           },
           (error) => {
             const errorMessage = error.error?.message || 'Unknown error occurred';
@@ -70,7 +89,7 @@ export class RegistrationComponent {
     });
   }
   checkUniqueEmail(email: string) {
-    return this.http.get<boolean>(`http://localhost:2580/api/users/check-email?email=${email}`);
+    return this.http.get<boolean>(`/api/users/check-email?email=${email}`);
   }
 
   checkEmailRequirements(): void {

@@ -10,7 +10,7 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 	List<Notification> findByIsApprovedFalse();
 	
-	List<Notification> findByApproved(boolean approved);
+	List<Notification> findByIsApproved(boolean approved);
 	
-	List<Notification> findByUserEmailAndApproved(String userEmail, boolean approved);
+	List<Notification> findByUserEmailAndIsApproved(String userEmail, boolean approved);
 }

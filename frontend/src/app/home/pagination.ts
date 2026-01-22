@@ -7,7 +7,7 @@ export class Pagination {
     constructor(private http: HttpClient) {
     }
 
-    apiUrl = "http://localhost:2580/api/action"
+    apiUrl = "/api/movies"
     public movies = new BehaviorSubject<any[]>([]);
     public allMovies = new BehaviorSubject<any[]>([]);
     totalItemsCount: number = 0;
@@ -21,10 +21,9 @@ export class Pagination {
             this.totalPages = Math.ceil(this.totalItemsCount / this.itemsPerPage);
 
             const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-            const endIndex = Math.min(startIndex + this.itemsPerPage, this.totalItemsCount);
-            this.http.get<any[]>(`${this.apiUrl}/${startIndex}/${endIndex}`).subscribe((data: any[]) => {
-                this.movies.next(data)
-                this.allMovies.next(data);
+            this.http.get<any>(`${this.apiUrl}?start=${startIndex}&size=${this.itemsPerPage}`).subscribe((response: any) => {
+                this.movies.next(response.content || response)
+                this.allMovies.next(response.content || response);
             });
         });
     }

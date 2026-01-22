@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router'
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Location} from '@angular/common';
 import {AuthGuard} from '../auth.guard';
 import {WebSocketService} from '../services/websocket';
@@ -20,7 +20,7 @@ import {LoadingComponent} from '../loading/loading.component';
     NgForOf,
     NgIf,
     ReactiveFormsModule,
-    HttpClientModule,
+
     AsyncPipe,
     FileLoaderComponent,
     ImportHistoryComponent,
@@ -60,7 +60,7 @@ export class HomeComponent implements OnInit {
     this.filterForm.valueChanges.subscribe(() => this.filterTable());
   }
 
-  apiUrl = "http://localhost:2580/api/action"
+  apiUrl = "/api/movies"
   movieCreateForm!: FormGroup
   movieUpdateForm!: FormGroup
   filterForm!: FormGroup
@@ -306,7 +306,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadExistingCoordinates() {
-    this.http.get('/api/coordinates').subscribe(
+    this.http.get('/api/movies/coordinates').subscribe(
       (response: any) => {
         this.existingCoordinates = response;
       },
@@ -317,7 +317,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadExistingPersons() {
-    this.http.get('/api/persons').subscribe(
+    this.http.get('/api/movies/persons').subscribe(
       (response: any) => {
         this.existingDirectors = response;
         this.existingScreenwriters = response;
@@ -330,7 +330,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadExistingLocations() {
-    this.http.get('/api/locations').subscribe(
+    this.http.get('/api/movies/locations').subscribe(
       (response: any) => {
         this.existingLocations = response;
       },
@@ -466,7 +466,7 @@ export class HomeComponent implements OnInit {
 
   createMovie() {
     this.isLoading = true;
-    this.http.post(`http://localhost:2580/api/action/${sessionStorage.getItem('loggedInUserEmail')}`, this.movieCreateForm.value).subscribe(
+    this.http.post(`/api/movies`, this.movieCreateForm.value).subscribe(
       response => {
         this.changeCreateFlag()
         this.initVars()
@@ -560,13 +560,13 @@ export class HomeComponent implements OnInit {
   }
 
   isMovieCreator(movie: any): boolean {
-    return movie.creator.email === sessionStorage.getItem('loggedInUserEmail');
+    return movie.creatorEmail === sessionStorage.getItem('loggedInUserEmail');
   }
 
   findDirectorWithMinMovies() {
     this.isLoading = true;
     this.minDirectorFlag = true;
-    this.http.get<any>('/api/min-director')
+    this.http.get<any>('/api/movies/min-director')
       .subscribe((data: any) => {
         this.minDirector = data
         this.isLoading = false;
@@ -577,7 +577,7 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     this.taglineSearchFlag = true;
     if (tagline) {
-      this.http.get<any[]>('/api/tagline-greater-than', {
+      this.http.get<any[]>('/api/movies/tagline-greater-than', {
         params: {tagline}
       }).subscribe((data: any[]) => {
         this.moviesWithTagline.next(data)
@@ -590,7 +590,7 @@ export class HomeComponent implements OnInit {
   findUniqueUsaBoxOffices() {
     this.isLoading = true;
     this.uniqueUsaBoxOfficesFlag = true;
-    this.http.get<number[]>('/api/unique-usa-box-office')
+    this.http.get<number[]>('/api/movies/unique-usa-box-office')
       .subscribe((data: any[]) => {
         this.uniqueUsaBoxOffices = data
         this.isLoading = false;
@@ -603,7 +603,7 @@ export class HomeComponent implements OnInit {
   findOperatorsWithoutOscars() {
     this.isLoading = true;
     this.operatorsWithoutOscarsFlag = true;
-    this.http.get<any[]>('/api/operators-no-oscars')
+    this.http.get<any[]>('/api/movies/operators-no-oscars')
       .subscribe((data: any[]) => {
         this.operatorsWithoutOscars = data
         this.isLoading = false;
@@ -613,7 +613,7 @@ export class HomeComponent implements OnInit {
   addOscarToRratedMovies() {
     this.isLoading = true;
     this.addOscarFlag = true;
-    this.http.post(`/api/add-oscar-to-r-rated`, {})
+    this.http.post(`/api/movies/add-oscar-to-r-rated`, {})
       .subscribe(
         () => {
           this.isLoading = false;

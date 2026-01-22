@@ -72,7 +72,7 @@ export class FileLoaderComponent {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('movies', JSON.stringify(data));
-    this.http.post(`http://localhost:2580/api/uploadTransaction/${sessionStorage.getItem('loggedInUserEmail')}`, formData).subscribe({
+    this.http.post(`/api/uploadTransaction/${sessionStorage.getItem('loggedInUserEmail')}`, formData).subscribe({
       next: (response: any) => {
         this.successMessage = 'Data loaded successfully';
         this.importHistoryService.addHistoryItem(response);
@@ -81,7 +81,7 @@ export class FileLoaderComponent {
       },
       error: (error) => {
         this.errorMessage = error.error?.message;
-        this.http.get(`http://localhost:2580/api/history/create/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe({
+        this.http.get(`/api/history/create/${sessionStorage.getItem('loggedInUserEmail')}`).subscribe({
           next: (response: any) => {
             this.isLoading = false;
             this.importHistoryService.addHistoryItem(response);
