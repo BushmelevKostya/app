@@ -38,9 +38,7 @@ export class ImportHistoryComponent implements OnInit {
   }
 
   fetchImportHistory(): void {
-    const url = this.isAdmin
-      ? '/api/history/all'
-      : `/api/history/user/${sessionStorage.getItem('loggedInUserEmail')}`;
+    const url = this.isAdmin ? '/api/history/all' : '/api/history';
     this.http.get<ImportHistory[]>(url).subscribe(
       (data) => this.importHistoryService.setHistory(data),
       (error) => console.error('Error fetching import history:', error)

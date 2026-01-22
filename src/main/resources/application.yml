@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: app
+  
+  config:
+    import: optional:file:./src/main/resources/env.properties
+  
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/is}
+    username: ${DB_USER:is}
+    password: ${DB_PASSWORD:is}
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000
+      password: ${REDIS_PASSWORD:}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: ${SERVER_PORT:2580}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+
+# CORS Configuration
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+# MinIO Configuration
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
+  access:
+    key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret:
+    key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket:
+    name: ${MINIO_BUCKET_NAME:mybucket}
+
+# Logging
+logging:
+  level:
+    itmo.app: DEBUG
+    org.springframework.security: DEBUG

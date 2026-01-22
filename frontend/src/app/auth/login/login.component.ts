@@ -1,20 +1,26 @@
 import { Component } from '@angular/core';
 import {FormsModule, NgForm} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import CryptoJS from 'crypto-js';
 import {NgIf} from '@angular/common';
 import {AuthGuard} from '../../auth.guard';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink, HttpClientModule, NgIf],
+  imports: [FormsModule, RouterLink, NgIf],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  constructor(private http: HttpClient, private router: Router, private authGuard: AuthGuard) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authGuard: AuthGuard,
+    private authService: AuthService
+  ) {}
 
   email: string = '';
   password: string = '';
@@ -36,21 +42,24 @@ export class LoginComponent {
       email: this.email,
       password: this.password,
     };
-    this.http.post<any>(`/api/users/login/${this.isAdminLogin}`, loginData, { observe: 'response' })
+    this.http.post<any>(`/api/auth/login?isAdminLogin=${this.isAdminLogin}`, loginData, { observe: 'response' })
       .subscribe(
         (response: any) => {
-          if (response.status === 200) {
-            if (this.isAdminLogin && response.body?.message === "The administrator has successfully logged in") {
-              sessionStorage.setItem('isAdmin', 'true');
-            }
+          if (response.status === 200 && response.body?.token) {
+            // Save JWT token
+            this.authService.setToken(response.body.token);
+            
+            // Save user info
             sessionStorage.setItem('loggedInUser', 'true');
-            sessionStorage.setItem('loggedInUserEmail', this.email);
+            sessionStorage.setItem('loggedInUserEmail', response.body.email || this.email);
+            sessionStorage.setItem('isAdmin', response.body.isAdmin ? 'true' : 'false');
+            sessionStorage.setItem('isApprovedAdmin', response.body.isApprovedAdmin ? 'true' : 'false');
 
-            alert(response.body?.message || "Login successful");
+            alert("Login successful");
             this.authGuard.markProgrammaticNavigation();
             this.router.navigate(['/home']);
           } else {
-            alert(response.body?.message);
+            alert(response.body?.message || 'Login failed');
           }
         },
         (error) => {

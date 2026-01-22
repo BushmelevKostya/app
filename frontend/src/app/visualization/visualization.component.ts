@@ -1,7 +1,7 @@
 import {Component, OnInit, ElementRef, ViewChild} from '@angular/core';
 import {WebSocketService} from '../services/websocket';
 import {BehaviorSubject} from 'rxjs';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {AuthGuard} from '../auth.guard';
 import {Router} from '@angular/router';
 import {NgForOf, NgIf} from '@angular/common';
@@ -12,7 +12,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   templateUrl: './visualization.component.html',
   standalone: true,
   styleUrls: ['./visualization.component.css'],
-  imports: [HttpClientModule, NgForOf, NgIf, ReactiveFormsModule]
+  imports: [NgForOf, NgIf, ReactiveFormsModule]
 })
 export class VisualizationComponent implements OnInit {
   @ViewChild('canvas', {static: true}) canvas!: ElementRef<HTMLCanvasElement>;
@@ -40,7 +40,7 @@ export class VisualizationComponent implements OnInit {
   selectedMovieId: number | null = null;
   updateFlag = 0
   movieUpdateForm!: FormGroup
-  apiUrl = "http://localhost:2580/api/action";
+  apiUrl = "/api/movies";
 
   ngOnInit(): void {
     this.ctx = this.canvas.nativeElement.getContext('2d');
@@ -174,7 +174,7 @@ export class VisualizationComponent implements OnInit {
   }
 
   loadExistingCoordinates() {
-    this.http.get('/api/coordinates').subscribe(
+    this.http.get('/api/movies/coordinates').subscribe(
       (response: any) => {
         this.existingCoordinates = response;
       },
@@ -185,7 +185,7 @@ export class VisualizationComponent implements OnInit {
   }
 
   loadExistingPersons() {
-    this.http.get('/api/persons').subscribe(
+    this.http.get('/api/movies/persons').subscribe(
       (response: any) => {
         this.existingDirectors = response;
         this.existingScreenwriters = response;
@@ -198,7 +198,7 @@ export class VisualizationComponent implements OnInit {
   }
 
   loadExistingLocations() {
-    this.http.get('/api/locations').subscribe(
+    this.http.get('/api/movies/locations').subscribe(
       (response: any) => {
         this.existingLocations = response;
       },
