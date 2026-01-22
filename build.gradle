@@ -16,10 +16,16 @@ bootJar {
 node {
     version = '20.10.0'
     npmVersion = '10.9.0'
-    download = false
+    download = true
+}
+
+task npmInstall(type: NpmTask) {
+    args = ['install']
+    workingDir = file('frontend')
 }
 
 task npmBuild(type: NpmTask) {
+    dependsOn npmInstall
     def distDir = file('frontend/dist')
     inputs.dir('frontend/src')
     inputs.file('frontend/angular.json')
@@ -30,7 +36,7 @@ task npmBuild(type: NpmTask) {
     args = ['run', 'build']
     workingDir = file('frontend')
 
-     onlyIf { !distDir.exists() }
+    onlyIf { !distDir.exists() }
 }
 
 processResources.dependsOn npmBuild
