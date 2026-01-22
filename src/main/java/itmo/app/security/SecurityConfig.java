@@ -64,6 +64,14 @@ public class SecurityConfig {
 						.requestMatchers("/api/users/check-email").permitAll()
 						.requestMatchers("/ws/**").permitAll()
 						.requestMatchers("/socket").permitAll()
+						// Swagger UI и OpenAPI документация
+						.requestMatchers("/swagger-ui/**").permitAll()
+						.requestMatchers("/swagger-ui.html").permitAll()
+						.requestMatchers("/v3/api-docs/**").permitAll()
+						.requestMatchers("/swagger-resources/**").permitAll()
+						.requestMatchers("/webjars/**").permitAll()
+						// Actuator endpoints
+						.requestMatchers("/actuator/**").permitAll()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.anyRequest().authenticated()
 				)
