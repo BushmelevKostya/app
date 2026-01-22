@@ -262,7 +262,7 @@ public class MovieService {
 	
 	private void handleExistingEntities(Movie movie) {
 		// Handle coordinates
-		if (movie.getCoordinates() != null && movie.getCoordinates().getId() != 0) {
+		if (movie.getCoordinates() != null && movie.getCoordinates().getId() != null && movie.getCoordinates().getId() != 0) {
 			Optional<Coordinates> existingCoordinates = coordinatesRepository.findById(movie.getCoordinates().getId());
 			existingCoordinates.ifPresent(movie::setCoordinates);
 		}
@@ -279,7 +279,7 @@ public class MovieService {
 	}
 	
 	private void handleExistingPerson(Person person) {
-		if (person != null && person.getId() != 0) {
+		if (person != null && person.getId() != null && person.getId() != 0) {
 			Optional<Person> existingPerson = personRepository.findById(person.getId());
 			if (existingPerson.isPresent()) {
 				// Update reference but keep the person object structure
@@ -288,7 +288,7 @@ public class MovieService {
 	}
 	
 	private void handleExistingLocation(Person person) {
-		if (person != null && person.getLocation() != null && person.getLocation().getId() != 0) {
+		if (person != null && person.getLocation() != null && person.getLocation().getId() != null && person.getLocation().getId() != 0) {
 			Optional<Location> existingLocation = locationRepository.findById(person.getLocation().getId());
 			if (existingLocation.isPresent()) {
 				person.setLocation(existingLocation.get());
@@ -315,9 +315,14 @@ public class MovieService {
 	}
 	
 	private boolean checkPeoples(Movie movie) {
-		Long director = movie.getDirector().getId();
-		Long screenwriter = movie.getScreenwriter().getId();
-		Long operator = movie.getOperator().getId();
+		Long director = movie.getDirector() != null ? movie.getDirector().getId() : null;
+		Long screenwriter = movie.getScreenwriter() != null ? movie.getScreenwriter().getId() : null;
+		Long operator = movie.getOperator() != null ? movie.getOperator().getId() : null;
+		
+		// If any person is null, they can't conflict
+		if (director == null || screenwriter == null || operator == null) {
+			return true;
+		}
 		
 		return (!director.equals(screenwriter) && !director.equals(operator) && !operator.equals(screenwriter)) ||
 				(director + screenwriter == 0) ||

@@ -11,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -64,7 +68,7 @@ class MovieServiceTest {
 	@Test
 	void getMovieById_ShouldReturnMovie_WhenMovieExists() {
 		// Arrange
-		when(movieRepository.findById(1L)).thenReturn(Optional.of(testMovie));
+		when(movieRepository.findWithDetailsById(1L)).thenReturn(Optional.of(testMovie));
 		
 		// Act
 		MovieResponse response = movieService.getMovieById(1L);
@@ -72,16 +76,17 @@ class MovieServiceTest {
 		// Assert
 		assertNotNull(response);
 		assertEquals("Test Movie", response.getName());
-		verify(movieRepository, times(1)).findById(1L);
+		verify(movieRepository, times(1)).findWithDetailsById(1L);
 	}
 	
 	@Test
 	void getMovieById_ShouldThrowException_WhenMovieNotFound() {
 		// Arrange
-		when(movieRepository.findById(anyLong())).thenReturn(Optional.empty());
+		when(movieRepository.findWithDetailsById(999L)).thenReturn(Optional.empty());
 		
 		// Act & Assert
 		assertThrows(ResourceNotFoundException.class, () -> movieService.getMovieById(999L));
+		verify(movieRepository, times(1)).findWithDetailsById(999L);
 	}
 	
 	@Test
@@ -94,7 +99,10 @@ class MovieServiceTest {
 		movie2.setCreationDate(LocalDateTime.now());
 		
 		List<Movie> allMovies = Arrays.asList(testMovie, movie2);
-		when(movieRepository.findAll()).thenReturn(allMovies);
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Movie> moviePage = new PageImpl<>(allMovies, pageable, allMovies.size());
+		
+		when(movieRepository.findAllWithDetails(any(Pageable.class))).thenReturn(moviePage);
 		
 		// Act
 		PageResponse<MovieResponse> response = movieService.getMovies(0, 10);
@@ -103,6 +111,6 @@ class MovieServiceTest {
 		assertNotNull(response);
 		assertEquals(2, response.getContent().size());
 		assertEquals(2, response.getTotalElements());
-		verify(movieRepository, times(1)).findAll();
+		verify(movieRepository, times(1)).findAllWithDetails(any(Pageable.class));
 	}
 }

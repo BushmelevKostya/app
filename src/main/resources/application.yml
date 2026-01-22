@@ -2,39 +2,43 @@ spring:
   application:
     name: app
   
-  config:
-    import: optional:file:./src/main/resources/env.properties
-  
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5434/is}
-    username: ${DB_USER:is}
-    password: ${DB_PASSWORD:is}
+    url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://localhost:5434/is}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:is}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:is}}
   
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: ${HIBERNATE_SHOW_SQL:true}
+  
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: false
   
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      timeout: 2000
+      host: ${SPRING_DATA_REDIS_HOST:${REDIS_HOST:localhost}}
+      port: ${SPRING_DATA_REDIS_PORT:${REDIS_PORT:6379}}
+      timeout: ${REDIS_TIMEOUT:2000}
       password: ${REDIS_PASSWORD:}
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
+          max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+          max-idle: ${REDIS_POOL_MAX_IDLE:8}
+          min-idle: ${REDIS_POOL_MIN_IDLE:0}
   
   servlet:
     multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+      enabled: ${MULTIPART_ENABLED:true}
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:10MB}
 
 server:
   port: ${SERVER_PORT:2580}
@@ -56,10 +60,21 @@ minio:
   secret:
     key: ${MINIO_SECRET_KEY:minioadmin}
   bucket:
-    name: ${MINIO_BUCKET_NAME:mybucket}
+    name: ${MINIO_BUCKET_NAME:movies}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics}
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:always}
 
 # Logging
 logging:
   level:
-    itmo.app: DEBUG
-    org.springframework.security: DEBUG
+    itmo.app: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:DEBUG}
+    org.hibernate: ${LOG_LEVEL_HIBERNATE:INFO}

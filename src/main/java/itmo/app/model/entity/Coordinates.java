@@ -1,5 +1,6 @@
 package itmo.app.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "coordinates", indexes = {
 	@Index(name = "idx_coordinates_xy", columnList = "x, y")
 })
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Coordinates {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,13 @@
 package itmo.app.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import itmo.app.controller.services.MovieWebSocketHandler;
 import itmo.app.dto.request.MovieCreateRequest;
 import itmo.app.dto.request.MovieUpdateRequest;
@@ -21,6 +29,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/movies")
+@Tag(name = "Movies", description = "API для управления фильмами")
+@SecurityRequirement(name = "bearerAuth")
 public class MovieController {
 	
 	@Autowired
@@ -38,6 +48,27 @@ public class MovieController {
 	}
 	
 	@PostMapping
+	@Operation(
+			summary = "Создать новый фильм",
+			description = "Создает новый фильм с заданными параметрами и отправляет уведомление всем подключенным клиентам через WebSocket"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "201",
+					description = "Фильм успешно создан",
+					content = @Content(schema = @Schema(implementation = MovieResponse.class))
+			),
+			@ApiResponse(
+					responseCode = "400",
+					description = "Невалидные данные фильма",
+					content = @Content
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
 	public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody MovieCreateRequest request) {
 		MovieResponse response = movieService.createMovie(request);
 		notifyClients();
@@ -45,26 +76,109 @@ public class MovieController {
 	}
 	
 	@GetMapping
+	@Operation(
+			summary = "Получить список фильмов с пагинацией",
+			description = "Возвращает страницу фильмов с указанным смещением и размером"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "200",
+					description = "Список фильмов успешно получен",
+					content = @Content(schema = @Schema(implementation = PageResponse.class))
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
 	public ResponseEntity<PageResponse<MovieResponse>> getMovies(
+			@Parameter(description = "Начальная позиция (смещение)", example = "0")
 			@RequestParam(defaultValue = "0") int start,
+			@Parameter(description = "Количество элементов на странице", example = "10")
 			@RequestParam(defaultValue = "10") int size) {
 		PageResponse<MovieResponse> response = movieService.getMovies(start, size);
 		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("/count")
+	@Operation(
+			summary = "Получить общее количество фильмов",
+			description = "Возвращает общее количество фильмов в базе данных"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "200",
+					description = "Количество фильмов получено"
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
 	public ResponseEntity<Long> getMoviesCount() {
 		return ResponseEntity.ok(movieService.getMoviesCount());
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<MovieResponse> getMovieById(@PathVariable Long id) {
+	@Operation(
+			summary = "Получить фильм по ID",
+			description = "Возвращает детальную информацию о фильме по его уникальному идентификатору"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "200",
+					description = "Фильм найден",
+					content = @Content(schema = @Schema(implementation = MovieResponse.class))
+			),
+			@ApiResponse(
+					responseCode = "404",
+					description = "Фильм не найден",
+					content = @Content
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
+	public ResponseEntity<MovieResponse> getMovieById(
+			@Parameter(description = "ID фильма", example = "1")
+			@PathVariable Long id) {
 		MovieResponse response = movieService.getMovieById(id);
 		return ResponseEntity.ok(response);
 	}
 	
 	@PutMapping("/{id}")
+	@Operation(
+			summary = "Обновить фильм",
+			description = "Обновляет информацию о существующем фильме и отправляет уведомление всем клиентам"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "200",
+					description = "Фильм успешно обновлен",
+					content = @Content(schema = @Schema(implementation = MovieResponse.class))
+			),
+			@ApiResponse(
+					responseCode = "404",
+					description = "Фильм не найден",
+					content = @Content
+			),
+			@ApiResponse(
+					responseCode = "400",
+					description = "Невалидные данные",
+					content = @Content
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
 	public ResponseEntity<MovieResponse> updateMovie(
+			@Parameter(description = "ID фильма для обновления", example = "1")
 			@PathVariable Long id,
 			@Valid @RequestBody MovieUpdateRequest request) {
 		MovieResponse response = movieService.updateMovie(id, request);
@@ -73,7 +187,29 @@ public class MovieController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+	@Operation(
+			summary = "Удалить фильм",
+			description = "Удаляет фильм из базы данных и отправляет уведомление всем клиентам"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(
+					responseCode = "200",
+					description = "Фильм успешно удален"
+			),
+			@ApiResponse(
+					responseCode = "404",
+					description = "Фильм не найден",
+					content = @Content
+			),
+			@ApiResponse(
+					responseCode = "401",
+					description = "Требуется аутентификация",
+					content = @Content
+			)
+	})
+	public ResponseEntity<Void> deleteMovie(
+			@Parameter(description = "ID фильма для удаления", example = "1")
+			@PathVariable Long id) {
 		movieService.deleteMovie(id);
 		notifyClients();
 		return ResponseEntity.ok().build();

@@ -1,10 +1,12 @@
 package itmo.app.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "locations")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Location {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
